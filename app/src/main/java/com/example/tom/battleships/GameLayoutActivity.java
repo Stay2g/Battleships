@@ -1,8 +1,8 @@
 package com.example.tom.battleships;
 
+import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -19,7 +19,7 @@ import android.widget.Toast;
 import java.util.Locale;
 
 
-public class GameLayoutActivity extends AppCompatActivity implements View.OnClickListener {
+public class GameLayoutActivity extends Activity implements View.OnClickListener {
 
     TextView arrTextViews[] = new TextView[100];
     TextView arrShipCounters[] = new TextView[4];
@@ -67,7 +67,7 @@ public class GameLayoutActivity extends AppCompatActivity implements View.OnClic
 
     }
 
-    private void createViews() {
+    public void createViews() {
         GridLayout gl = (GridLayout) findViewById(R.id.gridLayoutPlayer);
         gl.setColumnCount(10);
         gl.setRowCount(10);
@@ -424,6 +424,10 @@ public class GameLayoutActivity extends AppCompatActivity implements View.OnClic
                 for (int i = 0; i < arrShipCurrent[1]; i++) {
                     arrTextViews[arrShipCurrent[0] + i].setBackgroundColor(Color.RED);
                 }
+            }
+        } else {
+            for(int j = 0; j < 100; j++) {
+                arrTextViews[j].setBackgroundColor(Color.GRAY);
             }
         }
     }
