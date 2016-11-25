@@ -8,25 +8,22 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.graphics.Matrix;
 import java.util.Locale;
 
 
-public class MainGameLayoutActivity extends AppCompatActivity implements View.OnClickListener {
+public class GameLayoutActivity extends AppCompatActivity implements View.OnClickListener {
 
     TextView arrTextViews[] = new TextView[100];
     TextView arrShipCounters[] = new TextView[4];
     ImageView arrShips[] = new ImageView[10];
-
-    int asdf;
 
     int textViewSize, marginShips;
     int lastShipTouched;
@@ -38,6 +35,9 @@ public class MainGameLayoutActivity extends AppCompatActivity implements View.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game_layout);
 
         textViewSize = (int)dpToPx(30);
@@ -60,10 +60,6 @@ public class MainGameLayoutActivity extends AppCompatActivity implements View.On
                 break;
             }
         }
-    }
-
-    private void setShipHighlight() {
-        arrShips[lastShipTouched].setAlpha(0.1f);
     }
 
     private void btnRotate(int shipId) {
@@ -143,9 +139,9 @@ public class MainGameLayoutActivity extends AppCompatActivity implements View.On
                         case MotionEvent.ACTION_UP:
                             moving = false;
                             setShipTransparency(false, shipId);
-                            Log.d("shipCheckArea", Boolean.toString(shipCheckArea(shipId)));
                             setShipLocation(shipId);
                             setShipCounter(v.getId());
+                            lastShipTouched = shipId;
                             break;
                         case MotionEvent.ACTION_MOVE:
                             if (moving) {
@@ -153,6 +149,7 @@ public class MainGameLayoutActivity extends AppCompatActivity implements View.On
                                 float y = mv.getRawY() - v.getHeight();
                                 v.setX(x);
                                 v.setY(y);
+                                setTextViewColorMove(shipId);
                             }
                             break;
                     }
@@ -361,6 +358,7 @@ public class MainGameLayoutActivity extends AppCompatActivity implements View.On
     private boolean shipCheckArea(int shipId) {
         int startX, startY, endX, endY, placedStartY = 0, placedEndX = 0, placedStartX = 0, placedEndY = 0;
         boolean ok = false;
+        boolean okX, okY;
         int placedShip[] = getShipLocation(shipId);
 
         switch(placedShip[2]) {
@@ -382,14 +380,14 @@ public class MainGameLayoutActivity extends AppCompatActivity implements View.On
             if (i != shipId & iShip[0] > -1) {
                 switch (iShip[2]) {
                     case 1:
-                        startX = (int) arrShips[i].getX() - textViewSize;
-                        endX = (int) arrShips[i].getX() + (iShip[1] + 1) * textViewSize;
-                        startY = (int) arrShips[i].getY() - textViewSize;
-                        endY = (int) arrShips[i].getY() + textViewSize;
-                        ok = ((placedStartX > startX & placedStartX < endX |
-                                placedEndX > startX & placedEndX < endX) ^
-                                (placedStartY > startY & placedStartY < endY |
-                                placedEndY > startY & placedEndY < endY));
+                        startX = (int) arrShips[i].getX() - textViewSize -5;
+                        endX = (int) arrShips[i].getX() + (iShip[1] + 1) * textViewSize -5;
+                        startY = (int) arrShips[i].getY() - textViewSize -5;
+                        endY = (int) arrShips[i].getY() + textViewSize -5;
+
+                        okX = (placedStartX > startX & placedStartX < endX | placedEndX > startX & placedEndX < endX);
+                        okY = (placedStartY > startY & placedStartY < endY | placedEndY > startY & placedEndY < endY);
+                        ok = !(okX & okY);                                                          //NAND
                         break;
                     case 2:
                         startX = (int) arrShips[i].getX() - textViewSize;
@@ -397,19 +395,37 @@ public class MainGameLayoutActivity extends AppCompatActivity implements View.On
                         startY = (int) arrShips[i].getY() - textViewSize;
                         endY = (int) arrShips[i].getY() + (iShip[1] + 1) * textViewSize;
 
-                        ok = !((placedStartX > startX & placedStartX < endX |
-                                placedEndX > startX & placedEndX < endX) ^
-                                (placedStartY > startY & placedStartY < endY |
-                                placedEndY > startY & placedEndY < endY));
+                        okX = (placedStartX > startX & placedStartX < endX | placedEndX > startX & placedEndX < endX);
+                        okY = (placedStartY > startY & placedStartY < endY | placedEndY > startY & placedEndY < endY);
+                        ok = !(okX & okY);
                         break;
                 }
-
-                } else {
+            } else {
                 ok = true;
             }
-            if (!ok) {return ok;}
+            if (!ok) {return false;}
         }
-        return ok;
+        return true;
+    }                                                 //true = alles ok; false = kann nicht gesetzt werden
+
+    private void setTextViewColorMove(int shipId) {
+        if (!shipOutsideLayout(shipId)) {
+            int arrShipCurrent[] = getShipLocation(shipId);
+
+            for(int j = 0; j < 100; j++) {
+                arrTextViews[j].setBackgroundColor(Color.GRAY);
+            }
+
+            if (shipCheckArea(shipId)) {
+                for (int i = 0; i < arrShipCurrent[1]; i++) {
+                    arrTextViews[arrShipCurrent[0] + i].setBackgroundColor(Color.GREEN);
+                }
+            } else {
+                for (int i = 0; i < arrShipCurrent[1]; i++) {
+                    arrTextViews[arrShipCurrent[0] + i].setBackgroundColor(Color.RED);
+                }
+            }
+        }
     }
 }
 
