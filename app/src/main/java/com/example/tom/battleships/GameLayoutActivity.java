@@ -2,14 +2,22 @@ package com.example.tom.battleships;
 
 import android.app.Activity;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -23,10 +31,13 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
 
     TextView arrTextViews[] = new TextView[100];
     TextView arrShipCounters[] = new TextView[4];
+    TextView arrPlaceholder[] = new TextView[4];
     ImageView arrShips[] = new ImageView[10];
 
+    Button btnStart;
+
     int textViewSize, marginShips;
-    int lastShipTouched;
+    int lastShipTouched[] = new int[3];                                                             //Schiff-ID, Bild-ID, Länge
 
     int arrShipPlaced[]= {1, 2, 3, 4};                                                              //4 Shiffstypen: Wert in Array = Schiffe noch gesetzt
     int arrShipOrigins[][] = new int[10][3];                                                        //10 Schiffe; X, Y, bewegt?
@@ -44,14 +55,22 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         marginShips = (int)dpToPx(30);
         createViews();
         createShips();
-
+        findViewById(R.id.buttonStart).setOnClickListener(this);
         findViewById(R.id.buttonTest).setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         if(v.getId()==findViewById(R.id.buttonTest).getId()) {
-            btnRotate(1);
+            btnRotate();
+            if(!shipCheckArea(lastShipTouched[0]) | shipOutsideLayout(lastShipTouched[0])) {
+                arrShips[lastShipTouched[0]].setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+            } else {
+                arrShips[lastShipTouched[0]].clearColorFilter();
+            }
+        }
+        if(v.getId()==findViewById(R.id.buttonStart).getId()) {
+            Toast.makeText(this, "Start!", Toast.LENGTH_SHORT).show();
         }
         for(int i = 0; i < 100; i++) {
             if (arrTextViews[i].getId() == v.getId()) {
@@ -62,9 +81,31 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         }
     }
 
-    private void btnRotate(int shipId) {
+    private void initPlaceholder() {
+        arrPlaceholder[0] = (TextView) findViewById(R.id.textViewPlaceholder0);
+        arrPlaceholder[1] = (TextView) findViewById(R.id.textViewPlaceholder1);
+        arrPlaceholder[2] = (TextView) findViewById(R.id.textViewPlaceholder2);
+        arrPlaceholder[3] = (TextView) findViewById(R.id.textViewPlaceholder3);
+    }
 
+    private void btnRotate() {
+        if(lastShipTouched[1] != 0) {
+            Bitmap myImg = scaleShipImage(lastShipTouched[2], lastShipTouched[1]);
 
+            Matrix matrix = new Matrix();
+            if (arrShips[lastShipTouched[0]].getWidth() > arrShips[lastShipTouched[0]].getHeight()) {
+                matrix.postRotate(90f);
+            } else {
+                matrix.postRotate(180f);
+            }
+            Bitmap rotated = Bitmap.createBitmap(myImg, 0, 0, myImg.getWidth(), myImg.getHeight(), matrix, false);
+            arrShips[lastShipTouched[0]].setImageBitmap(rotated);
+        }
+    }
+
+    private Bitmap scaleShipImage(int size, int shipImage) {
+        Bitmap ship = BitmapFactory.decodeResource(getResources(), shipImage);
+        return Bitmap.createScaledBitmap(ship, textViewSize*size, textViewSize, false);
     }
 
     public void createViews() {
@@ -87,6 +128,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     }
 
     private void createShips() {
+        initPlaceholder();
         RelativeLayout rl = (RelativeLayout) findViewById(R.id.activity_main);
 
         for (int i = 0; i < 10; i++) {
@@ -95,14 +137,14 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
             switch (i) {
                 case 0:
                     setShipParams(5, i, rl);
-                    createShipCounter(0, i, rl);
+                    createShipCounter(0, rl);
                     break;
                 case 1:
                     setShipParams(4, i, rl);
                     break;
                 case 2:
                     setShipParams(4, i, rl);
-                    createShipCounter(1, i, rl);
+                    createShipCounter(1, rl);
                     break;
                 case 3:
                     setShipParams(3, i, rl);
@@ -112,7 +154,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                     break;
                 case 5:
                     setShipParams(3, i, rl);
-                    createShipCounter(2, i, rl);
+                    createShipCounter(2, rl);
                     break;
                 case 6:
                 case 7:
@@ -121,7 +163,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                     break;
                 case 9:
                     setShipParams(2, i, rl);
-                    createShipCounter(3, i, rl);
+                    createShipCounter(3, rl);
                     break;
             }
             arrShips[i].setOnTouchListener(new View.OnTouchListener() {
@@ -133,15 +175,14 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                         case MotionEvent.ACTION_DOWN:
                             moving = true;
                             setShipTransparency(true, shipId);
-                            Log.d("X", Float.toString(arrShips[1].getWidth()));
-                            Log.d("Y", Float.toString(arrShips[1].getHeight()));
                             break;
                         case MotionEvent.ACTION_UP:
                             moving = false;
                             setShipTransparency(false, shipId);
                             setShipLocation(shipId);
                             setShipCounter(v.getId());
-                            lastShipTouched = shipId;
+                            getShipLastTouched(shipId);
+                            setTextViewColorMove(shipId, true);
                             break;
                         case MotionEvent.ACTION_MOVE:
                             if (moving) {
@@ -149,7 +190,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                                 float y = mv.getRawY() - v.getHeight();
                                 v.setX(x);
                                 v.setY(y);
-                                setTextViewColorMove(shipId);
+                                setTextViewColorMove(shipId, false);
                             }
                             break;
                     }
@@ -159,7 +200,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         }
     }
 
-    private void createShipCounter( int id, int ship,  RelativeLayout rl) {                          //setMargins: http://stackoverflow.com/questions/4472429/change-the-right-margin-of-a-view-programmatically
+    private void createShipCounter( int id,  RelativeLayout rl) {                                   //setMargins: http://stackoverflow.com/questions/4472429/change-the-right-margin-of-a-view-programmatically
         LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
 
         arrShipCounters[id] = new TextView(this);
@@ -167,36 +208,34 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         arrShipCounters[id].setText(String.format(Locale.getDefault(),"%1$d×",id+1));
         arrShipCounters[id].setTextSize(41);
 
-        lp.addRule(RelativeLayout.LEFT_OF, arrShips[ship].getId());
-        lp.setMargins(0,marginShips + (marginShips*2*id),marginShips,0);
+        lp.addRule(RelativeLayout.LEFT_OF, arrPlaceholder[id].getId());
+        //lp.setMargins(0,marginShips + (marginShips*2*id),marginShips,0);
+        lp.setMargins(0,(int)(marginShips*0.5) +(marginShips*2*id),marginShips,0);
         rl.addView(arrShipCounters[id],lp);
     }
 
     private void setShipParams(int size, int ship, RelativeLayout rl) {                              //GridLayout http://stackoverflow.com/questions/25395773/gridlayout-align-children-within-column
-        LayoutParams lp = new LayoutParams(textViewSize*size,textViewSize);
+        LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
         switch (size) {
             case 5: //1x
-                lp.addRule(RelativeLayout.ALIGN_PARENT_END);
-                lp.setMargins(0,(int)(marginShips*1.5f),0,0);
-                arrShips[ship].setImageDrawable(getResources().getDrawable(R.drawable.giantship, null));
+                lp.addRule(RelativeLayout.ALIGN_START,arrPlaceholder[0].getId());
+                lp.addRule(RelativeLayout.BELOW,arrPlaceholder[0].getId());
+                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.giantship)));
                 break;
             case 4: //2x
-                lp.addRule(RelativeLayout.ALIGN_START,arrShips[0].getId());
-                lp.addRule(RelativeLayout.BELOW,arrShips[0].getId());
-                lp.setMargins(0,marginShips,0,0);
-                arrShips[ship].setImageDrawable(getResources().getDrawable(R.drawable.bigship, null));
+                lp.addRule(RelativeLayout.ALIGN_START,arrPlaceholder[1].getId());
+                lp.addRule(RelativeLayout.BELOW,arrPlaceholder[1].getId());
+                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.bigship)));
                 break;
             case 3: //3x
-                lp.addRule(RelativeLayout.BELOW,arrShips[2].getId());
-                lp.addRule(RelativeLayout.ALIGN_START,arrShips[2].getId());
-                lp.setMargins(0,marginShips,0,0);
-                arrShips[ship].setImageDrawable(getResources().getDrawable(R.drawable.mediumship, null));
+                lp.addRule(RelativeLayout.BELOW,arrPlaceholder[2].getId());
+                lp.addRule(RelativeLayout.ALIGN_START,arrPlaceholder[2].getId());
+                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.mediumship)));
                 break;
             case 2: //4x
-                lp.addRule(RelativeLayout.BELOW, arrShips[5].getId());
-                lp.addRule(RelativeLayout.ALIGN_START,arrShips[5].getId());
-                lp.setMargins(0,marginShips,0,0);
-                arrShips[ship].setImageDrawable(getResources().getDrawable(R.drawable.smallship, null));
+                lp.addRule(RelativeLayout.BELOW, arrPlaceholder[3].getId());
+                lp.addRule(RelativeLayout.ALIGN_START,arrPlaceholder[3].getId());
+                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.smallship)));
                 break;
         }
         rl.addView(arrShips[ship],lp);
@@ -311,6 +350,34 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         return arrLocation;
     }
 
+    private void getShipLastTouched(int shipId) {                                                   //Schiff-ID, Bild-ID, Länge
+        int width = arrShips[shipId].getWidth()/textViewSize;
+        int height = arrShips[shipId].getHeight()/textViewSize;
+
+        if (width > height) {lastShipTouched[2] = width;} else {lastShipTouched[2] = height;}
+        lastShipTouched[0] = shipId;
+        switch(shipId) {
+            case 0:
+                lastShipTouched[1] = R.drawable.giantship;
+                break;
+            case 1:
+            case 2:
+                lastShipTouched[1] = R.drawable.bigship;
+                break;
+            case 3:
+            case 4:
+            case 5:
+                lastShipTouched[1] = R.drawable.mediumship;
+                break;
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+                lastShipTouched[1] = R.drawable.smallship;
+                break;
+        }
+    }
+
     private void setShipLocation(int ship) {
         int matchingTextViews[] =  getShipLocation(ship);
 
@@ -380,9 +447,9 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
             if (i != shipId & iShip[0] > -1) {
                 switch (iShip[2]) {
                     case 1:
-                        startX = (int) arrShips[i].getX() - textViewSize -5;
-                        endX = (int) arrShips[i].getX() + (iShip[1] + 1) * textViewSize -5;
-                        startY = (int) arrShips[i].getY() - textViewSize -5;
+                        startX = (int) arrShips[i].getX() - textViewSize +5;
+                        endX = (int) arrShips[i].getX() + iShip[1] * textViewSize -5;
+                        startY = (int) arrShips[i].getY() - textViewSize +5;
                         endY = (int) arrShips[i].getY() + textViewSize -5;
 
                         okX = (placedStartX > startX & placedStartX < endX | placedEndX > startX & placedEndX < endX);
@@ -393,7 +460,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                         startX = (int) arrShips[i].getX() - textViewSize;
                         endX = (int) arrShips[i].getX() + textViewSize;
                         startY = (int) arrShips[i].getY() - textViewSize;
-                        endY = (int) arrShips[i].getY() + (iShip[1] + 1) * textViewSize;
+                        endY = (int) arrShips[i].getY() + iShip[1] * textViewSize;
 
                         okX = (placedStartX > startX & placedStartX < endX | placedEndX > startX & placedEndX < endX);
                         okY = (placedStartY > startY & placedStartY < endY | placedEndY > startY & placedEndY < endY);
@@ -403,30 +470,37 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
             } else {
                 ok = true;
             }
-            if (!ok) {return false;}
+            if (!ok) {
+                return false;
+            }
         }
         return true;
     }                                                 //true = alles ok; false = kann nicht gesetzt werden
 
-    private void setTextViewColorMove(int shipId) {
-        if (!shipOutsideLayout(shipId)) {
-            int arrShipCurrent[] = getShipLocation(shipId);
+    private void setTextViewColorMove(int shipId, boolean reset) {
+        if (!reset) {
+            int ext = 1;
+            if (!shipOutsideLayout(shipId)) {
+                int arrShipCurrent[] = getShipLocation(shipId);
 
-            for(int j = 0; j < 100; j++) {
-                arrTextViews[j].setBackgroundColor(Color.GRAY);
-            }
-
-            if (shipCheckArea(shipId)) {
-                for (int i = 0; i < arrShipCurrent[1]; i++) {
-                    arrTextViews[arrShipCurrent[0] + i].setBackgroundColor(Color.GREEN);
+                for (int j = 0; j < 100; j++) {
+                    arrTextViews[j].setBackgroundColor(Color.GRAY);
                 }
-            } else {
-                for (int i = 0; i < arrShipCurrent[1]; i++) {
-                    arrTextViews[arrShipCurrent[0] + i].setBackgroundColor(Color.RED);
+                if (arrShips[shipId].getWidth() < arrShips[shipId].getHeight()) {
+                    ext = 10;
+                }
+                if (shipCheckArea(shipId)) {
+                    for (int i = 0; i < arrShipCurrent[1]; i++) {
+                        arrTextViews[arrShipCurrent[0] + i * ext].setBackgroundColor(Color.GREEN);
+                    }
+                } else {
+                    for (int i = 0; i < arrShipCurrent[1]; i++) {
+                        arrTextViews[arrShipCurrent[0] + i * ext].setBackgroundColor(Color.RED);
+                    }
                 }
             }
         } else {
-            for(int j = 0; j < 100; j++) {
+            for (int j = 0; j < 100; j++) {
                 arrTextViews[j].setBackgroundColor(Color.GRAY);
             }
         }
