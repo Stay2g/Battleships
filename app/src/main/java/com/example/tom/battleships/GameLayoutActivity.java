@@ -63,11 +63,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     public void onClick(View v) {
         if(v.getId()==findViewById(R.id.buttonTest).getId()) {
             btnRotate();
-            if(!shipCheckArea(lastShipTouched[0]) | shipOutsideLayout(lastShipTouched[0])) {
-                arrShips[lastShipTouched[0]].setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
-            } else {
-                arrShips[lastShipTouched[0]].clearColorFilter();
-            }
+            //dev();
         }
         if(v.getId()==findViewById(R.id.buttonStart).getId()) {
             Toast.makeText(this, "Start!", Toast.LENGTH_SHORT).show();
@@ -81,32 +77,10 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         }
     }
 
-    private void initPlaceholder() {
-        arrPlaceholder[0] = (TextView) findViewById(R.id.textViewPlaceholder0);
-        arrPlaceholder[1] = (TextView) findViewById(R.id.textViewPlaceholder1);
-        arrPlaceholder[2] = (TextView) findViewById(R.id.textViewPlaceholder2);
-        arrPlaceholder[3] = (TextView) findViewById(R.id.textViewPlaceholder3);
-    }
 
-    private void btnRotate() {
-        if(lastShipTouched[1] != 0) {
-            Bitmap myImg = scaleShipImage(lastShipTouched[2], lastShipTouched[1]);
-
-            Matrix matrix = new Matrix();
-            if (arrShips[lastShipTouched[0]].getWidth() > arrShips[lastShipTouched[0]].getHeight()) {
-                matrix.postRotate(90f);
-            } else {
-                matrix.postRotate(180f);
-            }
-            Bitmap rotated = Bitmap.createBitmap(myImg, 0, 0, myImg.getWidth(), myImg.getHeight(), matrix, false);
-            arrShips[lastShipTouched[0]].setImageBitmap(rotated);
-        }
-    }
-
-    private Bitmap scaleShipImage(int size, int shipImage) {
-        Bitmap ship = BitmapFactory.decodeResource(getResources(), shipImage);
-        return Bitmap.createScaledBitmap(ship, textViewSize*size, textViewSize, false);
-    }
+    //------------------------------------------------------------------------------//
+    //----------------------------------- Creater ----------------------------------//
+    //------------------------------------------------------------------------------//
 
     public void createViews() {
         GridLayout gl = (GridLayout) findViewById(R.id.gridLayoutPlayer);
@@ -214,106 +188,15 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         rl.addView(arrShipCounters[id],lp);
     }
 
-    private void setShipParams(int size, int ship, RelativeLayout rl) {                              //GridLayout http://stackoverflow.com/questions/25395773/gridlayout-align-children-within-column
-        LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
-        switch (size) {
-            case 5: //1x
-                lp.addRule(RelativeLayout.ALIGN_START,arrPlaceholder[0].getId());
-                lp.addRule(RelativeLayout.BELOW,arrPlaceholder[0].getId());
-                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.giantship)));
-                break;
-            case 4: //2x
-                lp.addRule(RelativeLayout.ALIGN_START,arrPlaceholder[1].getId());
-                lp.addRule(RelativeLayout.BELOW,arrPlaceholder[1].getId());
-                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.bigship)));
-                break;
-            case 3: //3x
-                lp.addRule(RelativeLayout.BELOW,arrPlaceholder[2].getId());
-                lp.addRule(RelativeLayout.ALIGN_START,arrPlaceholder[2].getId());
-                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.mediumship)));
-                break;
-            case 2: //4x
-                lp.addRule(RelativeLayout.BELOW, arrPlaceholder[3].getId());
-                lp.addRule(RelativeLayout.ALIGN_START,arrPlaceholder[3].getId());
-                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.smallship)));
-                break;
-        }
-        rl.addView(arrShips[ship],lp);
-    }
+    //------------------------------------------------------------------------------//
+    //------------------------------------ Getter ----------------------------------//
+    //------------------------------------------------------------------------------//
 
     private void getShipOrigin() {
         for (int ship = 0; ship < 10; ship++) {
             //Toast.makeText(this, Integer.toString((int)arrShips[ship].getX()),Toast.LENGTH_SHORT).show();
             arrShipOrigins[ship][0] = (int) arrShips[ship].getX();
             arrShipOrigins[ship][1] = (int) arrShips[ship].getY();
-        }
-    }
-
-    private boolean shipWasMoved(int ship) {
-        return !(arrShipOrigins[ship][0] == arrShips[ship].getX() & arrShipOrigins[ship][1] == arrShips[ship].getY());
-    }
-
-    private float dpToPx(int dp) {
-        Resources r = getResources();
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
-    }
-
-    private void incShipCounter(int i, int shipId) {
-        if (!shipWasMoved(i)) {
-            arrShipPlaced[shipId] += 1;
-            arrShipOrigins[i][2] = 0;
-        }
-        arrShipCounters[shipId].setText(String.format(Locale.getDefault(), "%1$d×", arrShipPlaced[shipId]));
-    }
-
-    private void decShipCounter(int i, int shipId) {
-        if(shipWasMoved(i)) {
-            arrShipPlaced[shipId] -= 1;
-            arrShipOrigins[i][2] = 1;
-        }
-        arrShipCounters[shipId].setText(String.format(Locale.getDefault(), "%1$d×", arrShipPlaced[shipId]));
-    }
-
-    private void setShipCounter(int shipId) {
-        for (int i = 0; i < 10; i++) {
-            if (shipId == arrShips[i].getId()) {
-                switch (i) {
-                    case 0:
-                        if(arrShipOrigins[i][2] == 0) {
-                            decShipCounter(i, 0);
-                        } else {
-                            incShipCounter(i, 0);
-                        }
-                        break;
-                    case 1:
-                    case 2:
-                        if(arrShipOrigins[i][2] == 0) {
-                            decShipCounter(i, 1);
-                        } else {
-                            incShipCounter(i, 1);
-                        }
-                        break;
-                    case 3:
-                    case 4:
-                    case 5:
-                        if(arrShipOrigins[i][2] == 0) {
-                            decShipCounter(i, 2);
-                        } else {
-                            incShipCounter(i, 2);
-                        }
-                        break;
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9:
-                        if(arrShipOrigins[i][2] == 0) {
-                            decShipCounter(i, 3);
-                        } else {
-                            incShipCounter(i, 3);
-                        }
-                        break;
-                }
-            }
         }
     }
 
@@ -378,6 +261,80 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         }
     }
 
+    //------------------------------------------------------------------------------//
+    //------------------------------------ Setter ----------------------------------//
+    //------------------------------------------------------------------------------//
+
+    private void setShipParams(int size, int ship, RelativeLayout rl) {                              //GridLayout http://stackoverflow.com/questions/25395773/gridlayout-align-children-within-column
+        LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+        switch (size) {
+            case 5: //1x
+                lp.addRule(RelativeLayout.ALIGN_START,arrPlaceholder[0].getId());
+                lp.addRule(RelativeLayout.BELOW,arrPlaceholder[0].getId());
+                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.giantship)));
+                break;
+            case 4: //2x
+                lp.addRule(RelativeLayout.ALIGN_START,arrPlaceholder[1].getId());
+                lp.addRule(RelativeLayout.BELOW,arrPlaceholder[1].getId());
+                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.bigship)));
+                break;
+            case 3: //3x
+                lp.addRule(RelativeLayout.BELOW,arrPlaceholder[2].getId());
+                lp.addRule(RelativeLayout.ALIGN_START,arrPlaceholder[2].getId());
+                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.mediumship)));
+                break;
+            case 2: //4x
+                lp.addRule(RelativeLayout.BELOW, arrPlaceholder[3].getId());
+                lp.addRule(RelativeLayout.ALIGN_START,arrPlaceholder[3].getId());
+                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.smallship)));
+                break;
+        }
+        rl.addView(arrShips[ship],lp);
+    }
+
+    private void setShipCounter(int shipId) {
+        for (int i = 0; i < 10; i++) {
+            if (shipId == arrShips[i].getId()) {
+                switch (i) {
+                    case 0:
+                        if(arrShipOrigins[i][2] == 0) {
+                            decShipCounter(i, 0);
+                        } else {
+                            incShipCounter(i, 0);
+                        }
+                        break;
+                    case 1:
+                    case 2:
+                        if(arrShipOrigins[i][2] == 0) {
+                            decShipCounter(i, 1);
+                        } else {
+                            incShipCounter(i, 1);
+                        }
+                        break;
+                    case 3:
+                    case 4:
+                    case 5:
+                        if(arrShipOrigins[i][2] == 0) {
+                            decShipCounter(i, 2);
+                        } else {
+                            incShipCounter(i, 2);
+                        }
+                        break;
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 9:
+                        if(arrShipOrigins[i][2] == 0) {
+                            decShipCounter(i, 3);
+                        } else {
+                            incShipCounter(i, 3);
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
     private void setShipLocation(int ship) {
         int matchingTextViews[] =  getShipLocation(ship);
 
@@ -398,6 +355,64 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         } else {
             arrShips[ship].setAlpha(1.0f);
         }
+    }
+
+    private void setTextViewColorMove(int shipId, boolean reset) {
+        if (!reset) {
+            int ext = 1;
+            if (!shipOutsideLayout(shipId)) {
+                int arrShipCurrent[] = getShipLocation(shipId);
+
+                for (int j = 0; j < 100; j++) {
+                    arrTextViews[j].setBackgroundColor(Color.GRAY);
+                }
+                if (arrShips[shipId].getWidth() < arrShips[shipId].getHeight()) {
+                    ext = 10;
+                }
+                if (shipCheckArea(shipId)) {
+                    for (int i = 0; i < arrShipCurrent[1]; i++) {
+                        arrTextViews[arrShipCurrent[0] + i * ext].setBackgroundColor(Color.GREEN);
+                    }
+                } else {
+                    for (int i = 0; i < arrShipCurrent[1]; i++) {
+                        arrTextViews[arrShipCurrent[0] + i * ext].setBackgroundColor(Color.RED);
+                    }
+                }
+            }
+        } else {
+            for (int j = 0; j < 100; j++) {
+                arrTextViews[j].setBackgroundColor(Color.GRAY);
+            }
+        }
+    }
+
+    //------------------------------------------------------------------------------//
+    //-------------------------------- Outsourcing ---------------------------------//
+    //------------------------------------------------------------------------------//
+
+    private void incShipCounter(int i, int shipId) {
+        if (!shipWasMoved(i)) {
+            arrShipPlaced[shipId] += 1;
+            arrShipOrigins[i][2] = 0;
+        }
+        arrShipCounters[shipId].setText(String.format(Locale.getDefault(), "%1$d×", arrShipPlaced[shipId]));
+    }
+
+    private void decShipCounter(int i, int shipId) {
+        if(shipWasMoved(i)) {
+            arrShipPlaced[shipId] -= 1;
+            arrShipOrigins[i][2] = 1;
+        }
+        arrShipCounters[shipId].setText(String.format(Locale.getDefault(), "%1$d×", arrShipPlaced[shipId]));
+    }
+
+    private Bitmap scaleShipImage(int size, int shipImage) {
+        Bitmap ship = BitmapFactory.decodeResource(getResources(), shipImage);
+        return Bitmap.createScaledBitmap(ship, textViewSize*size, textViewSize, false);
+    }
+
+    private boolean shipWasMoved(int ship) {
+        return !(arrShipOrigins[ship][0] == arrShips[ship].getX() & arrShipOrigins[ship][1] == arrShips[ship].getY());
     }
 
     private boolean shipOutsideLayout(int ship) {
@@ -475,96 +490,49 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
             }
         }
         return true;
-    }                                                 //true = alles ok; false = kann nicht gesetzt werden
+    }                                                                                               //true = alles ok; false = kann nicht gesetzt werden -> Schiff in der Nähe
 
-    private void setTextViewColorMove(int shipId, boolean reset) {
-        if (!reset) {
-            int ext = 1;
-            if (!shipOutsideLayout(shipId)) {
-                int arrShipCurrent[] = getShipLocation(shipId);
+    //------------------------------------------------------------------------------//
+    //------------------------------------- Other ----------------------------------//
+    //------------------------------------------------------------------------------//
 
-                for (int j = 0; j < 100; j++) {
-                    arrTextViews[j].setBackgroundColor(Color.GRAY);
-                }
-                if (arrShips[shipId].getWidth() < arrShips[shipId].getHeight()) {
-                    ext = 10;
-                }
-                if (shipCheckArea(shipId)) {
-                    for (int i = 0; i < arrShipCurrent[1]; i++) {
-                        arrTextViews[arrShipCurrent[0] + i * ext].setBackgroundColor(Color.GREEN);
-                    }
-                } else {
-                    for (int i = 0; i < arrShipCurrent[1]; i++) {
-                        arrTextViews[arrShipCurrent[0] + i * ext].setBackgroundColor(Color.RED);
-                    }
-                }
+    private void initPlaceholder() {
+        arrPlaceholder[0] = (TextView) findViewById(R.id.textViewPlaceholder0);
+        arrPlaceholder[1] = (TextView) findViewById(R.id.textViewPlaceholder1);
+        arrPlaceholder[2] = (TextView) findViewById(R.id.textViewPlaceholder2);
+        arrPlaceholder[3] = (TextView) findViewById(R.id.textViewPlaceholder3);
+    }
+
+    private float dpToPx(int dp) {
+        Resources r = getResources();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
+    }
+
+    private void btnRotate() {
+        if(lastShipTouched[1] != 0) {
+            Bitmap myImg = scaleShipImage(lastShipTouched[2], lastShipTouched[1]);
+
+            Matrix matrix = new Matrix();
+            if (arrShips[lastShipTouched[0]].getWidth() > arrShips[lastShipTouched[0]].getHeight()) {
+                matrix.postRotate(90f);
+            } else {
+                matrix.postRotate(180f);
             }
+            Bitmap rotated = Bitmap.createBitmap(myImg, 0, 0, myImg.getWidth(), myImg.getHeight(), matrix, false);
+            arrShips[lastShipTouched[0]].setImageBitmap(rotated);
+        }
+    }
+
+    //------------------------------------------------------------------------------//
+    //----------------------------- UNDER DEVELOPMENT ------------------------------//
+    //------------------------------------------------------------------------------//
+
+    private void dev() {
+        if(shipCheckArea(lastShipTouched[0]) & !shipOutsideLayout(lastShipTouched[0])) {
+            arrShips[lastShipTouched[0]].clearColorFilter();
         } else {
-            for (int j = 0; j < 100; j++) {
-                arrTextViews[j].setBackgroundColor(Color.GRAY);
-            }
+            arrShips[lastShipTouched[0]].setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
         }
     }
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*                Schiffanordnung:
-    private void setShipParams(int size, int ship, RelativeLayout rl) {
-        LayoutParams lp = new LayoutParams(textViewSize*size,textViewSize);
-        switch (size) {
-            case 5: //1x
-                lp.addRule(RelativeLayout.ALIGN_PARENT_END);
-                lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                arrShips[ship].setImageDrawable(getResources().getDrawable(R.drawable.giantship, null));
-                break;
-            case 4: //2x
-                lp.addRule(RelativeLayout.ALIGN_PARENT_END);
-                lp.addRule(RelativeLayout.BELOW,arrShips[ship-1].getId());
-                lp.setMargins(0,marginShips,0,0);
-                arrShips[ship].setImageDrawable(getResources().getDrawable(R.drawable.bigship, null));
-                break;
-            case 3: //3x
-                lp.addRule(RelativeLayout.BELOW,arrShips[2].getId());
-                if (ship == 3) {
-                    lp.addRule(RelativeLayout.ALIGN_PARENT_END);
-                    lp.setMargins(0,marginShips,0,0);
-                } else {
-                    lp.addRule(RelativeLayout.LEFT_OF, arrShips[ship-1].getId());
-                    lp.setMargins(0,marginShips,marginShips,0);
-                }
-                arrShips[ship].setImageDrawable(getResources().getDrawable(R.drawable.mediumship, null));
-                break;
-            case 2: //4x
-                if (ship == 6 | ship == 8) {
-                    lp.addRule(RelativeLayout.BELOW, arrShips[ship-2].getId());
-                    lp.addRule(RelativeLayout.ALIGN_PARENT_END);
-                    lp.setMargins(0,marginShips,0,0);
-                } else {
-                    lp.addRule(RelativeLayout.BELOW, arrShips[ship-2].getId());
-                    lp.addRule(RelativeLayout.LEFT_OF, arrShips[ship-1].getId());
-                    lp.setMargins(0,marginShips,marginShips,0);
-
-                }
-                arrShips[ship].setImageDrawable(getResources().getDrawable(R.drawable.smallship, null));
-                break;
-        }
-        rl.addView(arrShips[ship],lp);
-    }
-*/
-
