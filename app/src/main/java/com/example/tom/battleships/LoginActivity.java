@@ -33,7 +33,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                 startActivity(intentStartRegAct);
                 break;
             case R.id.btnAutoLogin:
-                Intent intentStartGame = new Intent(this, MainGameLayoutActivity.class);
+                Intent intentStartGame = new Intent(this, GameLayoutActivity.class);
                 startActivity(intentStartGame);
                 break;
         }
