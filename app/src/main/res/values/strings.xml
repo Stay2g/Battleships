@@ -1,3 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Battleships</string>
+    <string name="app_name">Battleship</string>
+    <string name="stringLogin">Login</string>
+    <string name="stringName">Name</string>
+    <string name="stringPwd">Password</string>
+    <string name="stringRegister">Register</string>
+    <string name="textViewReg">No Account?</string>
+    <string name="abortReg">Register canceled</string>
+    <string name="stringPwdRpt">Repeat Password</string>
+    <string name="strSingleplayer">Singleplayer</string>
+    <string name="strMultiplayer">Multiplayer</string>
+    <string name="strSettings">Settings</string>
+    <string name="strLoginFailed">Your Username or Password is Wrong</string>
+    <string name="strExit">Exit</string>
 </resources>
