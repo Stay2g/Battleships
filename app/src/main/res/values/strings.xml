@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Battleship</string>
+    <string name="app_name">Battleships</string>
     <string name="stringLogin">Login</string>
     <string name="stringName">Name</string>
     <string name="stringPwd">Password</string>
@@ -13,4 +13,8 @@
     <string name="strSettings">Settings</string>
     <string name="strLoginFailed">Your Username or Password is Wrong</string>
     <string name="strExit">Exit</string>
+    <string name="strSound">Sound effects</string>
+    <string name="strMusic">Music</string>
+    <string name="strLogout">Logout</string>
+    <string name="server_client_id">689690160716-bsr6nfvnjcgl6e270qna2u3rj6qunbid.apps.googleusercontent.com</string>
 </resources>
