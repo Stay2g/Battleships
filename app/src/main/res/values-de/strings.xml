@@ -13,4 +13,7 @@
     <string name="stringRegister">Registrieren</string>
     <string name="textViewReg">Keinen Account?</string>
     <string name="stringName">Name</string>
+    <string name="strLogout">Logout</string>
+    <string name="strMusic">Musik</string>
+    <string name="strSound">Soundeffekte</string>
 </resources>
