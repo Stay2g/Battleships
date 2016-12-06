@@ -75,9 +75,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     @Override
     public void onClick(View v) {
         if (v.getId() == findViewById(R.id.buttonTest).getId()) {
-            btnRotate();
-            fixTextViewsUsed();
-            dev();
+            shipFindValidLocation();
         }
         if (v.getId() == findViewById(R.id.buttonStart).getId()) {
             Toast.makeText(this, "Start!", Toast.LENGTH_SHORT).show();
@@ -116,7 +114,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         initPlaceholder();
         RelativeLayout rl = (RelativeLayout) findViewById(R.id.activity_main);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < arrShips.length; i++) {
             arrShips[i] = new ImageView(this);
             arrShips[i].setId(100 + i);
             switch (i) {
@@ -314,7 +312,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     }
 
     private void setShipCounter(int shipId) {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < arrShips.length; i++) {
             if (shipId == arrShips[i].getId()) {
                 switch (i) {
                     case 0:
@@ -499,7 +497,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     }
 
     private boolean isFirstShip() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < arrShips.length; i++) {
             if (arrTextViewsUsed[i][0] != -1) {
                 return false;
             }
@@ -509,7 +507,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
 
     private boolean shipCheckArea(int shipId) {
         int currentShip[] = getShipLocation(shipId);
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < arrShips.length; i++) {
             if(i != shipId) {
                for (int j = 0; j < 5; j++) {
                    if(arrTextViewsUsed[i][j] == -1) {                                          //wenn Schiff schon gesetzt wurde, dann...
@@ -575,6 +573,74 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         return true;
     }
 
+    private boolean shipCheckArea(int shipId, int align, int textViewStartId) {
+        int currentShip[] = getShipLocation(shipId);
+        for(int i = 0; i < arrShips.length; i++) {
+            if(i != shipId) {
+                for (int j = 0; j < 5; j++) {
+                    if(arrTextViewsUsed[i][j] == -1) {                                          //wenn Schiff schon gesetzt wurde, dann...
+                        break;
+                    } else {
+                        for (int k = 0; k < 200; k++) {
+                            if(arrTextViewsLocked[k] == -1) {                                        //suche nach unbenutztem Platz...
+                                arrTextViewsLocked[k] = arrTextViewsUsed[i][j];
+                                switch(isTextViewAtBorder(arrTextViewsUsed[i][j])) {
+                                    case 0:
+                                        arrTextViewsLocked[k + 1] = checkTextViewExist(arrTextViewsUsed[i][j] - 1);
+                                        arrTextViewsLocked[k + 2] = checkTextViewExist(arrTextViewsUsed[i][j] + 1);
+                                        arrTextViewsLocked[k + 3] = checkTextViewExist(arrTextViewsUsed[i][j] - 9);
+                                        arrTextViewsLocked[k + 4] = checkTextViewExist(arrTextViewsUsed[i][j] + 9);
+                                        arrTextViewsLocked[k + 5] = checkTextViewExist(arrTextViewsUsed[i][j] + 10);
+                                        arrTextViewsLocked[k + 6] = checkTextViewExist(arrTextViewsUsed[i][j] - 10);
+                                        arrTextViewsLocked[k + 7] = checkTextViewExist(arrTextViewsUsed[i][j] + 11);
+                                        arrTextViewsLocked[k + 8] = checkTextViewExist(arrTextViewsUsed[i][j] - 11);
+                                        break;
+                                    case 1:
+                                        arrTextViewsLocked[k + 1] = checkTextViewExist(arrTextViewsUsed[i][j] + 1);
+                                        arrTextViewsLocked[k + 2] = checkTextViewExist(arrTextViewsUsed[i][j] - 9);
+                                        arrTextViewsLocked[k + 3] = checkTextViewExist(arrTextViewsUsed[i][j] + 10);
+                                        arrTextViewsLocked[k + 4] = checkTextViewExist(arrTextViewsUsed[i][j] - 10);
+                                        arrTextViewsLocked[k + 5] = checkTextViewExist(arrTextViewsUsed[i][j] + 11);
+                                        break;
+                                    case 2:
+                                        arrTextViewsLocked[k + 1] = checkTextViewExist(arrTextViewsUsed[i][j] - 1);
+                                        arrTextViewsLocked[k + 2] = checkTextViewExist(arrTextViewsUsed[i][j] + 9);
+                                        arrTextViewsLocked[k + 3] = checkTextViewExist(arrTextViewsUsed[i][j] + 10);
+                                        arrTextViewsLocked[k + 4] = checkTextViewExist(arrTextViewsUsed[i][j] - 10);
+                                        arrTextViewsLocked[k + 5] = checkTextViewExist(arrTextViewsUsed[i][j] - 11);
+                                        break;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for(int l = 0; l < currentShip[1]; l++) {
+            switch (align) {
+                case 1:
+                    for(int m = 0; m < 200; m++) {
+                        if((textViewStartId + l) == arrTextViewsLocked[m]) {
+                            initTextViewLocked();
+                            return false;
+                        }
+                    }
+                    break;
+                case 2:
+                    for(int m = 0; m < 200; m++) {
+                        if((textViewStartId + l * 10) == arrTextViewsLocked[m]) {
+                            initTextViewLocked();
+                            return false;
+                        }
+                    }
+                    break;
+            }
+        }
+        initTextViewLocked();
+        return true;
+    }
+
     private int isTextViewAtBorder(int textViewId) {                                                //0 = nicht am Rand, 1 = linker Rand, 2 = rechter Rand
         String val = Integer.toString(textViewId);
         int start = val.length();
@@ -609,7 +675,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     }
 
     private void initTextViewUsed() {
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < arrShips.length; i++) {
             for (int j = 0; j < 5; j++) {
                 arrTextViewsUsed[i][j] = -1;
             }
@@ -625,28 +691,6 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     private float dpToPx(int dp) {
         Resources r = getResources();
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
-    }
-
-    private void btnRotate() {
-        ImageView ship = arrShips[lastShipTouched[0]];
-        if (lastShipTouched[1] != 0) {
-            Bitmap shipImage = scaleShipImage(lastShipTouched[2], lastShipTouched[1]);
-            Matrix matrix = new Matrix();
-            if (ship.getWidth() > ship.getHeight()) {
-                matrix.setRotate(90f);
-                ship.setY((int) (ship.getY()-(Math.ceil(lastShipTouched[2]/2))*textViewSize));
-                ship.setX((int) (ship.getX()+(Math.ceil(lastShipTouched[2]/2))*textViewSize));
-            } else {
-                matrix.setRotate(180f);
-                ship.setX((int) (ship.getX()-(Math.ceil(lastShipTouched[2]/2))*textViewSize));
-                ship.setY((int) (ship.getY()+(Math.ceil(lastShipTouched[2]/2))*textViewSize));
-            }
-
-
-            Bitmap rotated = Bitmap.createBitmap(shipImage, 0, 0, shipImage.getWidth(), shipImage.getHeight(), matrix, false);
-            ship.setImageBitmap(rotated);
-            fixTextViewsUsed();
-        }
     }
 
     //------------------------------------------------------------------------------//
@@ -682,7 +726,122 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
 
     }
 
+    private void btnRotate() {
+        ImageView ship = arrShips[lastShipTouched[0]];
+        if (lastShipTouched[1] != 0) {
+            Bitmap shipImage = scaleShipImage(lastShipTouched[2], lastShipTouched[1]);
+            Matrix matrix = new Matrix();
+            if (ship.getWidth() > ship.getHeight()) {
+                matrix.setRotate(90f);
+                ship.setY((int) (ship.getY()-(Math.ceil(lastShipTouched[2]/2))*textViewSize));
+                ship.setX((int) (ship.getX()+(Math.ceil(lastShipTouched[2]/2))*textViewSize));
+            } else {
+                matrix.setRotate(180f);
+                ship.setX((int) (ship.getX()-(Math.ceil(lastShipTouched[2]/2))*textViewSize));
+                ship.setY((int) (ship.getY()+(Math.ceil(lastShipTouched[2]/2))*textViewSize));
+            }
+            Bitmap rotated = Bitmap.createBitmap(shipImage, 0, 0, shipImage.getWidth(), shipImage.getHeight(), matrix, false);
+            ship.setImageBitmap(rotated);
+            fixTextViewsUsed();
+        }
+    }
 
+    private void shipFindValidLocation() {
+        ImageView ship = arrShips[lastShipTouched[0]];
+        int shipId = lastShipTouched[0];
+        int align, startTextView;
+        int l = lastShipTouched[2];
+        int done = 0;
+        int ext = 0;
+        boolean exit = false;
+
+        if (lastShipTouched[1] != 0 & !shipOutsideLayout(shipId)) {
+            Bitmap shipImage = scaleShipImage(lastShipTouched[2], lastShipTouched[1]);
+            Matrix matrix = new Matrix();
+            if (ship.getWidth() > ship.getHeight()) {
+                matrix.setRotate(90f);
+                align = 2;
+            } else {
+                matrix.setRotate(180f);
+                align = 1;
+            }
+            Bitmap rotated = Bitmap.createBitmap(shipImage, 0, 0, shipImage.getWidth(), shipImage.getHeight(), matrix, false);
+            do {
+                startTextView = getShipLocation(shipId)[0] + ext;
+                    for (int i = 0; i < l; i++) {
+                        switch (align) {
+                            case 1:
+                                arrTextViewsUsed[shipId][i] = startTextView + i;
+                                break;
+                            case 2:
+                                arrTextViewsUsed[shipId][i] = startTextView + i * 10;
+                                break;
+                        }
+                    }
+                switch(done) {
+                    case 0:
+                        ext ++;
+                        break;
+                    case 1:
+                        ext --;
+                        break;
+                    case 2:
+                        exit = true;
+                        Log.d("Error: ", "nop!");
+                        break;
+                }
+                if((startTextView%10) == 9) {
+                    startTextView -= ext;
+                    ext = 0;
+                    done ++;
+                }
+                if ((startTextView%10) == 0) {
+                    startTextView += ext-1;
+                    ext = 0;
+                    done ++;
+                }
+                if (exit) {
+                    for (int i = 0; i < l; i++) {
+                        switch (align) {
+                            case 1:
+                                arrTextViewsUsed[shipId][i] = getShipLocation(shipId)[0] + i * 10;
+                                break;
+                            case 2:
+                                arrTextViewsUsed[shipId][i] = getShipLocation(shipId)[0] + i;
+                                break;
+                        }
+                    }
+                    break;
+                }
+            } while (!shipCheckArea(lastShipTouched[0], align, startTextView));
+
+            if (exit) {shipBlink(shipId);} else {ship.setImageBitmap(rotated);}
+            TextView firstTextView = (TextView) findViewById(arrTextViews[startTextView].getId());
+            int x = (int) (firstTextView.getX() + getResources().getDimension(R.dimen.activity_horizontal_margin));
+            int y = (int) (firstTextView.getY() + getResources().getDimension(R.dimen.activity_vertical_margin));
+
+            ship.animate().x(x).y(y).setDuration(200);
+            arrShips[shipId].setX(x);
+            arrShips[shipId].setY(y);
+        }
+    }
+
+    private void shipBlink(final int shipId) {
+        arrShips[shipId].setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+        arrShips[shipId].animate().scaleX(1.2f).scaleY(1.2f).setDuration(150);
+        arrShips[shipId].postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                arrShips[shipId].animate().scaleX(1f).scaleY(1f).setDuration(150);
+            }
+        }, 150);
+        arrShips[shipId].postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                arrShips[shipId].clearColorFilter();
+            }
+        }, 150);
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -734,7 +893,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                 placedEndY = (int) arrTextViews[placedShip[0]].getY() + textViewSize * placedShip[1];
                 break;
         }
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < arrShips.length; i++) {
             int iShip[] = getShipLocation(i);
             if (i != shipId & iShip[0] > -1) {
                 switch (iShip[2]) {
