@@ -32,6 +32,11 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 public class LoginActivity extends FragmentActivity implements View.OnClickListener{
 
+    //Ändere den Wert wenn du den Login ausprobieren willst:
+    //false -> Login wird Umgangen
+    //true  -> Loginfenster ist der start
+    private boolean loginUmgehung = true;
+
     private static final int RC_SIGN_IN = 1;
     private static final String TAG = "SignInActivity";
 
@@ -55,6 +60,11 @@ public class LoginActivity extends FragmentActivity implements View.OnClickListe
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
         initAll();
+
+        if (loginUmgehung == true){
+            Intent intentStartGame = new Intent(this, GameLayoutActivity.class);
+            startActivity(intentStartGame);
+        }
 
         mGoogleBtn = (SignInButton) findViewById(R.id.sign_in_button);
 
@@ -128,7 +138,9 @@ public class LoginActivity extends FragmentActivity implements View.OnClickListe
             case R.id.btnLogin:
                 editTextLoginName.setText("ADMIN");
                 editTextLoginPassword.setText("ADMIN");
-                userDataCheck();
+                Intent intentStartGame = new Intent(this, GameLayoutActivity.class);
+                startActivity(intentStartGame);
+                //userDataCheck();
                 break;
             case R.id.btnRegister:
                 Intent intentStartRegAct = new Intent(this, RegisterActivity.class);
