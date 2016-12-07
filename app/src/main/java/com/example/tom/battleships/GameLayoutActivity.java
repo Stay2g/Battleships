@@ -754,8 +754,10 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         int done = 0;
         int ext = 0;
         boolean exit = false;
+        boolean textViewNotExists = false;
+        boolean whileEnd;
 
-        if (lastShipTouched[1] != 0 & !shipOutsideLayout(shipId)) {
+        if (((lastShipTouched[1] != 0) & !shipOutsideLayout(shipId))) {
             Bitmap shipImage = scaleShipImage(lastShipTouched[2], lastShipTouched[1]);
             Matrix matrix = new Matrix();
             if (ship.getWidth() > ship.getHeight()) {
@@ -766,8 +768,35 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                 align = 1;
             }
             Bitmap rotated = Bitmap.createBitmap(shipImage, 0, 0, shipImage.getWidth(), shipImage.getHeight(), matrix, false);
+
+
+
             do {
                 startTextView = getShipLocation(shipId)[0] + ext;
+
+                if((startTextView%10) == 9) {
+                    ext = 0;
+                    done ++;
+                }
+                if ((startTextView%10) == 0) {
+                    ext = 0;
+                    done ++;
+                }
+
+                if(arrTextViews[arrTextViewsUsed[shipId][0]].getY() + rotated.getHeight() > arrTextViews[90].getY() + textViewSize) {
+                    int fix = (int) -(((ship.getY() + rotated.getHeight()) - (arrTextViews[90].getY() + textViewSize)) / textViewSize);
+                    startTextView += fix*10;
+                    Toast.makeText(this, Integer.toString(ext), Toast.LENGTH_SHORT).show();
+                }
+
+                if(arrTextViews[arrTextViewsUsed[shipId][0]].getX() + rotated.getWidth() > arrTextViews[9].getX() + textViewSize) {
+                    done = 1;
+                    ext = (int) -(((ship.getX() + rotated.getWidth()) - (arrTextViews[9].getX() + textViewSize)) / textViewSize);
+                    startTextView += ext;
+                }
+
+
+
                     for (int i = 0; i < l; i++) {
                         switch (align) {
                             case 1:
@@ -787,19 +816,16 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                         break;
                     case 2:
                         exit = true;
-                        Log.d("Error: ", "nop!");
                         break;
                 }
-                if((startTextView%10) == 9) {
-                    startTextView -= ext;
-                    ext = 0;
-                    done ++;
+
+                for(int i = 0; i < l; i++) {
+                    if (checkTextViewExist(arrTextViewsUsed[shipId][i]) == -1) {
+                        textViewNotExists = true;
+                        break;
+                    }
                 }
-                if ((startTextView%10) == 0) {
-                    startTextView += ext-1;
-                    ext = 0;
-                    done ++;
-                }
+
                 if (exit) {
                     for (int i = 0; i < l; i++) {
                         switch (align) {
@@ -813,12 +839,14 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                     }
                     break;
                 }
-            } while (!shipCheckArea(lastShipTouched[0], align, startTextView));
+                whileEnd = ((shipCheckArea(lastShipTouched[0], align, startTextView) & !textViewNotExists));
+            } while (!whileEnd);
 
-            if (exit) {shipBlink(shipId);} else {ship.setImageBitmap(rotated);}
-            TextView firstTextView = (TextView) findViewById(arrTextViews[startTextView].getId());
-            int x = (int) (firstTextView.getX() + getResources().getDimension(R.dimen.activity_horizontal_margin));
-            int y = (int) (firstTextView.getY() + getResources().getDimension(R.dimen.activity_vertical_margin));
+
+            if (exit) {shipBlink(shipId, 2);} else {ship.setImageBitmap(rotated); shipBlink(shipId, 1);}
+
+            int x = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getX() + getResources().getDimension(R.dimen.activity_horizontal_margin));
+            int y = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getY() + getResources().getDimension(R.dimen.activity_vertical_margin));
 
             ship.animate().x(x).y(y).setDuration(200);
             arrShips[shipId].setX(x);
@@ -826,9 +854,16 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         }
     }
 
-    private void shipBlink(final int shipId) {
-        arrShips[shipId].setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
-        arrShips[shipId].animate().scaleX(1.2f).scaleY(1.2f).setDuration(150);
+    private void shipBlink(final int shipId, int color) {
+        switch (color) {
+            case 1:
+                arrShips[shipId].setColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
+                break;
+            case 2:
+                arrShips[shipId].setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+                break;
+        }
+        arrShips[shipId].animate().scaleX(1.15f).scaleY(1.15f).setDuration(150);
         arrShips[shipId].postDelayed(new Runnable() {
             @Override
             public void run() {
