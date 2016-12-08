@@ -31,9 +31,9 @@ import com.google.firebase.auth.GoogleAuthProvider;
 public class BaseActivity extends FragmentActivity implements View.OnClickListener{
 
     //Wert verändern für direkten Spielstart:
-    //true  -> Loginfenster ist der start
-    //false -> Login wird Umgangen
-    private boolean loginUmgehung = true;
+    //true -> Login wird Umgangen
+    //false  -> Loginfenster ist der start
+    private boolean loginUmgehung = false;
 
     private static final int RC_SIGN_IN = 1;
     private static final String TAG = "SignInActivity";
@@ -154,9 +154,10 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
             case R.id.sign_in_button:
                 signIn();                                                                           //Start des Google-Login-Vorgangs
                 break;
-            case R.id.btnLogout:
+            /*case R.id.btnLogout:
                 FirebaseAuth.getInstance().signOut();
                 break;
+                */
         }
     }
 
@@ -169,10 +170,9 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
             if (result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();                            //Falls Login erfolgreich -> Datenentnahme des eigenloggten accounts
                 firebaseAuthWithGoogle(account);
-                textViewUsername.setText(result.getSignInAccount().getDisplayName());
                 pbBar.setVisibility(View.GONE);
                 mGoogleBtn.setVisibility(View.GONE);
-                btnLogout.setVisibility(View.VISIBLE);
+                //btnLogout.setVisibility(View.VISIBLE);
             } else {
                 // Google Sign In failed
             }
@@ -228,19 +228,17 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
     private void initAll() {                                                                        //Set GUI-Elemente und OnClickListener
         pbBar = (ProgressBar) findViewById(R.id.loadingProgress);
 
-        textViewUsername = (TextView) findViewById(R.id.textViewUsername);
-
         editTextLoginName = (EditText) findViewById(R.id.editTextLogin);
         editTextLoginPassword = (EditText) findViewById(R.id.editTextPwd);
 
         btnReg = (Button) findViewById(R.id.btnRegister);
         btnLogin = (Button) findViewById(R.id.btnLogin);
-        btnLogout = (Button) findViewById(R.id.btnLogout);
+        //btnLogout = (Button) findViewById(R.id.btnLogout);
         mGoogleBtn = (SignInButton) findViewById(R.id.sign_in_button);
 
         btnReg.setOnClickListener(this);
         btnLogin.setOnClickListener(this);
-        btnLogout.setOnClickListener(this);
+        //btnLogout.setOnClickListener(this);
         mGoogleBtn.setOnClickListener(this);
     }
 }

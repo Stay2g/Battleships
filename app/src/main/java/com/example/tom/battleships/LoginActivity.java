@@ -195,8 +195,6 @@ public class LoginActivity extends FragmentActivity implements View.OnClickListe
     }
 
     private void initAll() {
-        textViewUsername = (TextView) findViewById(R.id.textViewUsername);
-
         editTextLoginName = (EditText) findViewById(R.id.editTextLogin);
         editTextLoginPassword = (EditText) findViewById(R.id.editTextPwd);
 
