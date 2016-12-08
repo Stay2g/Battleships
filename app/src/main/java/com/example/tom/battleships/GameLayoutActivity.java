@@ -75,7 +75,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     @Override
     public void onClick(View v) {
         if (v.getId() == findViewById(R.id.buttonTest).getId()) {
-            shipFindValidLocation();
+            setValidShipLocation();
         }
         if (v.getId() == findViewById(R.id.buttonStart).getId()) {
             Toast.makeText(this, "Start!", Toast.LENGTH_SHORT).show();
@@ -445,6 +445,150 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         }
     }
 
+    private void setValidShipLocation() {
+        ImageView ship = arrShips[lastShipTouched[0]];
+        int shipId = lastShipTouched[0];
+        int align;
+        int l = lastShipTouched[2];
+        int textViewId = getShipLocation(shipId)[0];
+        int textViewStart;
+        int xEnd = 9;
+        int yEnd = 9;
+        int step = 0;
+        boolean exit = false;
+        boolean top = false;
+        boolean bottom = false;
+
+
+        //Schiff-Image drehen (nur innerhalb des Spielfeldes
+        if (((lastShipTouched[1] != 0) & !shipOutsideLayout(shipId))) {
+            Bitmap shipImage = scaleShipImage(lastShipTouched[2], lastShipTouched[1]);
+            Matrix matrix = new Matrix(); //erstelle Matrix, das anschließend dem
+            if (ship.getWidth() > ship.getHeight()) {
+                matrix.setRotate(90f);
+                align = 2;                //horizontal
+            } else {
+                matrix.setRotate(180f);
+                align = 1;                //vertikal
+            }
+            Bitmap rotated = Bitmap.createBitmap(shipImage, 0, 0, shipImage.getWidth(), shipImage.getHeight(), matrix, false);
+
+            //Schiff um enstrechende felder nach innen bewegen, wenn gedrehtes Schiff außerhalb des Spielfeldes liegt
+            if(arrTextViews[arrTextViewsUsed[shipId][0]].getX() + rotated.getWidth() > arrTextViews[9].getX() + textViewSize) {
+                int temp = (int) (((ship.getX() + rotated.getWidth()) - (arrTextViews[9].getX() + textViewSize)) / textViewSize);
+                textViewId -= temp;
+                xEnd -= temp;
+            }
+            if(arrTextViews[arrTextViewsUsed[shipId][0]].getY() + rotated.getHeight() > arrTextViews[90].getY() + textViewSize) {
+                int temp = (int) (((ship.getY() + rotated.getHeight()) - (arrTextViews[90].getY() + textViewSize)) / textViewSize);
+                textViewId -= temp*10;
+                yEnd -= temp;
+            }
+
+            textViewStart = textViewId; //Startwert auf den die Id nach jedem step zurückgesetzt wird
+
+            do {
+                switch (step) {
+                    case 0:
+                        textViewId = textViewStart;
+                        for (int i = textViewId % 10; i <= xEnd; i++) {       //X-Achse vom Punkt bis zum Endspalte
+                            setNewLocation(align, textViewId);
+                            if (checkNewLocation(align, textViewId)) {
+                                step = 4;
+                                break;
+                            } else {
+                                textViewId++;
+                            }
+                        }
+                        if(step == 4) {break;}
+                        step = 1;
+                        break;
+                    case 1:
+                        textViewId = textViewStart;
+                        for (int i = textViewId % 10; i >= 0; i--) {          //X-Achse vom Punkt bis zum Anfangsspalte
+                            setNewLocation(align, textViewId);
+                            if (checkNewLocation(align, textViewId)) {
+                                step = 4;
+                                break;
+                            } else {
+                                textViewId--;
+                            }
+                        }
+                        if(step == 4) {break;}
+                        step = 2;
+                        break;
+                    case 2:
+                        textViewId = textViewStart;
+                        for (int i = textViewId; i < yEnd; i += 10) {       //Y-Achse vom Punkt bis zum Endzeile
+                            setNewLocation(align, textViewId);
+                            if (checkNewLocation(align, textViewId)) {
+                                step = 4;
+                                break;
+                            } else {
+                                textViewId += 10;
+                            }
+                        }
+                        if(step == 4) {break;}
+                        step = 3;
+                        break;
+                    case 3:
+                        textViewId = textViewStart;
+                        for (int i = textViewId; i >= 0; i -= 10) {         //Y-Achse vom Punkt bis zur Anfangszeile
+                            setNewLocation(align, textViewId);
+                            if (checkNewLocation(align, textViewId)) {
+                                step = 4;
+                                break;
+                            } else {
+                                textViewId -= 10;
+                            }
+                        }
+                        if(step == 4) {break;}
+                        step = 0;
+                        if (!bottom) {
+                            bottom = (textViewStart > 89);}       //wenn die unterste Zeile erreicht ist
+                        if (!top) {
+                            top = (textViewStart < 11);}             //wenn die oberste Zeile erreicht ist
+                        if (!bottom & top) {
+                            textViewStart += 10;}
+                        if (!top & bottom) {
+                            textViewStart -= 10;}
+                        if(!bottom & !top) {
+                            textViewStart += 10;}
+                        if(bottom & top) {
+                            step = 5;}                        //wenn nichts frei ist, dann exit
+                        break;
+                    case 4:
+                        ship.setImageBitmap(rotated);
+                        shipBlink(shipId, 1);
+                        exit = true;
+                        break;
+                    case 5:
+                        for (int i = 0; i < l; i++) {
+                            switch (align) {
+                                case 1:
+                                    arrTextViewsUsed[shipId][i] = getShipLocation(shipId)[0] + i * 10;
+                                    break;
+                                case 2:
+                                    arrTextViewsUsed[shipId][i] = getShipLocation(shipId)[0] + i;
+                                    break;
+                            }
+                        }
+                        shipBlink(shipId, 2);
+                        exit = true;
+                        break;
+                }
+            } while (!exit);
+
+            int x = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getX() + getResources().getDimension(R.dimen.activity_horizontal_margin));
+            int y = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getY() + getResources().getDimension(R.dimen.activity_vertical_margin));
+
+            ship.animate().x(x).y(y).setDuration(200);
+
+            arrShips[shipId].setX(x);
+            arrShips[shipId].setY(y);
+        }
+    }
+
     //------------------------------------------------------------------------------//
     //-------------------------------- Outsourcing ---------------------------------//
     //------------------------------------------------------------------------------//
@@ -641,6 +785,66 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         return true;
     }
 
+    private boolean checkNewLocation(int align, int tv) {
+        boolean exists = true;
+        for(int i = 0; i < lastShipTouched[2] /*=Länge des Schiffs*/; i++) {
+            if (checkTextViewExist(arrTextViewsUsed[lastShipTouched[0]][i]) == -1) {
+                exists = false;
+                break;
+            }
+        }
+        switch (align) {
+            case 1:
+                if (exists & (tv%10 > (tv + lastShipTouched[2]-1)%10)) {
+                    exists = false;
+                }
+                break;
+            case 2:
+                if (exists & (tv%10 < (tv + (lastShipTouched[2]-1)*10)%10)) {
+                    exists = false;
+                }
+                break;
+        }
+        return (exists & shipCheckArea(lastShipTouched[0], align, tv));
+    }
+
+    private void setNewLocation(int align, int tv) {
+        for (int i = 0; i < lastShipTouched[2] /*=Länge des Schiffs*/; i++) {
+            switch (align) {
+                case 1:
+                    arrTextViewsUsed[lastShipTouched[0]][i] = tv + i;
+                    break;
+                case 2:
+                    arrTextViewsUsed[lastShipTouched[0]][i] = tv + i * 10;
+                    break;
+            }
+        }
+    }
+
+    private void shipBlink(final int shipId, int color) {
+        switch (color) {
+            case 1:
+                arrShips[shipId].setColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
+                break;
+            case 2:
+                arrShips[shipId].setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+                break;
+        }
+        arrShips[shipId].animate().scaleX(1.15f).scaleY(1.15f).setDuration(150);
+        arrShips[shipId].postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                arrShips[shipId].animate().scaleX(1f).scaleY(1f).setDuration(150);
+            }
+        }, 150);
+        arrShips[shipId].postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                arrShips[shipId].clearColorFilter();
+            }
+        }, 150);
+    }
+
     private int isTextViewAtBorder(int textViewId) {                                                //0 = nicht am Rand, 1 = linker Rand, 2 = rechter Rand
         String val = Integer.toString(textViewId);
         int start = val.length();
@@ -656,7 +860,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     }
 
     private int checkTextViewExist(int textViewId) {
-        if (textViewId < 0 & textViewId < 99) {
+        if (!((textViewId >= 0) & (textViewId <= 99))) {
             return -1;
         } else {
             return textViewId;
@@ -745,138 +949,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
             fixTextViewsUsed();
         }
     }
-
-    private void shipFindValidLocation() {
-        ImageView ship = arrShips[lastShipTouched[0]];
-        int shipId = lastShipTouched[0];
-        int align, startTextView;
-        int l = lastShipTouched[2];
-        int done = 0;
-        int ext = 0;
-        boolean exit = false;
-        boolean textViewNotExists = false;
-        boolean whileEnd;
-
-        if (((lastShipTouched[1] != 0) & !shipOutsideLayout(shipId))) {
-            Bitmap shipImage = scaleShipImage(lastShipTouched[2], lastShipTouched[1]);
-            Matrix matrix = new Matrix();
-            if (ship.getWidth() > ship.getHeight()) {
-                matrix.setRotate(90f);
-                align = 2;
-            } else {
-                matrix.setRotate(180f);
-                align = 1;
-            }
-            Bitmap rotated = Bitmap.createBitmap(shipImage, 0, 0, shipImage.getWidth(), shipImage.getHeight(), matrix, false);
-
-
-
-            do {
-                startTextView = getShipLocation(shipId)[0] + ext;
-
-                if((startTextView%10) == 9) {
-                    ext = 0;
-                    done ++;
-                }
-                if ((startTextView%10) == 0) {
-                    ext = 0;
-                    done ++;
-                }
-
-                if(arrTextViews[arrTextViewsUsed[shipId][0]].getY() + rotated.getHeight() > arrTextViews[90].getY() + textViewSize) {
-                    int fix = (int) -(((ship.getY() + rotated.getHeight()) - (arrTextViews[90].getY() + textViewSize)) / textViewSize);
-                    startTextView += fix*10;
-                    Toast.makeText(this, Integer.toString(ext), Toast.LENGTH_SHORT).show();
-                }
-
-                if(arrTextViews[arrTextViewsUsed[shipId][0]].getX() + rotated.getWidth() > arrTextViews[9].getX() + textViewSize) {
-                    done = 1;
-                    ext = (int) -(((ship.getX() + rotated.getWidth()) - (arrTextViews[9].getX() + textViewSize)) / textViewSize);
-                    startTextView += ext;
-                }
-
-
-
-                    for (int i = 0; i < l; i++) {
-                        switch (align) {
-                            case 1:
-                                arrTextViewsUsed[shipId][i] = startTextView + i;
-                                break;
-                            case 2:
-                                arrTextViewsUsed[shipId][i] = startTextView + i * 10;
-                                break;
-                        }
-                    }
-                switch(done) {
-                    case 0:
-                        ext ++;
-                        break;
-                    case 1:
-                        ext --;
-                        break;
-                    case 2:
-                        exit = true;
-                        break;
-                }
-
-                for(int i = 0; i < l; i++) {
-                    if (checkTextViewExist(arrTextViewsUsed[shipId][i]) == -1) {
-                        textViewNotExists = true;
-                        break;
-                    }
-                }
-
-                if (exit) {
-                    for (int i = 0; i < l; i++) {
-                        switch (align) {
-                            case 1:
-                                arrTextViewsUsed[shipId][i] = getShipLocation(shipId)[0] + i * 10;
-                                break;
-                            case 2:
-                                arrTextViewsUsed[shipId][i] = getShipLocation(shipId)[0] + i;
-                                break;
-                        }
-                    }
-                    break;
-                }
-                whileEnd = ((shipCheckArea(lastShipTouched[0], align, startTextView) & !textViewNotExists));
-            } while (!whileEnd);
-
-
-            if (exit) {shipBlink(shipId, 2);} else {ship.setImageBitmap(rotated); shipBlink(shipId, 1);}
-
-            int x = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getX() + getResources().getDimension(R.dimen.activity_horizontal_margin));
-            int y = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getY() + getResources().getDimension(R.dimen.activity_vertical_margin));
-
-            ship.animate().x(x).y(y).setDuration(200);
-            arrShips[shipId].setX(x);
-            arrShips[shipId].setY(y);
-        }
-    }
-
-    private void shipBlink(final int shipId, int color) {
-        switch (color) {
-            case 1:
-                arrShips[shipId].setColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
-                break;
-            case 2:
-                arrShips[shipId].setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
-                break;
-        }
-        arrShips[shipId].animate().scaleX(1.15f).scaleY(1.15f).setDuration(150);
-        arrShips[shipId].postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                arrShips[shipId].animate().scaleX(1f).scaleY(1f).setDuration(150);
-            }
-        }, 150);
-        arrShips[shipId].postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                arrShips[shipId].clearColorFilter();
-            }
-        }, 150);
-    }
+    
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -907,7 +980,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
  */
 
 
-    /*
+/*  Erste Versuch, zu überprüfen, ob das Schiff dort platziert werden darf
     private boolean shipCheckArea(int shipId) {
         int startX, startY, endX, endY, placedStartY = 0, placedEndX = 0, placedStartX = 0, placedEndY = 0;
         boolean ok = false;
@@ -995,4 +1068,114 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         }
         return true;
     }                                                                                               //true = alles ok; false = kann nicht gesetzt werden -> Schiff in der Nähe
+
+*/
+/* Versuch 1. -> Automatisch freien Platz nach drehen finden
+    private void shipFindValidLocation() {
+        ImageView ship = arrShips[lastShipTouched[0]];
+        int shipId = lastShipTouched[0];
+        int align, startTextView;
+        int l = lastShipTouched[2];
+        int done = 0;
+        int ext = 0;
+        boolean exit = false;
+        boolean textViewNotExists = false;
+        boolean whileEnd;
+
+        if (((lastShipTouched[1] != 0) & !shipOutsideLayout(shipId))) {
+            Bitmap shipImage = scaleShipImage(lastShipTouched[2], lastShipTouched[1]);
+            Matrix matrix = new Matrix();
+            if (ship.getWidth() > ship.getHeight()) {
+                matrix.setRotate(90f);
+                align = 2;
+            } else {
+                matrix.setRotate(180f);
+                align = 1;
+            }
+            Bitmap rotated = Bitmap.createBitmap(shipImage, 0, 0, shipImage.getWidth(), shipImage.getHeight(), matrix, false);
+
+
+
+            do {
+                startTextView = getShipLocation(shipId)[0] + ext;
+
+                if((startTextView%10) == 9) {
+                    ext = 0;
+                    done ++;
+                }
+                if ((startTextView%10) == 0) {
+                    ext = 0;
+                    done ++;
+                }
+
+                if(arrTextViews[arrTextViewsUsed[shipId][0]].getY() + rotated.getHeight() > arrTextViews[90].getY() + textViewSize) {
+                    int fix = (int) -(((ship.getY() + rotated.getHeight()) - (arrTextViews[90].getY() + textViewSize)) / textViewSize);
+                    startTextView += fix*10;
+                    Toast.makeText(this, Integer.toString(ext), Toast.LENGTH_SHORT).show();
+                }
+
+                if(arrTextViews[arrTextViewsUsed[shipId][0]].getX() + rotated.getWidth() > arrTextViews[9].getX() + textViewSize) {
+                    done = 1;
+                    ext = (int) -(((ship.getX() + rotated.getWidth()) - (arrTextViews[9].getX() + textViewSize)) / textViewSize);
+                    startTextView += ext;
+                }
+
+
+
+                for (int i = 0; i < l; i++) {
+                    switch (align) {
+                        case 1:
+                            arrTextViewsUsed[shipId][i] = startTextView + i;
+                            break;
+                        case 2:
+                            arrTextViewsUsed[shipId][i] = startTextView + i * 10;
+                            break;
+                    }
+                }
+                switch(done) {
+                    case 0:
+                        ext ++;
+                        break;
+                    case 1:
+                        ext --;
+                        break;
+                    case 2:
+                        exit = true;
+                        break;
+                }
+
+                for(int i = 0; i < l; i++) {
+                    if (checkTextViewExist(arrTextViewsUsed[shipId][i]) == -1) {
+                        textViewNotExists = true;
+                        break;
+                    }
+                }
+
+                if (exit) {
+                    for (int i = 0; i < l; i++) {
+                        switch (align) {
+                            case 1:
+                                arrTextViewsUsed[shipId][i] = getShipLocation(shipId)[0] + i * 10;
+                                break;
+                            case 2:
+                                arrTextViewsUsed[shipId][i] = getShipLocation(shipId)[0] + i;
+                                break;
+                        }
+                    }
+                    break;
+                }
+                whileEnd = ((shipCheckArea(lastShipTouched[0], align, startTextView) & !textViewNotExists));
+            } while (!whileEnd);
+
+
+            if (exit) {shipBlink(shipId, 2);} else {ship.setImageBitmap(rotated); shipBlink(shipId, 1);}
+
+            int x = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getX() + getResources().getDimension(R.dimen.activity_horizontal_margin));
+            int y = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getY() + getResources().getDimension(R.dimen.activity_vertical_margin));
+
+            ship.animate().x(x).y(y).setDuration(200);
+            arrShips[shipId].setX(x);
+            arrShips[shipId].setY(y);
+        }
+    }
 */
