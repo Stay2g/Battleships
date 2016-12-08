@@ -51,7 +51,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     int arrShipPlaced[] = {1, 2, 3, 4};                                                             //4 Shiffstypen: Wert in Array = Schiffe noch gesetzt
     int arrShipOrigins[][] = new int[10][3];                                                        //10 Schiffe; X, Y, bewegt?
     int arrTextViewsUsed[][] = new int[10][5];
-    int arrTextViewsLocked[] = new int[200];
+    int arrTextViewsLocked[] = new int[300];
     boolean moving;
 
     @Override
@@ -657,7 +657,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                    if(arrTextViewsUsed[i][j] == -1) {                                          //wenn Schiff schon gesetzt wurde, dann...
                        break;
                    } else {
-                       for (int k = 0; k < 200; k++) {
+                       for (int k = 0; k < arrTextViewsUsed.length; k++) {
                            if(arrTextViewsLocked[k] == -1) {                                        //suche nach unbenutztem Platz...
                                arrTextViewsLocked[k] = arrTextViewsUsed[i][j];
                                switch(isTextViewAtBorder(arrTextViewsUsed[i][j])) {
