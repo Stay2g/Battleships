@@ -357,7 +357,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     private void setShipLocation(int shipId) {
         int matchingTextViews[] = getShipLocation(shipId);
         if(!isFirstShip()) {
-            if (matchingTextViews[0] > -1 & !shipOutsideLayout(shipId) & shipCheckArea(shipId)) {
+            if (matchingTextViews[0] > -1 & !shipOutsideLayout(shipId) & shipCheckArea(shipId, 0, 0)) {
                 TextView firstTextView = (TextView) findViewById(matchingTextViews[0]);
                 arrShips[shipId].setX(firstTextView.getX() + getResources().getDimension(R.dimen.activity_horizontal_margin));
                 arrShips[shipId].setY(firstTextView.getY() + getResources().getDimension(R.dimen.activity_vertical_margin));
@@ -404,7 +404,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                 if (arrShips[shipId].getWidth() < arrShips[shipId].getHeight()) {
                     ext = 10;
                 }
-                if (shipCheckArea(shipId)) {
+                if (shipCheckArea(shipId, 0, 0)) {
                     for (int i = 0; i < arrShipCurrent[1]; i++) {
                         arrTextViews[arrShipCurrent[0] + i * ext].setBackgroundColor(Color.GREEN);
                         arrTextViews[arrShipCurrent[0] + i * ext].setAlpha(0.5f);
@@ -427,7 +427,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     private void setArrTextViewsUsed(int shipId) {
         int currentShip[] = getShipLocation(shipId);
         int textViewId = currentShip[0];
-        if(shipOutsideLayout(shipId) & shipCheckArea(shipId)) {
+        if(shipOutsideLayout(shipId) & shipCheckArea(shipId, 0, 0)) {
             for (int i = 0; i < 5; i++) {
                 arrTextViewsUsed[shipId][i] = -1;
             }
@@ -648,7 +648,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         }
         return true;
     }
-
+/*
     private boolean shipCheckArea(int shipId) {
         int currentShip[] = getShipLocation(shipId);
         for(int i = 0; i < arrShips.length; i++) {
@@ -716,8 +716,15 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         initTextViewLocked();
         return true;
     }
-
+*/
     private boolean shipCheckArea(int shipId, int align, int textViewStartId) {
+        int a;
+        if(align == 0 & textViewStartId == 0) {
+            int currentShip[] = getShipLocation(shipId);
+            align = currentShip[2];
+            textViewStartId = currentShip[0];
+        }
+
         int currentShip[] = getShipLocation(shipId);
         for(int i = 0; i < arrShips.length; i++) {
             if(i != shipId) {
@@ -730,28 +737,79 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                                 arrTextViewsLocked[k] = arrTextViewsUsed[i][j];
                                 switch(isTextViewAtBorder(arrTextViewsUsed[i][j])) {
                                     case 0:
-                                        arrTextViewsLocked[k + 1] = checkTextViewExist(arrTextViewsUsed[i][j] - 1);
-                                        arrTextViewsLocked[k + 2] = checkTextViewExist(arrTextViewsUsed[i][j] + 1);
-                                        arrTextViewsLocked[k + 3] = checkTextViewExist(arrTextViewsUsed[i][j] - 9);
-                                        arrTextViewsLocked[k + 4] = checkTextViewExist(arrTextViewsUsed[i][j] + 9);
-                                        arrTextViewsLocked[k + 5] = checkTextViewExist(arrTextViewsUsed[i][j] + 10);
-                                        arrTextViewsLocked[k + 6] = checkTextViewExist(arrTextViewsUsed[i][j] - 10);
-                                        arrTextViewsLocked[k + 7] = checkTextViewExist(arrTextViewsUsed[i][j] + 11);
-                                        arrTextViewsLocked[k + 8] = checkTextViewExist(arrTextViewsUsed[i][j] - 11);
+                                        a = 0;
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] - 1);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] + 1);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] - 9);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] + 9);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] + 10);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] - 10);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] + 11);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] - 11);
                                         break;
                                     case 1:
-                                        arrTextViewsLocked[k + 1] = checkTextViewExist(arrTextViewsUsed[i][j] + 1);
-                                        arrTextViewsLocked[k + 2] = checkTextViewExist(arrTextViewsUsed[i][j] - 9);
-                                        arrTextViewsLocked[k + 3] = checkTextViewExist(arrTextViewsUsed[i][j] + 10);
-                                        arrTextViewsLocked[k + 4] = checkTextViewExist(arrTextViewsUsed[i][j] - 10);
-                                        arrTextViewsLocked[k + 5] = checkTextViewExist(arrTextViewsUsed[i][j] + 11);
+                                        a = 0;
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] + 1);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] - 9);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] + 10);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] - 10);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] + 11);
                                         break;
                                     case 2:
-                                        arrTextViewsLocked[k + 1] = checkTextViewExist(arrTextViewsUsed[i][j] - 1);
-                                        arrTextViewsLocked[k + 2] = checkTextViewExist(arrTextViewsUsed[i][j] + 9);
-                                        arrTextViewsLocked[k + 3] = checkTextViewExist(arrTextViewsUsed[i][j] + 10);
-                                        arrTextViewsLocked[k + 4] = checkTextViewExist(arrTextViewsUsed[i][j] - 10);
-                                        arrTextViewsLocked[k + 5] = checkTextViewExist(arrTextViewsUsed[i][j] - 11);
+                                        a = 0;
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] - 1);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] + 9);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] + 10);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] - 10);
+                                        do {
+                                            a++;
+                                        } while (arrTextViewsLocked[k + a] != -1);
+                                        arrTextViewsLocked[k + a] = checkTextViewExist(arrTextViewsUsed[i][j] - 11);
                                         break;
                                 }
                                 break;
@@ -919,7 +977,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     }
 
     private void dev() {
-        if (shipCheckArea(lastShipTouched[0]) & !shipOutsideLayout(lastShipTouched[0])) {
+        if (shipCheckArea(lastShipTouched[0], 0, 0) & !shipOutsideLayout(lastShipTouched[0])) {
             arrShips[lastShipTouched[0]].clearColorFilter();
         } else {
             arrShips[lastShipTouched[0]].setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
