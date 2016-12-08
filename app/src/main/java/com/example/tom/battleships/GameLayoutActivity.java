@@ -725,7 +725,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                     if(arrTextViewsUsed[i][j] == -1) {                                          //wenn Schiff schon gesetzt wurde, dann...
                         break;
                     } else {
-                        for (int k = 0; k < 200; k++) {
+                        for (int k = 0; k < arrTextViewsLocked.length; k++) {
                             if(arrTextViewsLocked[k] == -1) {                                        //suche nach unbenutztem Platz...
                                 arrTextViewsLocked[k] = arrTextViewsUsed[i][j];
                                 switch(isTextViewAtBorder(arrTextViewsUsed[i][j])) {
@@ -764,7 +764,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         for(int l = 0; l < currentShip[1]; l++) {
             switch (align) {
                 case 1:
-                    for(int m = 0; m < 200; m++) {
+                    for(int m = 0; m < arrTextViewsLocked.length; m++) {
                         if((textViewStartId + l) == arrTextViewsLocked[m]) {
                             initTextViewLocked();
                             return false;
@@ -772,7 +772,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
                     }
                     break;
                 case 2:
-                    for(int m = 0; m < 200; m++) {
+                    for(int m = 0; m < arrTextViewsLocked.length; m++) {
                         if((textViewStartId + l * 10) == arrTextViewsLocked[m]) {
                             initTextViewLocked();
                             return false;

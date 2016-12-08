@@ -33,7 +33,7 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
     //Wert verändern für direkten Spielstart:
     //true  -> Loginfenster ist der start
     //false -> Login wird Umgangen
-    private boolean loginUmgehung = false;
+    private boolean loginUmgehung = true;
 
     private static final int RC_SIGN_IN = 1;
     private static final String TAG = "SignInActivity";
