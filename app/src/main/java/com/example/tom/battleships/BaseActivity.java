@@ -31,7 +31,7 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
     //Wert verändern für direkten Spielstart:
     //true -> Login wird Umgangen
     //false  -> Loginfenster ist der start
-    private boolean instantGameStart = false;
+    private boolean instantGameStart = true;
 
     private static final int RC_SIGN_IN = 1;
     private static final String TAG = "SignInActivity";
@@ -238,16 +238,16 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
         btnReg = (Button) findViewById(R.id.btnRegister);
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnGuestLogin = (Button) findViewById(R.id.btnGuestLogin);
-        btnSingleplayer = (Button) findViewById(R.id.btnSingleplayer);
-        btnMultiplayer = (Button) findViewById(R.id.btnMultiplayer);
+        //btnSingleplayer = (Button) findViewById(R.id.btnSingleplayer);
+        //btnMultiplayer = (Button) findViewById(R.id.btnMultiplayer);
         //btnSettings = (Button) findViewById(R.id.btnSettings);
         mGoogleBtn = (SignInButton) findViewById(R.id.sign_in_button);
 
         btnReg.setOnClickListener(this);
         btnLogin.setOnClickListener(this);
         btnGuestLogin.setOnClickListener(this);
-        btnSingleplayer.setOnClickListener(this);
-        btnMultiplayer.setOnClickListener(this);
+        //btnSingleplayer.setOnClickListener(this);
+        //btnMultiplayer.setOnClickListener(this);
         //btnSettings.setOnClickListener(this);
         mGoogleBtn.setOnClickListener(this);
     }
