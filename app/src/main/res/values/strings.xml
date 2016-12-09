@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Battleships</string>
-    <string name="stringLogin">Login</string>
-    <string name="stringName">Name</string>
-    <string name="stringPwd">Password</string>
-    <string name="stringRegister">Register</string>
-    <string name="textViewReg">No Account?</string>
-    <string name="abortReg">Register canceled</string>
-    <string name="stringPwdRpt">Repeat Password</string>
+
+    <string name="strLogin">Login</string>
+    <string name="strLogout">Logout</string>
+    <string name="strRegister">Register</string>
+    <string name="strGast">Guest</string>
     <string name="strSingleplayer">Singleplayer</string>
     <string name="strMultiplayer">Multiplayer</string>
     <string name="strSettings">Settings</string>
-    <string name="strLoginFailed">Your Username or Password is Wrong</string>
-    <string name="strExit">Exit</string>
     <string name="strSound">Sound effects</string>
     <string name="strMusic">Music</string>
-    <string name="strLogout">Logout</string>
-    <string name="server_client_id">689690160716-bsr6nfvnjcgl6e270qna2u3rj6qunbid.apps.googleusercontent.com</string>
+    <string name="strExit">Exit</string>
+
+    <string name="strName">Name</string>
+    <string name="strPwd">Password</string>
+    <string name="strPwdRpt">Repeat Password</string>
+    <string name="strLoginFailed">Your Username or Password is Wrong</string>
+    <string name="strTextViewReg">No Account?</string>
+    <string name="strAbortReg">Registration Cancelled</string>
+    <string name="strGuestLogin">Login As Guest</string>
+    <string name="strSearchForPlayer">Search...</string>
 </resources>

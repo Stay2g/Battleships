@@ -1,6 +1,7 @@
 package com.example.tom.battleships;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -74,6 +75,9 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
+        if (v.getId() == findViewById(R.id.buttonStart).getId()){
+            btnStart();
+        }
         if (v.getId() == findViewById(R.id.buttonTest).getId()) {
             setValidShipLocation();
         }
@@ -985,7 +989,8 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
     }
 
     private void btnStart() {
-
+        Intent startGameIntent = new Intent(this, GameActivity.class);
+        startActivity(startGameIntent);
     }
 
     private void btnRotate() {

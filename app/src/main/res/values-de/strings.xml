@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Battleship</string>
-    <string name="abortReg">Registrierung abgebrochen</string>
     <string name="strExit">Beenden</string>
     <string name="strLoginFailed">Ihr Nutzername oder Passwort ist falsch</string>
     <string name="strMultiplayer">Mehrspieler</string>
     <string name="strSettings">Enstellungen</string>
     <string name="strSingleplayer">Einzelspieler</string>
-    <string name="stringLogin">Login</string>
-    <string name="stringPwd">Passwort</string>
-    <string name="stringPwdRpt">Passwort wiederholen</string>
-    <string name="stringRegister">Registrieren</string>
-    <string name="textViewReg">Keinen Account?</string>
-    <string name="stringName">Name</string>
+    <string name="strLogin">Anmelden</string>
+    <string name="strPwd">Passwort</string>
+    <string name="strPwdRpt">Passwort wiederholen</string>
+    <string name="strRegister">Registrieren</string>
+    <string name="strName">Name</string>
     <string name="strLogout">Logout</string>
     <string name="strMusic">Musik</string>
     <string name="strSound">Soundeffekte</string>
+    <string name="strAbortReg">Registrierung abgebrochen</string>
+    <string name="strTextViewReg">Keinen Account?</string>
+    <string name="strGast">Gast</string>
+    <string name="strGuestLogin">Als Gast einloggen</string>
+    <string name="strSearchForPlayer">Suche...</string>
 </resources>

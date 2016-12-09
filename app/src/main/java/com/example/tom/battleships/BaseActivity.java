@@ -9,9 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -33,22 +31,24 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
     //Wert verändern für direkten Spielstart:
     //true -> Login wird Umgangen
     //false  -> Loginfenster ist der start
-    private boolean loginUmgehung = false;
+    private boolean instantGameStart = false;
 
     private static final int RC_SIGN_IN = 1;
     private static final String TAG = "SignInActivity";
 
-    private TextView textViewUsername;
     private ProgressBar pbBar;
 
     private EditText editTextLoginName, editTextLoginPassword;
-    private Button btnLogin, btnReg, btnLogout;
+    private Button btnLogin, btnReg, btnGuestLogin, btnSingleplayer, btnMultiplayer, btnSettings;
 
     private DBAdapter dbAdapter;
     private SignInButton mGoogleBtn;
     private GoogleApiClient mGoogleApiClient;
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
+
+    public String strLoginName, strLoginPassword;
+
+    public FirebaseAuth mAuth;
+    public FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +56,7 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
         setContentView(R.layout.activity_login);
         initAll();                                                                                  //initialisiere alle Buttons, TextViews, usw.
 
-        if (loginUmgehung) {                                                                        //loginUmgehung == true -> Loginanzeige wird übersprungen
+        if (instantGameStart) {                                                                     //loginUmgehung == true -> Loginanzeige wird übersprungen
             Intent intentStartGame = new Intent(this, GameLayoutActivity.class);
             startActivity(intentStartGame);
         }
@@ -84,6 +84,7 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (firebaseAuth.getCurrentUser() != null) {
                     Toast.makeText(BaseActivity.this, "Logged In", Toast.LENGTH_SHORT).show();      //User logged in
+
                 } else {
                     Log.d(TAG, "onAuthStateChanged:signed_out");                                    //User logged out
                 }
@@ -120,6 +121,7 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
         uiHelper.hide();
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -143,21 +145,22 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btnLogin:
+                mAuth.signOut();
                 editTextLoginName.setText("ADMIN");                                                 //'ADMIN' 'ADMIN' in EditTexts setzen
                 editTextLoginPassword.setText("ADMIN");
                 userDataCheck();
+                finish();
                 break;
             case R.id.btnRegister:
                 Intent intentStartRegAct = new Intent(this, RegisterActivity.class);
                 startActivity(intentStartRegAct);
                 break;
+            case R.id.btnGuestLogin:
+
+                break;
             case R.id.sign_in_button:
                 signIn();                                                                           //Start des Google-Login-Vorgangs
                 break;
-            /*case R.id.btnLogout:
-                FirebaseAuth.getInstance().signOut();
-                break;
-                */
         }
     }
 
@@ -171,18 +174,19 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
                 GoogleSignInAccount account = result.getSignInAccount();                            //Falls Login erfolgreich -> Datenentnahme des eigenloggten accounts
                 firebaseAuthWithGoogle(account);
                 pbBar.setVisibility(View.GONE);
-                mGoogleBtn.setVisibility(View.GONE);
-                //btnLogout.setVisibility(View.VISIBLE);
+                Intent intent = new Intent(this, MainMenuActivity.class);
+                startActivity(intent);
+                finish();
             } else {
-                // Google Sign In failed
+                pbBar.setVisibility(View.GONE);
             }
         }
     }
 
     private void userDataCheck() {
 
-        String strLoginName = editTextLoginName.getText().toString();
-        String strLoginPassword = editTextLoginPassword.getText().toString();
+        strLoginName = editTextLoginName.getText().toString();
+        strLoginPassword = editTextLoginPassword.getText().toString();
 
         boolean userDataCorrect = dbAdapter.checkUserData(strLoginName, strLoginPassword);          //Prüfe ob Name mit passendem Passwort in Datenbank eingetragen ist
 
@@ -191,7 +195,7 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
         } else if (userDataCorrect){                                                                //Bei Falschen Daten: userDataCorrect == False
              Toast.makeText(this, R.string.strLoginFailed, Toast.LENGTH_SHORT).show();
         } else {                                                                                    //Rest ist passend
-            Intent intentStartGame = new Intent(this, GameLayoutActivity.class);
+            Intent intentStartGame = new Intent(this, MainMenuActivity.class);
             startActivity(intentStartGame);
         }
     }
@@ -233,12 +237,18 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
 
         btnReg = (Button) findViewById(R.id.btnRegister);
         btnLogin = (Button) findViewById(R.id.btnLogin);
-        //btnLogout = (Button) findViewById(R.id.btnLogout);
+        btnGuestLogin = (Button) findViewById(R.id.btnGuestLogin);
+        btnSingleplayer = (Button) findViewById(R.id.btnSingleplayer);
+        btnMultiplayer = (Button) findViewById(R.id.btnMultiplayer);
+        //btnSettings = (Button) findViewById(R.id.btnSettings);
         mGoogleBtn = (SignInButton) findViewById(R.id.sign_in_button);
 
         btnReg.setOnClickListener(this);
         btnLogin.setOnClickListener(this);
-        //btnLogout.setOnClickListener(this);
+        btnGuestLogin.setOnClickListener(this);
+        btnSingleplayer.setOnClickListener(this);
+        btnMultiplayer.setOnClickListener(this);
+        //btnSettings.setOnClickListener(this);
         mGoogleBtn.setOnClickListener(this);
     }
 }

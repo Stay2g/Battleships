@@ -12,9 +12,9 @@
 
         <EditText
             android:id="@+id/editTextLogin"
-            android:layout_width="150dp"
+            android:layout_width="210dp"
             android:layout_height="wrap_content"
-            android:hint="@string/stringLogin"
+            android:hint="@string/strName"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:textAlignment="center"
@@ -24,9 +24,9 @@
 
         <EditText
             android:id="@+id/editTextPwd"
-            android:layout_width="150dp"
+            android:layout_width="210dp"
             android:layout_height="wrap_content"
-            android:hint="@string/stringPwd"
+            android:hint="@string/strPwd"
             android:inputType="textPassword"
             android:layout_below="@+id/editTextLogin"
             android:layout_centerHorizontal="true"
@@ -37,7 +37,7 @@
 
 
         <TextView
-            android:text="@string/textViewReg"
+            android:text="@string/strTextViewReg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/small_text_size"
@@ -50,26 +50,49 @@
             android:id="@+id/loadingProgress"
             android:layout_centerInParent="true"
             android:indeterminate="true"
-            android:translationZ="2dp"
+            android:translationZ="50dp"
             android:visibility="invisible"/>
+
 
         <Button
             android:id="@+id/btnLogin"
-            android:text="@string/stringLogin"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
+            android:text="@string/strLogin"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:textColor="@color/buttonTextStartColor"
+            android:background="@drawable/custom_button"
+            android:textStyle="bold"
+            android:textAllCaps="false"
             android:layout_below="@+id/editTextPwd"
             android:layout_alignStart="@+id/editTextPwd"
-            android:layout_marginTop="25dp" />
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"/>
+
+        <Button
+            android:id="@+id/btnGuestLogin"
+            android:text="@string/strGuestLogin"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:textColor="@color/buttonTextStartColor"
+            android:background="@drawable/custom_button"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:layout_below="@+id/editTextPwd"
+            android:layout_toEndOf="@+id/btnLogin"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="5dp"/>
 
         <Button
             android:id="@+id/btnRegister"
-            android:text="@string/stringRegister"
+            android:text="@string/strRegister"
             android:textSize="@dimen/small_text_size"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/custom_button"
+            android:textAllCaps="false"
             android:layout_alignParentBottom="true"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
             android:layout_centerHorizontal="true" />
 
         <com.google.android.gms.common.SignInButton
