@@ -35,7 +35,7 @@ public class LoginActivity extends FragmentActivity implements View.OnClickListe
     //Ändere den Wert wenn du den Login ausprobieren willst:
     //false -> Login wird Umgangen
     //true  -> Loginfenster ist der start
-    private boolean loginUmgehung = true;
+    private boolean loginUmgehung = false;
 
     private static final int RC_SIGN_IN = 1;
     private static final String TAG = "SignInActivity";

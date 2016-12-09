@@ -1,6 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-</LinearLayout>
+    <GridLayout
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="@dimen/marginLayoutPlayer"
+        android:layout_marginEnd="@dimen/marginLayoutPlayer"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/gridLayoutPlayer">
+    </GridLayout>
+
+    <GridLayout
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="@dimen/marginLayoutPlayer"
+        android:layout_marginStart="@dimen/marginLayoutPlayer"
+        android:layout_alignParentStart="true"
+        android:id="@+id/gridLayoutEnemy">
+    </GridLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/gridLayoutEnemy"
+        android:layout_toEndOf="@+id/gridLayoutEnemy"
+        android:layout_marginStart="21dp"
+        android:layout_marginTop="25dp"
+        android:id="@+id/textViewArrow" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:layout_below="@+id/gridLayoutPlayer"
+        android:layout_toEndOf="@+id/textViewArrow"
+        android:layout_marginTop="20dp" />
+
+</RelativeLayout>

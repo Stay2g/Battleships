@@ -15,18 +15,10 @@
         android:layout_height="300dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
+        android:layout_marginTop="@dimen/marginLayoutPlayer"
+        android:layout_marginStart="@dimen/marginLayoutPlayer"
         android:id="@+id/gridLayoutPlayer">
-
     </GridLayout>
-
-    <Button
-        android:text="↻"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:id="@+id/buttonTest"
-        android:layout_centerVertical="true"
-        android:layout_toEndOf="@+id/gridLayoutPlayer"
-        android:layout_marginStart="15dp" />
 
     <TextView
         android:layout_width="150dp"
@@ -67,5 +59,14 @@
         android:id="@+id/buttonStart"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true" />
+
+    <Button
+        android:text="↻"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/buttonTest"
+        android:layout_marginStart="19dp"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/gridLayoutPlayer" />
 
 </RelativeLayout>
