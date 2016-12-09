@@ -31,7 +31,7 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
     //Wert verändern für direkten Spielstart:
     //true -> Login wird Umgangen
     //false  -> Loginfenster ist der start
-    private boolean instantGameStart = true;
+    private boolean instantGameStart = false;
 
     private static final int RC_SIGN_IN = 1;
     private static final String TAG = "SignInActivity";

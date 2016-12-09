@@ -31,6 +31,7 @@ public class MainMenuActivity extends BaseActivity{
 
     @Override
     public void onClick(View view) {
+        /*
         switch (view.getId()){
             case R.id.btnSingleplayer:
                 Intent startShipSettingIntent = new Intent(this, GameLayoutActivity.class);
@@ -42,11 +43,11 @@ public class MainMenuActivity extends BaseActivity{
                 progressDialog.show();
                 searchForPlayer();
                 break;
-            /*
+
             case R.id.btnSettings:
                 break;
-            */
         }
+        */
     }
 
     private void searchForPlayer() {
