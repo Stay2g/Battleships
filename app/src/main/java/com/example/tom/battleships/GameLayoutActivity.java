@@ -87,6 +87,29 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
             }
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //TODO: GOING BACK
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+
+        com.example.tom.battleships.SystemUiHelper uiHelper =                                       //Aufrufen einer Helper-Klasse, die einen "richtigen" Vollbildmodus hervorruft
+                new com.example.tom.battleships.SystemUiHelper(
+                        this, com.example.tom.battleships.SystemUiHelper.LEVEL_IMMERSIVE ,flags);
+        uiHelper.hide();
+    }
     //------------------------------------------------------------------------------//
     //----------------------------------- Creator ----------------------------------//
     //------------------------------------------------------------------------------//
@@ -648,75 +671,7 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
         }
         return true;
     }
-/*
-    private boolean shipCheckArea(int shipId) {
-        int currentShip[] = getShipLocation(shipId);
-        for(int i = 0; i < arrShips.length; i++) {
-            if(i != shipId) {
-               for (int j = 0; j < 5; j++) {
-                   if(arrTextViewsUsed[i][j] == -1) {                                          //wenn Schiff schon gesetzt wurde, dann...
-                       break;
-                   } else {
-                       for (int k = 0; k < arrTextViewsLocked.length; k++) {
-                           if(arrTextViewsLocked[k] == -1) {                                        //suche nach unbenutztem Platz...
-                               arrTextViewsLocked[k] = arrTextViewsUsed[i][j];
-                               switch(isTextViewAtBorder(arrTextViewsUsed[i][j])) {
-                                   case 0:
-                                       arrTextViewsLocked[k + 1] = checkTextViewExist(arrTextViewsUsed[i][j] - 1);
-                                       arrTextViewsLocked[k + 2] = checkTextViewExist(arrTextViewsUsed[i][j] + 1);
-                                       arrTextViewsLocked[k + 3] = checkTextViewExist(arrTextViewsUsed[i][j] - 9);
-                                       arrTextViewsLocked[k + 4] = checkTextViewExist(arrTextViewsUsed[i][j] + 9);
-                                       arrTextViewsLocked[k + 5] = checkTextViewExist(arrTextViewsUsed[i][j] + 10);
-                                       arrTextViewsLocked[k + 6] = checkTextViewExist(arrTextViewsUsed[i][j] - 10);
-                                       arrTextViewsLocked[k + 7] = checkTextViewExist(arrTextViewsUsed[i][j] + 11);
-                                       arrTextViewsLocked[k + 8] = checkTextViewExist(arrTextViewsUsed[i][j] - 11);
-                                       break;
-                                   case 1:
-                                       arrTextViewsLocked[k + 1] = checkTextViewExist(arrTextViewsUsed[i][j] + 1);
-                                       arrTextViewsLocked[k + 2] = checkTextViewExist(arrTextViewsUsed[i][j] - 9);
-                                       arrTextViewsLocked[k + 3] = checkTextViewExist(arrTextViewsUsed[i][j] + 10);
-                                       arrTextViewsLocked[k + 4] = checkTextViewExist(arrTextViewsUsed[i][j] - 10);
-                                       arrTextViewsLocked[k + 5] = checkTextViewExist(arrTextViewsUsed[i][j] + 11);
-                                       break;
-                                   case 2:
-                                       arrTextViewsLocked[k + 1] = checkTextViewExist(arrTextViewsUsed[i][j] - 1);
-                                       arrTextViewsLocked[k + 2] = checkTextViewExist(arrTextViewsUsed[i][j] + 9);
-                                       arrTextViewsLocked[k + 3] = checkTextViewExist(arrTextViewsUsed[i][j] + 10);
-                                       arrTextViewsLocked[k + 4] = checkTextViewExist(arrTextViewsUsed[i][j] - 10);
-                                       arrTextViewsLocked[k + 5] = checkTextViewExist(arrTextViewsUsed[i][j] - 11);
-                                       break;
-                               }
-                               break;
-                           }
-                       }
-                   }
-               }
-            }
-        }
-        for(int l = 0; l < currentShip[1]; l++) {
-            switch (currentShip[2]) {
-                case 1:
-                    for(int m = 0; m < arrTextViewsLocked.length; m++) {
-                        if((currentShip[0] + l) == arrTextViewsLocked[m]) {
-                            initTextViewLocked();
-                            return false;
-                        }
-                    }
-                    break;
-                case 2:
-                    for(int m = 0; m < arrTextViewsLocked.length; m++) {
-                        if((currentShip[0] + l * 10) == arrTextViewsLocked[m]) {
-                            initTextViewLocked();
-                            return false;
-                        }
-                    }
-                    break;
-            }
-        }
-        initTextViewLocked();
-        return true;
-    }
-*/
+
     private boolean shipCheckArea(int shipId, int align, int textViewStartId) {
         int a;
         if(align == 0 & textViewStartId == 0) {
@@ -1006,30 +961,10 @@ public class GameLayoutActivity extends Activity implements View.OnClickListener
             ship.setImageBitmap(rotated);
             fixTextViewsUsed();
         }
-    }
-    
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //TODO: GOING BACK
-    }
+    }  //1. Versuch Schiff zu drehen
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
+    //TODO: Button -> Random Schiffe setzen
 
-        final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-
-        com.example.tom.battleships.SystemUiHelper uiHelper =                                       //Aufrufen einer Helper-Klasse, die einen "richtigen" Vollbildmodus hervorruft
-                new com.example.tom.battleships.SystemUiHelper(
-                        this, com.example.tom.battleships.SystemUiHelper.LEVEL_IMMERSIVE ,flags);
-        uiHelper.hide();
-    }
 }
 
 
