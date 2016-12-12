@@ -24,9 +24,9 @@ public class MainMenuActivity extends BaseActivity{
 
         if (mAuth.getCurrentUser() != null) {
             textView.setText(mAuth.getCurrentUser().getDisplayName());
-        } else if (!strLoginName.isEmpty()){
+        } /*else if (!strLoginName.isEmpty()){
             textView.setText(strLoginName);
-        }
+        }*/
     }
 
     @Override
