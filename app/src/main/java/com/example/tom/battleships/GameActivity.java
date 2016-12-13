@@ -14,22 +14,24 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class GameActivity extends Activity implements View.OnClickListener{
-    int arrTextViewsUsed[][] = new int[10][5];
-    int arrTextViewsEnemy[][] = new int[10][5];
+    int arrTextViewsUsed[][] = new int[8][5];
+    int arrTextViewsEnemy[][] = new int[arrTextViewsUsed.length][5];
     TextView arrTextViews[] = new TextView[200];
-    ImageView arrShipsPlayer[] = new ImageView[10];
+    ImageView arrShipsPlayer[] = new ImageView[arrTextViewsUsed.length];
     int textViewSizePlayer, textViewSizeEnemy;
     GridLayout gridLayoutPlayer, gridLayoutEnemy;
     TextView textViewArrow;
-    boolean playerTurn;
-    int textViewForGame[] = new int[100];
+    int playerShots[] = new int[100];
+    int enemyShots[] = new int[100];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,13 +58,13 @@ public class GameActivity extends Activity implements View.OnClickListener{
             @Override
             public void run() {
                 initShipsPlayer();
+                initShipsEnemy();
             }
         }, 50);
 
         textViewArrow.postDelayed(new Runnable() {
             @Override
             public void run() {
-
                 animShowShips();
             }
         }, 100);
@@ -72,8 +74,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
     public void onClick(View v) {
         for (int i = 0; i < 100; i++) {
             if (arrTextViews[i].getId() == v.getId()) {
-                arrTextViews[i].setBackgroundColor(Color.BLUE);
-                randomShot();
+                playerShot(v.getId());
                 break;
             }
         }
@@ -104,7 +105,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
     }
 
     private void animShowShips() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < arrTextViewsEnemy.length; i++) {
             arrShipsPlayer[i].animate().alpha(1.0f).setDuration(100);
             arrShipsPlayer[i].postDelayed(new Runnable() {@Override public void run() {}}, 100);
         }
@@ -134,13 +135,13 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
     private void initShipsPlayer() {
         Intent intent = getIntent();
-        arrTextViewsUsed = (int[][]) intent.getSerializableExtra("textViewUsed");
+        arrTextViewsUsed = (int[][]) intent.getSerializableExtra("textViewUsedPlayer");
 
         RelativeLayout rl = (RelativeLayout) findViewById(R.id.rlActivityGame);
         int extX = (int) gridLayoutPlayer.getX();
         int extY = (int) gridLayoutPlayer.getY();
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < arrTextViewsUsed.length; i++) {
             arrShipsPlayer[i] = new ImageView(this);
             arrShipsPlayer[i].setId(400+i);
             arrShipsPlayer[i].setAlpha(0.0f);
@@ -153,22 +154,22 @@ public class GameActivity extends Activity implements View.OnClickListener{
                     arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
                     break;
                 case 1:
-                case 2:
+                //case 2:
                     rotate(i, R.drawable.bigship, 4);
                     arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
                     arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
                     break;
-                case 3:
-                case 4:
-                case 5:
+                case 2: //3
+                case 3: //4
+                case 4: //5
                     rotate(i, R.drawable.mediumship, 3);
                     arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
                     arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
                     break;
-                case 6:
-                case 7:
-                case 8:
-                case 9:
+                case 5: //6
+                case 6: //7
+                //case 8:
+                case 7: //9
                     rotate(i, R.drawable.smallship, 2);
                     arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
                     arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
@@ -178,10 +179,53 @@ public class GameActivity extends Activity implements View.OnClickListener{
         gridLayoutPlayer.bringToFront();
     }
 
+    private void initShipsEnemy() {
+        Intent intent = getIntent();
+        arrTextViewsEnemy = (int[][]) intent.getSerializableExtra("textViewUsedEnemy");
+    }
+
     private void initTextView4Game() {
         for(int i = 0; i < 100; i++) {
-            textViewForGame[i] = i;
+            enemyShots[i] = i;
+            playerShots[i] = i;
         }
+    }
+
+    private void playerShot(int vId) {
+        for (int x = 0; x < 100; x++) {
+            if (playerShots[x] == vId) {
+                for (int j = 0; j < arrTextViewsEnemy.length; j++) {
+                    for (int k = 0; k < 5; k++) {
+                        if (vId == arrTextViewsEnemy[j][k]) {
+                            arrTextViews[x].setBackgroundColor(Color.RED);
+                            playerShots[x] = -1;
+                            if(checkIfWon(arrTextViewsEnemy, playerShots)) {
+                                Toast.makeText(this, "Du hast gewonnen!", Toast.LENGTH_SHORT).show();
+                            }
+                            randomShot();
+                            return;
+                        }
+                    }
+                }
+                arrTextViews[x].setBackgroundColor(Color.BLUE);
+                randomShot();
+                playerShots[x] = -1;
+                return;
+            }
+        }
+    }
+
+    private boolean checkIfWon(int arr[][], int shots[]) {
+        for (int[] anArr : arr) {
+            for (int k = 0; k < 5; k++) {
+                for (int i = 0; i < 100; i++) {
+                    if ((anArr[k] == shots[i]) & anArr[k] != -1) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     private void randomShot() {
@@ -190,26 +234,25 @@ public class GameActivity extends Activity implements View.OnClickListener{
             textViewId = (int) (Math.random()*101);
 
             for (int i = 0; i < 100; i++) {
-                if(textViewForGame[i] == textViewId) {
-                    for (int j = 0; j < 10; j++) {
+                if(enemyShots[i] == textViewId) {
+                    for (int[] anArrTextViewsUsed : arrTextViewsUsed) {
                         for (int k = 0; k < 5; k++) {
-                            if (textViewId == arrTextViewsUsed[j][k]) {
+                            if (textViewId == anArrTextViewsUsed[k]) {
                                 arrTextViews[i + 100].setBackgroundColor(Color.RED);
-                                textViewForGame[i] = -1;
+                                enemyShots[i] = -1;
+                                if (checkIfWon(arrTextViewsUsed, enemyShots)) {
+                                    Toast.makeText(this, "Dein Gegner hat gewonnen.", Toast.LENGTH_SHORT).show();
+                                }
                                 return;
                             }
                         }
                     }
                     arrTextViews[i + 100].setBackgroundColor(Color.BLUE);
-                    textViewForGame[i] = -1;
+                    enemyShots[i] = -1;
                     return;
                 }
             }
         }
 
-    }
-
-    private void initShipsEnemy() {
-        
     }
 }

@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -32,17 +33,19 @@ public class GameLayoutActivity extends Activity implements Serializable {
     TextView arrShipCounters[] = new TextView[4];
     TextView arrPlaceholder[] = new TextView[4];
     TextView arrTextViewNames[] = new TextView[20];
-    ImageView arrShips[] = new ImageView[10];
+    ImageView arrShips[] = new ImageView[8];
+    boolean firstTimeRandom = true;                                                                 //setShipRandom muss 2 mal ausgeführt werden beim 1. Mal
     View.OnClickListener ocl;
-    Button btnStart;
+    Button btnStart, btnSetShipsRandom, btnRotate;
 
     int textViewSize, marginShips;
     int lastShipTouched[] = new int[3];                                                             //Schiff-ID, Bild-ID, Länge
 
-    int arrShipPlaced[] = {1, 2, 3, 4};                                                             //4 Shiffstypen: Wert in Array = Schiffe noch gesetzt
-    int arrShipOrigins[][] = new int[10][3];                                                        //10 Schiffe; X, Y, bewegt?
-    int arrTextViewsUsed[][] = new int[10][5];
-    int arrTextViewsLocked[] = new int[270];
+    int arrShipPlaced[] = {1, 1, 3, 3};                                                             //4 Shiffstypen: Wert in Array = Schiffe noch gesetzt
+    int arrShipOrigins[][] = new int[arrShips.length][3];                                           //Schiffe; X, Y, bewegt?
+    int arrTextViewsUsed[][] = new int[arrShips.length][5];
+    int arrTextViewsUsedPlayer[][] = new int[arrShips.length][5];
+    int arrTextViewsLocked[] = new int[240];
     boolean moving;
 
     @Override
@@ -61,19 +64,25 @@ public class GameLayoutActivity extends Activity implements Serializable {
         initTextViewUsed();
         initTextViewLocked();
 
+
+        btnRotate = (Button) findViewById(R.id.buttonRotate);
         btnStart = (Button) findViewById(R.id.buttonStart);
+        btnSetShipsRandom = (Button) findViewById(R.id.buttonSetShipsRandom);
 
         View.OnClickListener ocl = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (v.getId() == findViewById(R.id.buttonStart).getId()){
-                    btnStart();
-                }
-                if (v.getId() == findViewById(R.id.buttonTest).getId()) {
-                    setValidShipLocation();
-                }
-                if (v.getId() == btnStart.getId()) {
-                    btnStart();
+                switch (v.getId()) {
+                    case R.id.buttonStart:
+                        btnStart();
+                        break;
+                    case R.id.buttonSetShipsRandom:
+                        if (firstTimeRandom) {setShipsRandom(); firstTimeRandom = false;}
+                        setShipsRandom();
+                        break;
+                    case R.id.buttonRotate:
+                        setValidShipLocation(true, -1);
+                        break;
                 }
             }
         };
@@ -81,7 +90,8 @@ public class GameLayoutActivity extends Activity implements Serializable {
         btnStart.setOnClickListener(ocl);
         btnStart.setClickable(false);
         btnStart.setAlpha(0.5f);
-        findViewById(R.id.buttonTest).setOnClickListener(ocl);
+        btnSetShipsRandom.setOnClickListener(ocl);
+        btnRotate.setOnClickListener(ocl);
     }
 
     @Override
@@ -161,33 +171,38 @@ public class GameLayoutActivity extends Activity implements Serializable {
             switch (i) {
                 case 0:
                     setShipParams(5, i, rl);
-                    createShipCounter(0, rl);
+                    createShipCounter(0, rl, "1×");
                     break;
+                /*
                 case 1:
                     setShipParams(4, i, rl);
                     break;
-                case 2:
+                    */
+                case 1: //2
                     setShipParams(4, i, rl);
-                    createShipCounter(1, rl);
+                    createShipCounter(1, rl, "1×");
                     break;
-                case 3:
+                case 2: //3
                     setShipParams(3, i, rl);
                     break;
-                case 4:
+                case 3: //4
                     setShipParams(3, i, rl);
                     break;
-                case 5:
+                case 4: //5
                     setShipParams(3, i, rl);
-                    createShipCounter(2, rl);
+                    createShipCounter(2, rl, "3×");
                     break;
-                case 6:
-                case 7:
-                case 8:
+                case 5: //6
+                case 6: //7
+                    setShipParams(2, i, rl); break; //neu
+                /*
+                case 8: //8
                     setShipParams(2, i, rl);
                     break;
-                case 9:
+                    */
+                case 7: //9
                     setShipParams(2, i, rl);
-                    createShipCounter(3, rl);
+                    createShipCounter(3, rl, "3×");
                     break;
             }
             arrShips[i].setOnTouchListener(new View.OnTouchListener() {
@@ -227,12 +242,12 @@ public class GameLayoutActivity extends Activity implements Serializable {
         }
     }
 
-    private void createShipCounter(int id, RelativeLayout rl) {                                   //setMargins: http://stackoverflow.com/questions/4472429/change-the-right-margin-of-a-view-programmatically
+    private void createShipCounter(int id, RelativeLayout rl, String countValue) {                                   //setMargins: http://stackoverflow.com/questions/4472429/change-the-right-margin-of-a-view-programmatically
         LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
         arrShipCounters[id] = new TextView(this);
         arrShipCounters[id].setId(120 + id);
-        arrShipCounters[id].setText(String.format(Locale.getDefault(), "%1$d×", id + 1));
+        arrShipCounters[id].setText(countValue);
         arrShipCounters[id].setTextSize(41);
 
         lp.addRule(RelativeLayout.LEFT_OF, arrPlaceholder[id].getId());
@@ -246,7 +261,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
     //------------------------------------------------------------------------------//
 
     private void getShipOrigin() {
-        for (int ship = 0; ship < 10; ship++) {
+        for (int ship = 0; ship < arrShips.length; ship++) {
             arrShipOrigins[ship][0] = (int) arrShips[ship].getX();
             arrShipOrigins[ship][1] = (int) arrShips[ship].getY();
         }
@@ -304,18 +319,18 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 lastShipTouched[1] = R.drawable.giantship;
                 break;
             case 1:
-            case 2:
+            //case 2:
                 lastShipTouched[1] = R.drawable.bigship;
                 break;
-            case 3:
-            case 4:
-            case 5:
+            case 2: //3
+            case 3: //4
+            case 4: //5
                 lastShipTouched[1] = R.drawable.mediumship;
                 break;
-            case 6:
-            case 7:
-            case 8:
-            case 9:
+            case 5: //6
+            case 6: //7
+            //case 8:
+            case 7: //9
                 lastShipTouched[1] = R.drawable.smallship;
                 break;
         }
@@ -364,26 +379,26 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         }
                         break;
                     case 1:
-                    case 2:
+                    //case 2:
                         if (arrShipOrigins[i][2] == 0) {
                             decShipCounter(i, 1);
                         } else {
                             incShipCounter(i, 1);
                         }
                         break;
-                    case 3:
-                    case 4:
-                    case 5:
+                    case 2: //3
+                    case 3: //4
+                    case 4: //5
                         if (arrShipOrigins[i][2] == 0) {
                             decShipCounter(i, 2);
                         } else {
                             incShipCounter(i, 2);
                         }
                         break;
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9:
+                    case 5: //6
+                    case 6: //7
+                    //case 8:
+                    case 7: //9
                         if (arrShipOrigins[i][2] == 0) {
                             decShipCounter(i, 3);
                         } else {
@@ -482,13 +497,12 @@ public class GameLayoutActivity extends Activity implements Serializable {
         }
     }
 
-    private void setValidShipLocation() {
+    private void setValidShipLocation(boolean rotate, int start) {                                             //rotate true =
         ImageView ship = arrShips[lastShipTouched[0]];
         int shipId = lastShipTouched[0];
         int align;
         int l = lastShipTouched[2];
-        int textViewId = getShipLocation(shipId)[0];
-        int textViewStart;
+        int textViewId, textViewStart;
         int xEnd = 9;
         int yEnd = 9;
         int step = 0;
@@ -496,12 +510,13 @@ public class GameLayoutActivity extends Activity implements Serializable {
         boolean top = false;
         boolean bottom = false;
 
+        if(start != -1) {textViewId = start;} else {textViewId = getShipLocation(shipId)[0];}//startpunkt manuell setzen
 
         //Schiff-Image drehen (nur innerhalb des Spielfeldes
-        if (((lastShipTouched[1] != 0) & !shipOutsideLayout(shipId))) {
+        if (((lastShipTouched[1] != 0) /*& !shipOutsideLayout(shipId) */)) {
             Bitmap shipImage = scaleShipImage(lastShipTouched[2], lastShipTouched[1]);
             Matrix matrix = new Matrix(); //erstelle Matrix, das anschließend dem
-            if (ship.getWidth() > ship.getHeight()) {
+            if ((ship.getWidth() > ship.getHeight()) & rotate) {
                 matrix.setRotate(90f);
                 align = 2;                //horizontal
             } else {
@@ -596,7 +611,9 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         break;
                     case 4:
                         ship.setImageBitmap(rotated);
-                        shipBlink(shipId, 1);
+                        if (start == -1) {
+                            shipBlink(shipId, 1);
+                        }
                         exit = true;
                         break;
                     case 5:
@@ -610,16 +627,16 @@ public class GameLayoutActivity extends Activity implements Serializable {
                                     break;
                             }
                         }
-                        shipBlink(shipId, 2);
+                        if (start == -1) {
+                            shipBlink(shipId, 2);
+                        }
                         exit = true;
                         break;
                 }
             } while (!exit);
 
-            int x = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getX() + getResources().getDimension(R.dimen.activity_horizontal_margin)
-                    + getResources().getDimension(R.dimen.marginLayoutPlayer));
-            int y = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getY() + getResources().getDimension(R.dimen.activity_vertical_margin)
-                    + getResources().getDimension(R.dimen.marginLayoutPlayer));
+            int x = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getX() + getResources().getDimension(R.dimen.activity_horizontal_margin) + getResources().getDimension(R.dimen.marginLayoutPlayer));
+            int y = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getY() + getResources().getDimension(R.dimen.activity_vertical_margin) + getResources().getDimension(R.dimen.marginLayoutPlayer));
 
             ship.animate().x(x).y(y).setDuration(200);
 
@@ -938,17 +955,66 @@ public class GameLayoutActivity extends Activity implements Serializable {
     }
 
     private void btnStart() {
+        for (ImageView arrShip : arrShips) {
+            arrShip.setAlpha(0.0f);
+        }
+        for(int i = 0; i < arrShips.length; i++) {
+            System.arraycopy(arrTextViewsUsed[i], 0, arrTextViewsUsedPlayer[i], 0, 5);
+        }
+        initTextViewUsed();
+        setShipsRandom();
+        setShipsRandom();
         Intent startGameIntent = new Intent(this, GameActivity.class);
-        startGameIntent.putExtra("textViewUsed", arrTextViewsUsed);
+        startGameIntent.putExtra("textViewUsedPlayer", arrTextViewsUsedPlayer);
+        startGameIntent.putExtra("textViewUsedEnemy", arrTextViewsUsed);
         startActivity(startGameIntent);
     }
 
-    private void test() {
+    private void setShipsRandom() {
+        int val1, val2;
 
+        getShipOrigin();
+
+        for (int i = 0; i < 2; i++) {
+            val1 = (int) (Math.random() * 100);
+            val2 = (int) (Math.random() * 2);
+            boolean rotate = (val2 == 0);
+
+            getShipLastTouched(i);
+            arrTextViewsUsed[i][0] = val1;
+            setValidShipLocation(rotate, val1);
+            arrShipOrigins[i][2] = 1;
+        }
+
+        for (int i = 2; i < 5; i++) {
+            val1 = (int) (Math.random() * 10);
+            val1 = val1*10 + 4;
+            val2 = (int) (Math.random() * 2);
+            boolean rotate = (val2 == 0);
+
+            getShipLastTouched(i);
+            arrTextViewsUsed[i][0] = val1;
+            setValidShipLocation(rotate, val1);
+            arrShipOrigins[i][2] = 1;
+        }
+
+        for (int i = 5; i < 8; i++) {
+            val2 = (int) (Math.random() * 2);
+            boolean rotate = (val2 == 0);
+
+            getShipLastTouched(i);
+            arrTextViewsUsed[i][0] = 44;
+            setValidShipLocation(rotate, 44);
+            arrShipOrigins[i][2] = 1;
+        }
+        if(firstTimeRandom) {
+            for (int i = 0; i < 4; i++) {
+                arrShipCounters[i].setText("0×");
+                arrShipPlaced[i] = 0;
+            }
+        }
+        checkIfReady();
     }
-
-    //TODO: Button -> Random Schiffe setzen
-
 }
 /*
     private void btnRotate() {
