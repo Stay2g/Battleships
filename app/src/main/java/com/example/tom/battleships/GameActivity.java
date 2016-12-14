@@ -30,6 +30,8 @@ public class GameActivity extends Activity implements View.OnClickListener{
     int textViewSizePlayer, textViewSizeEnemy;
     GridLayout gridLayoutPlayer, gridLayoutEnemy;
     TextView textViewArrow;
+    int firstHit = -1;
+    int nextShot[] = {-1, 0};                                                                      // arr[0] = nextShot, arr[1] = textViewId + x (x wird gemerkt)
     int playerShots[] = new int[100];
     int enemyShots[] = new int[100];
 
@@ -194,21 +196,21 @@ public class GameActivity extends Activity implements View.OnClickListener{
     private void playerShot(int vId) {
         for (int x = 0; x < 100; x++) {
             if (playerShots[x] == vId) {
-                for (int j = 0; j < arrTextViewsEnemy.length; j++) {
+                for (int[] anArrTextViewsEnemy : arrTextViewsEnemy) {
                     for (int k = 0; k < 5; k++) {
-                        if (vId == arrTextViewsEnemy[j][k]) {
+                        if (vId == anArrTextViewsEnemy[k]) {
                             arrTextViews[x].setBackgroundColor(Color.RED);
                             playerShots[x] = -1;
-                            if(checkIfWon(arrTextViewsEnemy, playerShots)) {
-                                Toast.makeText(this, "Du hast gewonnen!", Toast.LENGTH_SHORT).show();
+                            if (checkIfWon(arrTextViewsEnemy, playerShots)) {
+                                Toast.makeText(this, "Du hast gewonnen!", Toast.LENGTH_LONG).show();
                             }
-                            randomShot();
+                            botLevel1();
                             return;
                         }
                     }
                 }
                 arrTextViews[x].setBackgroundColor(Color.BLUE);
-                randomShot();
+                botLevel1();
                 playerShots[x] = -1;
                 return;
             }
@@ -253,6 +255,114 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 }
             }
         }
+    }
 
+    private void botLevel1() {
+        int textViewId;
+        while(true) {
+            if (nextShot[0] == -1) {
+                textViewId = (int) (Math.random() * 101);
+            } else {
+                textViewId = nextShot[0];
+            }
+            for (int i = 0; i < 100; i++) {
+                if(enemyShots[i] == textViewId) {
+                    for (int[] anArrTextViewsUsed : arrTextViewsUsed) {
+                        for (int k = 0; k < 5; k++) {
+                            if (textViewId == anArrTextViewsUsed[k]) {
+                                arrTextViews[i + 100].setBackgroundColor(Color.RED);
+                                enemyShots[i] = -1;
+                                anArrTextViewsUsed[k] = -1;
+                                if (nextShot[1] == 0) {
+                                    for (int y = 0; y < 100; y++) {
+                                        if (enemyShots[y] == ((textViewId + 1)) & ((textViewId + 1) < 100)) {
+                                            nextShot[0] = textViewId + 1;
+                                            nextShot[1] = 1;
+                                            break;
+                                        }
+                                        if (enemyShots[y] == ((textViewId - 1)) & ((textViewId - 1) >= 0)) {
+                                            nextShot[0] = textViewId - 1;
+                                            nextShot[1] = -1;
+                                            break;
+                                        }
+                                        if (enemyShots[y] == ((textViewId + 10)) & ((textViewId + 10) < 100)) {
+                                            nextShot[0] = textViewId + 10;
+                                            nextShot[1] = 10;
+                                            break;
+                                        }
+                                        if (enemyShots[y] == ((textViewId - 10)) & ((textViewId - 10 >= 0))) {
+                                            nextShot[0] = textViewId - 10;
+                                            nextShot[1] = -10;
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    int ext = 0;
+                                    switch (nextShot[1]) {
+                                        case 1:
+                                            ext += 1;
+                                            break;
+                                        case -1:
+                                            ext += -1;
+                                            break;
+                                        case 10:
+                                            ext += 10;
+                                            break;
+                                        case -10:
+                                            ext += -10;
+                                            break;
+                                    }
+                                    nextShot[0] = textViewId + ext;
+                                }
+                                if (checkIfWon(arrTextViewsUsed, enemyShots)) {
+                                    Toast.makeText(this, "Dein Gegner hat gewonnen.", Toast.LENGTH_SHORT).show();
+                                }
+                                if(firstHit == -1) {
+                                    firstHit = i;
+                                }
+                                for (int u = 0; u < 5; u++) {
+                                    if (anArrTextViewsUsed[u] != -1) {
+                                        break;
+                                    }
+                                    if (u == 4) {
+                                        firstHit = -1;
+                                        nextShot[0] = -1;
+                                        nextShot[1] = 0;
+                                    }
+                                }
+                                return;
+                            }
+                        }
+                    }
+                    arrTextViews[i + 100].setBackgroundColor(Color.BLUE);
+                    enemyShots[i] = -1;
+                    if(firstHit != -1) {
+                        for (int y = 0; y < 100; y++) {
+                            if (enemyShots[y] == (firstHit + 1)) {
+                                nextShot[0] = firstHit + 1;
+                                nextShot[1] = 1;
+                                break;
+                            }
+                            if (enemyShots[y] == (firstHit - 1)) {
+                                nextShot[0] = firstHit - 1;
+                                nextShot[1] = -1;
+                                break;
+                            }
+                            if (enemyShots[y] == (firstHit + 10)) {
+                                nextShot[0] = firstHit + 10;
+                                nextShot[1] = 10;
+                                break;
+                            }
+                            if (enemyShots[y] == (firstHit - 10)) {
+                                nextShot[0] = firstHit - 10;
+                                nextShot[1] = -10;
+                                break;
+                            }
+                        }
+                    }
+                    return;
+                }
+            }
+        }
     }
 }
