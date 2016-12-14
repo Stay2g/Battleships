@@ -48,7 +48,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
         textViewSizeEnemy = (int) dpToPx(30);
         textViewSizePlayer = (int) dpToPx(22);
-        textViewArrow.setText("<-Tom=gay-");
+        textViewArrow.setText("...");
 
         findViewById(R.id.btnTest).setOnClickListener(this);
 
@@ -203,6 +203,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             playerShots[x] = -1;
                             if (checkIfWon(arrTextViewsEnemy, playerShots)) {
                                 Toast.makeText(this, "Du hast gewonnen!", Toast.LENGTH_LONG).show();
+                                textViewArrow.setText("won");
                             }
                             botLevel1();
                             return;
@@ -316,6 +317,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                                 }
                                 if (checkIfWon(arrTextViewsUsed, enemyShots)) {
                                     Toast.makeText(this, "Dein Gegner hat gewonnen.", Toast.LENGTH_SHORT).show();
+                                    textViewArrow.setText("lost");
                                 }
                                 if(firstHit == -1) {
                                     firstHit = i;
@@ -360,6 +362,46 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             }
                         }
                     }
+                    return;
+                }
+            }
+        }
+    }
+
+    private void botLevel9000() {
+        int textViewId = -1;
+        while(true) {
+
+            for(int[] arr : arrTextViewsUsed) {
+                for (int j = 0; j < 5; j++) {
+                    if (arr[j] != -1) {
+                        textViewId = arr[j];
+                        break;
+                    }
+                }
+                if(textViewId != -1) {
+                    break;
+                }
+            }
+
+            for (int i = 0; i < 100; i++) {
+                if(enemyShots[i] == textViewId) {
+                    for (int[] anArrTextViewsUsed : arrTextViewsUsed) {
+                        for (int k = 0; k < 5; k++) {
+                            if (textViewId == anArrTextViewsUsed[k]) {
+                                arrTextViews[i + 100].setBackgroundColor(Color.RED);
+                                enemyShots[i] = -1;
+                                anArrTextViewsUsed[k] = -1;
+                                if (checkIfWon(arrTextViewsUsed, enemyShots)) {
+                                    textViewArrow.setText("verlohren");
+                                    Toast.makeText(this, "Dein Gegner hat gewonnen.", Toast.LENGTH_SHORT).show();
+                                }
+                                return;
+                            }
+                        }
+                    }
+                    arrTextViews[i + 100].setBackgroundColor(Color.BLUE);
+                    enemyShots[i] = -1;
                     return;
                 }
             }
