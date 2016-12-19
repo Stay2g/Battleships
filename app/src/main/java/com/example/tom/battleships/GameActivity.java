@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
@@ -27,6 +28,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
     int arrTextViewsEnemy[][] = new int[arrTextViewsUsed.length][5];
     TextView arrTextViews[] = new TextView[200];
     ImageView arrShipsPlayer[] = new ImageView[arrTextViewsUsed.length];
+    ImageView arrShipsEnemy[] = new ImageView[arrTextViewsUsed.length];
     int textViewSizePlayer, textViewSizeEnemy;
     GridLayout gridLayoutPlayer, gridLayoutEnemy;
     TextView textViewArrow;
@@ -118,21 +120,39 @@ public class GameActivity extends Activity implements View.OnClickListener{
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
     }
 
-    private Bitmap scaleShipImage(int size, int shipImage) {
+    private Bitmap scaleShipImage(int size, int shipImage, int group) {
         Bitmap ship = BitmapFactory.decodeResource(getResources(), shipImage);
-        return Bitmap.createScaledBitmap(ship, textViewSizePlayer * size, textViewSizePlayer, false);
+        int textViewSize;
+        if (group == 1) {
+            textViewSize = textViewSizeEnemy;
+        } else {
+            textViewSize = textViewSizePlayer;
+        }
+        return Bitmap.createScaledBitmap(ship, textViewSize * size, textViewSize, false);
     }
 
-    private void rotate(int i, int id, int l) {
+    private void rotate(int i, int id, int l, ImageView[] arrShips) {
         Matrix matrix = new Matrix();
-        Bitmap shipImage = scaleShipImage(l, id);
-        if ((arrTextViewsUsed[i][1] - arrTextViewsUsed[i][0]) == 10) {
-            matrix.setRotate(90f);
+        Bitmap shipImage;
+        if (arrShips == arrShipsEnemy) {
+            if ((arrTextViewsEnemy[i][1] - arrTextViewsEnemy[i][0]) == 10) {
+                shipImage = scaleShipImage(l, id, 1);
+                matrix.setRotate(90f);
+            } else {
+                shipImage = scaleShipImage(l, id, 1);
+                matrix.setRotate(180f);
+            }
         } else {
-            matrix.setRotate(180f);
+            if ((arrTextViewsUsed[i][1] - arrTextViewsUsed[i][0]) == 10) {
+                shipImage = scaleShipImage(l, id, 2);
+                matrix.setRotate(90f);
+            } else {
+                shipImage = scaleShipImage(l, id, 2);
+                matrix.setRotate(180f);
+            }
         }
         Bitmap rotated = Bitmap.createBitmap(shipImage, 0, 0, shipImage.getWidth(), shipImage.getHeight(), matrix, false);
-        arrShipsPlayer[i].setImageBitmap(rotated);
+        arrShips[i].setImageBitmap(rotated);
     }
 
     private void initShipsPlayer() {
@@ -151,20 +171,20 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
             switch (i) {
                 case 0:
-                    rotate(i, R.drawable.giantship, 5);
+                    rotate(i, R.drawable.giantship, 5, arrShipsPlayer);
                     arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
                     arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
                     break;
                 case 1:
                 //case 2:
-                    rotate(i, R.drawable.bigship, 4);
+                    rotate(i, R.drawable.bigship, 4, arrShipsPlayer);
                     arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
                     arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
                     break;
                 case 2: //3
                 case 3: //4
                 case 4: //5
-                    rotate(i, R.drawable.mediumship, 3);
+                    rotate(i, R.drawable.mediumship, 3, arrShipsPlayer);
                     arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
                     arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
                     break;
@@ -172,7 +192,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 case 6: //7
                 //case 8:
                 case 7: //9
-                    rotate(i, R.drawable.smallship, 2);
+                    rotate(i, R.drawable.smallship, 2, arrShipsPlayer);
                     arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
                     arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
                     break;
@@ -184,6 +204,46 @@ public class GameActivity extends Activity implements View.OnClickListener{
     private void initShipsEnemy() {
         Intent intent = getIntent();
         arrTextViewsEnemy = (int[][]) intent.getSerializableExtra("textViewUsedEnemy");
+
+        RelativeLayout rl = (RelativeLayout) findViewById(R.id.rlActivityGame);
+        int extX = (int) gridLayoutEnemy.getX();
+        int extY = (int) gridLayoutEnemy.getY();
+
+        for (int i = 0; i < arrTextViewsEnemy.length; i++) {
+            arrShipsEnemy[i] = new ImageView(this);
+            arrShipsEnemy[i].setId(500+i);
+            arrShipsEnemy[i].setAlpha(0.0f);
+            rl.addView(arrShipsEnemy[i], RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+            switch (i) {
+                case 0:
+                    rotate(i, R.drawable.giantship, 5, arrShipsEnemy);
+                    arrShipsEnemy[i].setX(extX + arrTextViews[arrTextViewsEnemy[i][0]].getX());
+                    arrShipsEnemy[i].setY(extY + arrTextViews[arrTextViewsEnemy[i][0]].getY());
+                    break;
+                case 1:
+                    //case 2:
+                    rotate(i, R.drawable.bigship, 4, arrShipsEnemy);
+                    arrShipsEnemy[i].setX(extX + arrTextViews[arrTextViewsEnemy[i][0]].getX());
+                    arrShipsEnemy[i].setY(extY + arrTextViews[arrTextViewsEnemy[i][0]].getY());
+                    break;
+                case 2: //3
+                case 3: //4
+                case 4: //5
+                    rotate(i, R.drawable.mediumship, 3, arrShipsEnemy);
+                    arrShipsEnemy[i].setX(extX + arrTextViews[arrTextViewsEnemy[i][0]].getX());
+                    arrShipsEnemy[i].setY(extY + arrTextViews[arrTextViewsEnemy[i][0]].getY());
+                    break;
+                case 5: //6
+                case 6: //7
+                    //case 8:
+                case 7: //9
+                    rotate(i, R.drawable.smallship, 2, arrShipsEnemy);
+                    arrShipsEnemy[i].setX(extX + arrTextViews[arrTextViewsEnemy[i][0]].getX());
+                    arrShipsEnemy[i].setY(extY + arrTextViews[arrTextViewsEnemy[i][0]].getY());
+                    break;
+            }
+        }
     }
 
     private void initTextView4Game() {
@@ -196,11 +256,22 @@ public class GameActivity extends Activity implements View.OnClickListener{
     private void playerShot(int vId) {
         for (int x = 0; x < 100; x++) {
             if (playerShots[x] == vId) {
-                for (int[] anArrTextViewsEnemy : arrTextViewsEnemy) {
+                for (int i = 0; i < arrShipsPlayer.length; i++) {
+                    int anArrTextViewsEnemy[] = arrTextViewsEnemy[i];
                     for (int k = 0; k < 5; k++) {
                         if (vId == anArrTextViewsEnemy[k]) {
                             arrTextViews[x].setBackgroundColor(Color.RED);
                             playerShots[x] = -1;
+                            anArrTextViewsEnemy[k] = -1;
+                            for (int u = 0; u < 5; u++) {
+                                if (anArrTextViewsEnemy[u] != -1) {
+                                    break;
+                                }
+                                if (u == 4) {
+                                    arrShipsEnemy[i].animate().alpha(1.0f).setDuration(100);
+                                    arrShipsEnemy[i].bringToFront();
+                                }
+                            }
                             if (checkIfWon(arrTextViewsEnemy, playerShots)) {
                                 Toast.makeText(this, "Du hast gewonnen!", Toast.LENGTH_LONG).show();
                                 textViewArrow.setText("won");
@@ -209,6 +280,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             return;
                         }
                     }
+
                 }
                 arrTextViews[x].setBackgroundColor(Color.BLUE);
                 botLevel1();
@@ -250,6 +322,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             }
                         }
                     }
+
                     arrTextViews[i + 100].setBackgroundColor(Color.BLUE);
                     enemyShots[i] = -1;
                     return;
@@ -366,6 +439,10 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 }
             }
         }
+    }
+
+    private void botLevel2()  {
+        //TODO: Wenn Schiff zerstört, auch Felder um das Schiff nicht mehr beschießen
     }
 
     private void botLevel9000() {
