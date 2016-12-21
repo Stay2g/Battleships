@@ -212,20 +212,20 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
             switch (i) {
                 case 0:
-                    rotate(i, R.drawable.giantship, 5, arrShipsPlayer);
+                    rotate(i, R.drawable.ship_giant, 5, arrShipsPlayer);
                     arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
                     arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
                     break;
                 case 1:
                 //case 2:
-                    rotate(i, R.drawable.bigship, 4, arrShipsPlayer);
+                    rotate(i, R.drawable.ship_big, 4, arrShipsPlayer);
                     arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
                     arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
                     break;
                 case 2: //3
                 case 3: //4
                 case 4: //5
-                    rotate(i, R.drawable.mediumship, 3, arrShipsPlayer);
+                    rotate(i, R.drawable.ship_medium, 3, arrShipsPlayer);
                     arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
                     arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
                     break;
@@ -233,7 +233,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 case 6: //7
                 //case 8:
                 case 7: //9
-                    rotate(i, R.drawable.smallship, 2, arrShipsPlayer);
+                    rotate(i, R.drawable.ship_small, 2, arrShipsPlayer);
                     arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
                     arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
                     break;
@@ -258,20 +258,20 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
             switch (i) {
                 case 0:
-                    rotate(i, R.drawable.giantship, 5, arrShipsEnemy);
+                    rotate(i, R.drawable.ship_giant, 5, arrShipsEnemy);
                     arrShipsEnemy[i].setX(extX + arrTextViews[arrTextViewsEnemy[i][0]].getX());
                     arrShipsEnemy[i].setY(extY + arrTextViews[arrTextViewsEnemy[i][0]].getY());
                     break;
                 case 1:
                     //case 2:
-                    rotate(i, R.drawable.bigship, 4, arrShipsEnemy);
+                    rotate(i, R.drawable.ship_big, 4, arrShipsEnemy);
                     arrShipsEnemy[i].setX(extX + arrTextViews[arrTextViewsEnemy[i][0]].getX());
                     arrShipsEnemy[i].setY(extY + arrTextViews[arrTextViewsEnemy[i][0]].getY());
                     break;
                 case 2: //3
                 case 3: //4
                 case 4: //5
-                    rotate(i, R.drawable.mediumship, 3, arrShipsEnemy);
+                    rotate(i, R.drawable.ship_medium, 3, arrShipsEnemy);
                     arrShipsEnemy[i].setX(extX + arrTextViews[arrTextViewsEnemy[i][0]].getX());
                     arrShipsEnemy[i].setY(extY + arrTextViews[arrTextViewsEnemy[i][0]].getY());
                     break;
@@ -279,7 +279,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 case 6: //7
                     //case 8:
                 case 7: //9
-                    rotate(i, R.drawable.smallship, 2, arrShipsEnemy);
+                    rotate(i, R.drawable.ship_small, 2, arrShipsEnemy);
                     arrShipsEnemy[i].setX(extX + arrTextViews[arrTextViewsEnemy[i][0]].getX());
                     arrShipsEnemy[i].setY(extY + arrTextViews[arrTextViewsEnemy[i][0]].getY());
                     break;

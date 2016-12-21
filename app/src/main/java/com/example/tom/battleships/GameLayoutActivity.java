@@ -316,22 +316,22 @@ public class GameLayoutActivity extends Activity implements Serializable {
         lastShipTouched[0] = shipId;
         switch (shipId) {
             case 0:
-                lastShipTouched[1] = R.drawable.giantship;
+                lastShipTouched[1] = R.drawable.ship_giant;
                 break;
             case 1:
             //case 2:
-                lastShipTouched[1] = R.drawable.bigship;
+                lastShipTouched[1] = R.drawable.ship_big;
                 break;
             case 2: //3
             case 3: //4
             case 4: //5
-                lastShipTouched[1] = R.drawable.mediumship;
+                lastShipTouched[1] = R.drawable.ship_medium;
                 break;
             case 5: //6
             case 6: //7
             //case 8:
             case 7: //9
-                lastShipTouched[1] = R.drawable.smallship;
+                lastShipTouched[1] = R.drawable.ship_small;
                 break;
         }
     }
@@ -346,22 +346,22 @@ public class GameLayoutActivity extends Activity implements Serializable {
             case 5: //1x
                 lp.addRule(RelativeLayout.ALIGN_START, arrPlaceholder[0].getId());
                 lp.addRule(RelativeLayout.BELOW, arrPlaceholder[0].getId());
-                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.giantship)));
+                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.ship_giant)));
                 break;
             case 4: //2x
                 lp.addRule(RelativeLayout.ALIGN_START, arrPlaceholder[1].getId());
                 lp.addRule(RelativeLayout.BELOW, arrPlaceholder[1].getId());
-                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.bigship)));
+                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.ship_big)));
                 break;
             case 3: //3x
                 lp.addRule(RelativeLayout.BELOW, arrPlaceholder[2].getId());
                 lp.addRule(RelativeLayout.ALIGN_START, arrPlaceholder[2].getId());
-                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.mediumship)));
+                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.ship_medium)));
                 break;
             case 2: //4x
                 lp.addRule(RelativeLayout.BELOW, arrPlaceholder[3].getId());
                 lp.addRule(RelativeLayout.ALIGN_START, arrPlaceholder[3].getId());
-                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.smallship)));
+                arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.ship_small)));
                 break;
         }
         rl.addView(arrShips[ship], lp);
