@@ -282,8 +282,8 @@ public class GameLayoutActivity extends Activity implements Serializable {
         }
 
         for (int i = 0; i < 100; i++) {
-            int textViewX = (int) (arrTextViews[i].getX() + getResources().getDimension(R.dimen.marginLayoutPlayer));
-            int textViewY = (int) (arrTextViews[i].getY() + getResources().getDimension(R.dimen.marginLayoutPlayer));
+            int textViewX = (int) (arrTextViews[i].getX() + dpToPx(20));
+            int textViewY = (int) (arrTextViews[i].getY() + dpToPx(20));
             if (shipX > textViewX & shipX < textViewX + textViewSize &
                     shipY > textViewY & shipY < textViewY + textViewSize) {
                 arrLocation[0] = arrTextViews[i].getId();
@@ -415,8 +415,8 @@ public class GameLayoutActivity extends Activity implements Serializable {
         if(!isFirstShip()) {
             if (matchingTextViews[0] > -1 & !shipOutsideLayout(shipId) & shipCheckArea(shipId, 0, 0)) {
                 TextView firstTextView = (TextView) findViewById(matchingTextViews[0]);
-                arrShips[shipId].setX(firstTextView.getX() + getResources().getDimension(R.dimen.activity_horizontal_margin) + getResources().getDimension(R.dimen.marginLayoutPlayer));
-                arrShips[shipId].setY(firstTextView.getY() + getResources().getDimension(R.dimen.activity_vertical_margin) + getResources().getDimension(R.dimen.marginLayoutPlayer));
+                arrShips[shipId].setX(firstTextView.getX() + getResources().getDimension(R.dimen.activity_horizontal_margin) + dpToPx(20));
+                arrShips[shipId].setY(firstTextView.getY() + getResources().getDimension(R.dimen.activity_vertical_margin) + dpToPx(20));
                 setArrTextViewsUsed(shipId);
             } else {
                 arrShips[shipId].animate().x(arrShipOrigins[shipId][0]).y(arrShipOrigins[shipId][1]);
@@ -428,8 +428,8 @@ public class GameLayoutActivity extends Activity implements Serializable {
         } else {
             if (matchingTextViews[0] > -1 & !shipOutsideLayout(shipId)) {
                 TextView firstTextView = (TextView) findViewById(matchingTextViews[0]);
-                arrShips[shipId].setX(firstTextView.getX() + getResources().getDimension(R.dimen.activity_horizontal_margin) + getResources().getDimension(R.dimen.marginLayoutPlayer));
-                arrShips[shipId].setY(firstTextView.getY() + getResources().getDimension(R.dimen.activity_vertical_margin) + getResources().getDimension(R.dimen.marginLayoutPlayer));
+                arrShips[shipId].setX(firstTextView.getX() + getResources().getDimension(R.dimen.activity_horizontal_margin) + dpToPx(20));
+                arrShips[shipId].setY(firstTextView.getY() + getResources().getDimension(R.dimen.activity_vertical_margin) + dpToPx(20));
                 setArrTextViewsUsed(shipId);
             } else {
                 arrShips[shipId].animate().x(arrShipOrigins[shipId][0]).y(arrShipOrigins[shipId][1]);
@@ -635,8 +635,8 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 }
             } while (!exit);
 
-            int x = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getX() + getResources().getDimension(R.dimen.activity_horizontal_margin) + getResources().getDimension(R.dimen.marginLayoutPlayer));
-            int y = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getY() + getResources().getDimension(R.dimen.activity_vertical_margin) + getResources().getDimension(R.dimen.marginLayoutPlayer));
+            int x = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getX() + getResources().getDimension(R.dimen.activity_horizontal_margin) + dpToPx(20));
+            int y = (int) (arrTextViews[arrTextViewsUsed[shipId][0]].getY() + getResources().getDimension(R.dimen.activity_vertical_margin) + dpToPx(20));
 
             ship.animate().x(x).y(y).setDuration(200);
 

@@ -1,6 +1,7 @@
 package com.example.tom.battleships;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -11,8 +12,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -32,6 +36,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
     int textViewSizePlayer, textViewSizeEnemy;
     GridLayout gridLayoutPlayer, gridLayoutEnemy;
     TextView textViewArrow;
+    ImageView imageViewBackground;
     int firstHit = -1;
     int nextShot[] = {-1, 0};                                                                      // arr[0] = nextShot, arr[1] = textViewId + x (x wird gemerkt)
     int playerShots[] = new int[100];
@@ -40,24 +45,26 @@ public class GameActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game);
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setContentView(R.layout.activity_game);
 
         gridLayoutPlayer = (GridLayout) findViewById(R.id.gridLayoutPlayer);
         gridLayoutEnemy = (GridLayout) findViewById(R.id.gridLayoutEnemy);
         textViewArrow = (TextView) findViewById(R.id.textViewArrow);
+        imageViewBackground = (ImageView) findViewById(R.id.imageViewBackground);
 
-        textViewSizeEnemy = (int) dpToPx(30);
-        textViewSizePlayer = (int) dpToPx(22);
-        textViewArrow.setText("...");
+        textViewSizeEnemy = (int) dpToPx(28);
+        textViewSizePlayer = (int) dpToPx(20);
+        //textViewArrow.setText("...");
 
-        findViewById(R.id.btnTest).setOnClickListener(this);
+        //findViewById(R.id.btnTest).setOnClickListener(this);
 
         createViews(gridLayoutPlayer, 100, textViewSizePlayer);
         createViews(gridLayoutEnemy, 0, textViewSizeEnemy);
         initTextView4Game();
-
+        initBackground();
+        initGridBackgrounds();
         textViewArrow.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -82,9 +89,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 break;
             }
         }
-        if(v.getId() == findViewById(R.id.btnTest).getId()) {
-
-        }
+        //if(v.getId() == findViewById(R.id.btnTest).getId()) {        }
     }
 
     public void createViews(GridLayout gl, int idOffset, int tvSize) {
@@ -98,9 +103,8 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
                 arrTextViews[i+idOffset] = new TextView(this);
                 arrTextViews[i+idOffset].setId(i+idOffset);
-                arrTextViews[i+idOffset].setBackgroundResource(R.drawable.textview_border);
-                arrTextViews[i+idOffset].setAlpha(0.7f);
-                if(idOffset == 0) {
+                //arrTextViews[i+idOffset].setBackgroundResource(R.drawable.textview_border);
+                 if(idOffset == 0) {
                     arrTextViews[i + idOffset].setOnClickListener(this);
                 }
                 gl.addView(arrTextViews[i + idOffset], lp);
@@ -113,6 +117,43 @@ public class GameActivity extends Activity implements View.OnClickListener{
             arrShipsPlayer[i].animate().alpha(1.0f).setDuration(100);
             arrShipsPlayer[i].postDelayed(new Runnable() {@Override public void run() {}}, 100);
         }
+    }
+
+    private void initBackground() {
+        Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        WindowManager wm = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+        wm.getDefaultDisplay().getMetrics(displayMetrics);
+        int w = displayMetrics.widthPixels;
+        int h = displayMetrics.heightPixels;
+
+        imageViewBackground.setImageBitmap(Bitmap.createScaledBitmap(background, w, h, false));
+    }
+
+    private void initGridBackgrounds() {
+        RelativeLayout rl = (RelativeLayout) findViewById(R.id.rlActivityGame);
+        Bitmap image, image2;
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams lp2 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+        lp.addRule(RelativeLayout.ALIGN_BOTTOM, gridLayoutPlayer.getId());
+        lp.addRule(RelativeLayout.ALIGN_END, gridLayoutPlayer.getId());
+
+        lp2.addRule(RelativeLayout.ALIGN_BOTTOM, gridLayoutEnemy.getId());
+        lp2.addRule(RelativeLayout.ALIGN_END, gridLayoutEnemy.getId());
+
+        ImageView grid = new ImageView(this);
+        ImageView grid2 = new ImageView(this);
+
+        image = BitmapFactory.decodeResource(getResources(), R.drawable.grid_background);
+        image2 = BitmapFactory.decodeResource(getResources(), R.drawable.grid_background);
+
+        grid.setImageBitmap(Bitmap.createScaledBitmap(image, textViewSizePlayer*11, textViewSizePlayer*11, false));
+        grid2.setImageBitmap(Bitmap.createScaledBitmap(image2, textViewSizeEnemy*11, textViewSizeEnemy*11, false));
+
+        rl.addView(grid, lp);
+        rl.addView(grid2, lp2);
     }
 
     public float dpToPx(int dp) {
@@ -253,6 +294,16 @@ public class GameActivity extends Activity implements View.OnClickListener{
         }
     }
 
+    private void setTextViewImage(boolean hit, int id, int size) {
+        Bitmap image;
+        if(hit) {
+            image = BitmapFactory.decodeResource(getResources(), R.drawable.field_hit);
+        } else {
+            image = BitmapFactory.decodeResource(getResources(), R.drawable.field_miss);
+        }
+        arrTextViews[id].setBackground(new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(image, size, size, false)));
+    }
+
     private void playerShot(int vId) {
         for (int x = 0; x < 100; x++) {
             if (playerShots[x] == vId) {
@@ -260,7 +311,8 @@ public class GameActivity extends Activity implements View.OnClickListener{
                     int anArrTextViewsEnemy[] = arrTextViewsEnemy[i];
                     for (int k = 0; k < 5; k++) {
                         if (vId == anArrTextViewsEnemy[k]) {
-                            arrTextViews[x].setBackgroundColor(Color.RED);
+                            //arrTextViews[x].setBackgroundColor(Color.RED);
+                            setTextViewImage(true, x, textViewSizeEnemy);
                             playerShots[x] = -1;
                             anArrTextViewsEnemy[k] = -1;
                             for (int u = 0; u < 5; u++) {
@@ -282,7 +334,8 @@ public class GameActivity extends Activity implements View.OnClickListener{
                     }
 
                 }
-                arrTextViews[x].setBackgroundColor(Color.BLUE);
+                //arrTextViews[x].setBackgroundColor(Color.BLUE);
+                setTextViewImage(false, x, textViewSizeEnemy);
                 botLevel1();
                 playerShots[x] = -1;
                 return;
@@ -344,7 +397,8 @@ public class GameActivity extends Activity implements View.OnClickListener{
                     for (int[] anArrTextViewsUsed : arrTextViewsUsed) {
                         for (int k = 0; k < 5; k++) {
                             if (textViewId == anArrTextViewsUsed[k]) {
-                                arrTextViews[i + 100].setBackgroundColor(Color.RED);
+                                //arrTextViews[i + 100].setBackgroundColor(Color.RED);
+                                setTextViewImage(true, i + 100, textViewSizeEnemy);
                                 enemyShots[i] = -1;
                                 anArrTextViewsUsed[k] = -1;
                                 if (nextShot[1] == 0) {
@@ -409,7 +463,8 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             }
                         }
                     }
-                    arrTextViews[i + 100].setBackgroundColor(Color.BLUE);
+                    //arrTextViews[i + 100].setBackgroundColor(Color.BLUE);
+                    setTextViewImage(false, i + 100, textViewSizeEnemy);
                     enemyShots[i] = -1;
                     if(firstHit != -1) {
                         for (int y = 0; y < 100; y++) {
@@ -466,7 +521,8 @@ public class GameActivity extends Activity implements View.OnClickListener{
                     for (int[] anArrTextViewsUsed : arrTextViewsUsed) {
                         for (int k = 0; k < 5; k++) {
                             if (textViewId == anArrTextViewsUsed[k]) {
-                                arrTextViews[i + 100].setBackgroundColor(Color.RED);
+                                //arrTextViews[i + 100].setBackgroundColor(Color.RED);
+                                setTextViewImage(true, i + 100, textViewSizeEnemy);
                                 enemyShots[i] = -1;
                                 anArrTextViewsUsed[k] = -1;
                                 if (checkIfWon(arrTextViewsUsed, enemyShots)) {
@@ -477,7 +533,8 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             }
                         }
                     }
-                    arrTextViews[i + 100].setBackgroundColor(Color.BLUE);
+                    //arrTextViews[i + 100].setBackgroundColor(Color.BLUE);
+                    setTextViewImage(false, i + 100, textViewSizeEnemy);
                     enemyShots[i] = -1;
                     return;
                 }

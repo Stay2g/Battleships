@@ -1,26 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/rlActivityGame">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageViewBackground" />
+
     <GridLayout
-        android:layout_width="220dp"
-        android:layout_height="220dp"
-        android:layout_marginTop="@dimen/marginLayoutPlayer"
-        android:layout_marginEnd="@dimen/marginLayoutPlayer"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="45dp"
+        android:layout_marginEnd="30dp"
         android:layout_alignParentEnd="true"
         android:id="@+id/gridLayoutPlayer">
     </GridLayout>
 
     <GridLayout
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_marginTop="@dimen/marginLayoutPlayer"
-        android:layout_marginStart="@dimen/marginLayoutPlayer"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:layout_marginTop="@dimen/marginLayoutPlayerTop"
+        android:layout_marginStart="@dimen/marginLayoutPlayerStart"
         android:layout_alignParentStart="true"
         android:id="@+id/gridLayoutEnemy">
     </GridLayout>
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -30,14 +37,4 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="25dp"
         android:id="@+id/textViewArrow" />
-
-    <Button
-        android:text="Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnTest"
-        android:layout_below="@+id/gridLayoutPlayer"
-        android:layout_alignEnd="@+id/gridLayoutPlayer"
-        android:layout_marginTop="7dp" />
-
 </RelativeLayout>
