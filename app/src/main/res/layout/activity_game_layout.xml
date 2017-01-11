@@ -4,77 +4,85 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.tom.battleships.GameLayoutActivity">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageViewBackgroundLayout"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
     <GridLayout
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:id="@+id/gridLayoutPlayer">
+        android:layout_marginTop="@dimen/marginLayoutPlayerTop"
+        android:layout_marginStart="@dimen/marginLayoutPlayerStart"
+        android:id="@+id/gridLayout">
     </GridLayout>
+
+    <TextView
+        android:layout_width="120dp"
+        android:layout_height="30dp"
+        android:id="@+id/textViewPlaceholder1"
+        android:layout_alignTop="@+id/gridLayout"
+        android:layout_alignEnd="@+id/textViewPlaceholder0"
+        android:layout_marginTop="7dp" />
 
     <TextView
         android:layout_width="150dp"
         android:layout_height="30dp"
         android:id="@+id/textViewPlaceholder0"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="0dp" />
+        android:layout_marginEnd="21dp"
+        android:layout_marginTop="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignEnd="@+id/buttonStart" />
 
     <TextView
-        android:layout_width="150dp"
-        android:layout_height="30dp"
-        android:id="@+id/textViewPlaceholder1"
-        android:layout_below="@id/textViewPlaceholder0"
-        android:layout_marginTop="30dp"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="0dp" />
-
-    <TextView
-        android:layout_width="150dp"
-        android:layout_height="30dp"
-        android:id="@+id/textViewPlaceholder2"
-        android:layout_below="@+id/textViewPlaceholder1"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="30dp" />
-
-    <TextView
-        android:layout_width="150dp"
+        android:layout_width="60dp"
         android:layout_height="30dp"
         android:id="@+id/textViewPlaceholder3"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="23dp"
         android:layout_below="@+id/textViewPlaceholder2"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignEnd="@+id/textViewPlaceholder2"
+        android:layout_marginEnd="2dp" />
 
-    <Button
-        android:text="Start"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:id="@+id/buttonStart"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+    <TextView
+        android:layout_width="90dp"
+        android:layout_height="30dp"
+        android:id="@+id/textViewPlaceholder2"
+        android:layout_marginTop="18dp"
+        android:layout_below="@+id/textViewPlaceholder1"
+        android:layout_alignEnd="@+id/textViewPlaceholder1" />
 
     <Button
         android:text="↻"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:id="@+id/buttonRotate"
-        android:layout_marginStart="19dp"
-        android:layout_centerVertical="true"
-        android:layout_toEndOf="@+id/gridLayoutPlayer" />
+        android:layout_marginEnd="16dp"
+        android:layout_alignTop="@+id/buttonSetShipsRandom"
+        android:layout_toStartOf="@+id/buttonSetShipsRandom" />
 
     <Button
         android:text="Zufällig setzen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/buttonSetShipsRandom"
-        android:layout_alignTop="@+id/buttonStart"
-        android:layout_toStartOf="@+id/buttonStart" />
+        android:layout_marginBottom="8dp"
+        android:layout_above="@+id/buttonStart"
+        android:layout_alignStart="@+id/textViewPlaceholder1" />
+
+    <Button
+        android:text="Start"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:id="@+id/buttonStart"
+        android:layout_marginEnd="12dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="14dp" />
 
 </RelativeLayout>

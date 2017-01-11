@@ -9,17 +9,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -49,7 +44,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game);
 
-        gridLayoutPlayer = (GridLayout) findViewById(R.id.gridLayoutPlayer);
+        gridLayoutPlayer = (GridLayout) findViewById(R.id.gridLayout);
         gridLayoutEnemy = (GridLayout) findViewById(R.id.gridLayoutEnemy);
         textViewArrow = (TextView) findViewById(R.id.textViewArrow);
         imageViewBackground = (ImageView) findViewById(R.id.imageViewBackground);
