@@ -211,7 +211,10 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         case MotionEvent.ACTION_UP:
                             moving = false;
                             if (touchPoint == (int) mv.getX()) {
-                                setValidShipLocation(true, -1);
+                                if (!shipOutsideLayout(shipId)) {
+                                    getShipLastTouched(shipId);
+                                    setValidShipLocation(true, -1);
+                                }
                             } else {
                                 setShipLocation(shipId);
                                 setShipCounter(v.getId());
@@ -1077,19 +1080,12 @@ public class GameLayoutActivity extends Activity implements Serializable {
         startGameIntent.putExtra("textViewUsedPlayer", arrTextViewsUsedPlayer);
         startGameIntent.putExtra("textViewUsedEnemy", arrTextViewsUsed);
         startActivity(startGameIntent);
+        finish();
     }
 
     //------------------------------------------------------------------------------//
     //----------------------------- UNDER DEVELOPMENT ------------------------------//
     //------------------------------------------------------------------------------//
-
-    //TODO: Statt rotate-button, shot-click zum drehen?
-
-
-
-
-
-
 
 
     private void old() {

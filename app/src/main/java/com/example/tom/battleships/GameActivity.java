@@ -323,7 +323,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                                 Toast.makeText(this, "Du hast gewonnen!", Toast.LENGTH_LONG).show();
                                 textViewArrow.setText("Du hast gewonnen!");
                             }
-                            botLevel1();
+                            botLevel9000();
                             return;
                         }
                     }
@@ -331,7 +331,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 }
                 //arrTextViews[x].setBackgroundColor(Color.BLUE);
                 setTextViewImage(false, x, textViewSizeEnemy);
-                botLevel1();
+                botLevel9000();
                 playerShots[x] = -1;
                 return;
             }
