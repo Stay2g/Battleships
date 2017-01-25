@@ -321,7 +321,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             }
                             if (checkIfWon(arrTextViewsEnemy, playerShots)) {
                                 Toast.makeText(this, "Du hast gewonnen!", Toast.LENGTH_LONG).show();
-                                textViewArrow.setText("won");
+                                textViewArrow.setText("Du hast gewonnen!");
                             }
                             botLevel1();
                             return;
@@ -439,7 +439,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                                 }
                                 if (checkIfWon(arrTextViewsUsed, enemyShots)) {
                                     Toast.makeText(this, "Dein Gegner hat gewonnen.", Toast.LENGTH_SHORT).show();
-                                    textViewArrow.setText("lost");
+                                    textViewArrow.setText("Dein Gegner hat gewonnen.");
                                 }
                                 if(firstHit == -1) {
                                     firstHit = i;
@@ -492,6 +492,16 @@ public class GameActivity extends Activity implements View.OnClickListener{
     }
 
     private void botLevel2()  {
+        int textViewId;
+        int nextShot = -1;
+
+        if (nextShot == -1) {
+            textViewId = (int) (Math.random() * 101);
+        }
+
+
+
+
         //TODO: Wenn Schiff zerstört, auch Felder um das Schiff nicht mehr beschießen
     }
 
@@ -521,7 +531,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                                 enemyShots[i] = -1;
                                 anArrTextViewsUsed[k] = -1;
                                 if (checkIfWon(arrTextViewsUsed, enemyShots)) {
-                                    textViewArrow.setText("verlohren");
+                                    textViewArrow.setText("Dein Gegner hat gewonnen.");
                                     Toast.makeText(this, "Dein Gegner hat gewonnen.", Toast.LENGTH_SHORT).show();
                                 }
                                 return;
@@ -535,5 +545,5 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 }
             }
         }
-    }
+    } //unschaffbar (jeder Schuss = 1 Treffer)
 }

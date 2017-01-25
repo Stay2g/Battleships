@@ -32,9 +32,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/gridLayoutEnemy"
-        android:layout_toEndOf="@+id/gridLayoutEnemy"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="25dp"
-        android:id="@+id/textViewArrow" />
+        android:id="@+id/textViewArrow"
+        android:text="test-asdf-asdf -asdf "
+        android:layout_below="@+id/gridLayout"
+        android:layout_alignStart="@+id/gridLayout"
+        android:layout_marginTop="9dp" />
 </RelativeLayout>

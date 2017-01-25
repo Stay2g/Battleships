@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -33,7 +34,6 @@ public class GameLayoutActivity extends Activity implements Serializable {
     TextView arrTextViews[] = new TextView[100];
     TextView arrShipCounters[] = new TextView[4];
     TextView arrPlaceholder[] = new TextView[4];
-    //TextView arrTextViewNames[] = new TextView[20];
     ImageView arrShips[] = new ImageView[8];
     ImageView imageViewBackgroundLayout;
     boolean firstTimeRandom = true;                                                                 //setShipRandom muss 2 mal ausgeführt werden beim 1. Mal
@@ -43,7 +43,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
 
     int textViewSize, marginShips;
     int lastShipTouched[] = new int[3];                                                             //Schiff-ID, Bild-ID, Länge
-
+    int touchPoint = 0;
     int arrShipPlaced[] = {1, 1, 3, 3};                                                             //4 Shiffstypen: Wert in Array = Schiffe noch gesetzt
     int arrShipOrigins[][] = new int[arrShips.length][3];                                           //Schiffe; X, Y, bewegt?
     int arrTextViewsUsed[][] = new int[arrShips.length][5];
@@ -69,13 +69,12 @@ public class GameLayoutActivity extends Activity implements Serializable {
 
         createViews((GridLayout) findViewById(R.id.gridLayout), 0);
         createShips();
-        //createColumnsRowsNames();
         initTextViewUsed();
         initTextViewLocked();
         initBackground();
         initGridBackgrounds();
 
-        View.OnClickListener ocl = new View.OnClickListener() {
+        ocl = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switch (v.getId()) {
@@ -83,12 +82,20 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         btnStart();
                         break;
                     case R.id.buttonSetShipsRandom:
-                        if (firstTimeRandom) {setShipsRandom(); firstTimeRandom = false;}
+                        if (firstTimeRandom) {
+                            setShipsRandom();
+                            firstTimeRandom = false;
+                        }
                         setShipsRandom();
                         break;
                     case R.id.buttonRotate:
                         setValidShipLocation(true, -1);
                         break;
+                }
+                for (ImageView arrShip : arrShips) {
+                    if (v.getId() == arrShip.getId()) {
+                        setValidShipLocation(true, -1);
+                    }
                 }
             }
         };
@@ -119,8 +126,9 @@ public class GameLayoutActivity extends Activity implements Serializable {
 
         com.example.tom.battleships.SystemUiHelper uiHelper =                                       //Aufrufen einer Helper-Klasse, die einen "richtigen" Vollbildmodus hervorruft
                 new com.example.tom.battleships.SystemUiHelper(
-                        this, com.example.tom.battleships.SystemUiHelper.LEVEL_IMMERSIVE ,flags);
+                        this, com.example.tom.battleships.SystemUiHelper.LEVEL_IMMERSIVE, flags);
         uiHelper.hide();
+        setShipOrigins();
     }
 
     //------------------------------------------------------------------------------//
@@ -137,11 +145,11 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 LayoutParams lp = new LayoutParams(textViewSize, textViewSize);
 
                 arrTextViews[i] = new TextView(GameLayoutActivity.this);
-                arrTextViews[i].setId(i+idOffset);
+                arrTextViews[i].setId(i + idOffset);
                 gl.addView(arrTextViews[i], lp);
             }
         }
-}
+    }
 
     private void createShips() {
         initPlaceholder();
@@ -150,6 +158,8 @@ public class GameLayoutActivity extends Activity implements Serializable {
         for (int i = 0; i < arrShips.length; i++) {
             arrShips[i] = new ImageView(this);
             arrShips[i].setId(100 + i);
+            arrShips[i].setClickable(true);
+            arrShips[i].setOnClickListener(ocl);
             switch (i) {
                 case 0:
                     setShipParams(5, i, rl);
@@ -192,22 +202,25 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 @Override
                 public boolean onTouch(View v, MotionEvent mv) {
                     int shipId = v.getId() - 100;
-                    if (arrShipOrigins[0][0] == 0) {
-                        getShipOrigin();
-                    }
                     switch (mv.getAction()) {
                         case MotionEvent.ACTION_DOWN:
+                            touchPoint = (int) mv.getX();
                             moving = true;
                             setShipTransparency(true, shipId);
                             break;
                         case MotionEvent.ACTION_UP:
                             moving = false;
+                            if (touchPoint == (int) mv.getX()) {
+                                setValidShipLocation(true, -1);
+                            } else {
+                                setShipLocation(shipId);
+                                setShipCounter(v.getId());
+                                getShipLastTouched(shipId);
+                                setTextViewColorMove(shipId, true);
+                                checkIfReady();
+                            }
                             setShipTransparency(false, shipId);
-                            setShipLocation(shipId);
-                            setShipCounter(v.getId());
-                            getShipLastTouched(shipId);
-                            setTextViewColorMove(shipId, true);
-                            checkIfReady();
+                            touchPoint = 0;
                             break;
                         case MotionEvent.ACTION_MOVE:
                             if (moving) {
@@ -263,15 +276,16 @@ public class GameLayoutActivity extends Activity implements Serializable {
 
         image = BitmapFactory.decodeResource(getResources(), R.drawable.grid_background);
 
-        grid.setImageBitmap(Bitmap.createScaledBitmap(image, textViewSize*11, textViewSize*11, false));
+        grid.setImageBitmap(Bitmap.createScaledBitmap(image, textViewSize * 11, textViewSize * 11, false));
 
         rl.addView(grid, lp);
     }
+
     //------------------------------------------------------------------------------//
     //------------------------------------ Getter ----------------------------------//
     //------------------------------------------------------------------------------//
 
-    private void getShipOrigin() {
+    private void setShipOrigins() {
         for (int ship = 0; ship < arrShips.length; ship++) {
             arrShipOrigins[ship][0] = (int) arrShips[ship].getX();
             arrShipOrigins[ship][1] = (int) arrShips[ship].getY();
@@ -293,8 +307,8 @@ public class GameLayoutActivity extends Activity implements Serializable {
         }
 
         for (int i = 0; i < 100; i++) {
-            int textViewX = (int) (arrTextViews[i].getX() + getResources().getDimension(R.dimen.marginLayoutPlayerStart) - textViewSize/2);
-            int textViewY = (int) (arrTextViews[i].getY() + getResources().getDimension(R.dimen.marginLayoutPlayerTop) - textViewSize/2);
+            int textViewX = (int) (arrTextViews[i].getX() + getResources().getDimension(R.dimen.marginLayoutPlayerStart) - textViewSize / 2);
+            int textViewY = (int) (arrTextViews[i].getY() + getResources().getDimension(R.dimen.marginLayoutPlayerTop) - textViewSize / 2);
             if (shipX > textViewX & shipX < textViewX + textViewSize &
                     shipY > textViewY & shipY < textViewY + textViewSize) {
                 arrLocation[0] = arrTextViews[i].getId();
@@ -330,7 +344,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 lastShipTouched[1] = R.drawable.ship_giant;
                 break;
             case 1:
-            //case 2:
+                //case 2:
                 lastShipTouched[1] = R.drawable.ship_big;
                 break;
             case 2: //3
@@ -340,7 +354,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 break;
             case 5: //6
             case 6: //7
-            //case 8:
+                //case 8:
             case 7: //9
                 lastShipTouched[1] = R.drawable.ship_small;
                 break;
@@ -368,22 +382,22 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 lp.addRule(RelativeLayout.BELOW, arrPlaceholder[2].getId());
                 lp.addRule(RelativeLayout.ALIGN_START, arrPlaceholder[2].getId());
                 arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.ship_medium)));
-                if(ship == 3) {
-                    lp.setMargins(0, (int)dpToPx(5), 0, 0);
+                if (ship == 3) {
+                    lp.setMargins(0, (int) dpToPx(5), 0, 0);
                 }
                 if (ship == 4) {
-                    lp.setMargins(0, (int)dpToPx(10), 0, 0);
+                    lp.setMargins(0, (int) dpToPx(10), 0, 0);
                 }
                 break;
             case 2: //4x
                 lp.addRule(RelativeLayout.BELOW, arrPlaceholder[3].getId());
                 lp.addRule(RelativeLayout.ALIGN_START, arrPlaceholder[3].getId());
                 arrShips[ship].setImageDrawable(new BitmapDrawable(getResources(), scaleShipImage(size, R.drawable.ship_small)));
-                if(ship == 6) {
-                    lp.setMargins(0, (int)dpToPx(5), 0, 0);
+                if (ship == 6) {
+                    lp.setMargins(0, (int) dpToPx(5), 0, 0);
                 }
                 if (ship == 7) {
-                    lp.setMargins(0, (int)dpToPx(10), 0, 0);
+                    lp.setMargins(0, (int) dpToPx(10), 0, 0);
                 }
                 break;
         }
@@ -402,7 +416,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         }
                         break;
                     case 1:
-                    //case 2:
+                        //case 2:
                         if (arrShipOrigins[i][2] == 0) {
                             decShipCounter(i, 1);
                         } else {
@@ -420,7 +434,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         break;
                     case 5: //6
                     case 6: //7
-                    //case 8:
+                        //case 8:
                     case 7: //9
                         if (arrShipOrigins[i][2] == 0) {
                             decShipCounter(i, 3);
@@ -435,7 +449,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
 
     private void setShipLocation(int shipId) {
         int matchingTextViews[] = getShipLocation(shipId);
-        if(!isFirstShip()) {
+        if (!isFirstShip()) {
             if (matchingTextViews[0] > -1 & !shipOutsideLayout(shipId) & shipCheckArea(shipId, 0, 0)) {
                 TextView firstTextView = (TextView) findViewById(matchingTextViews[0]);
                 arrShips[shipId].setX(firstTextView.getX() + getResources().getDimension(R.dimen.marginLayoutPlayerStart));
@@ -443,6 +457,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 setArrTextViewsUsed(shipId);
             } else {
                 arrShips[shipId].animate().x(arrShipOrigins[shipId][0]).y(arrShipOrigins[shipId][1]);
+                shipResetOrientation(shipId);
                 arrShips[shipId].setX(arrShipOrigins[shipId][0]);
                 arrShips[shipId].setY(arrShipOrigins[shipId][1]);
                 setArrTextViewsUsed(shipId);
@@ -456,6 +471,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 setArrTextViewsUsed(shipId);
             } else {
                 arrShips[shipId].animate().x(arrShipOrigins[shipId][0]).y(arrShipOrigins[shipId][1]);
+                shipResetOrientation(shipId);
                 arrShips[shipId].setX(arrShipOrigins[shipId][0]);
                 arrShips[shipId].setY(arrShipOrigins[shipId][1]);
                 setArrTextViewsUsed(shipId);
@@ -502,7 +518,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
     private void setArrTextViewsUsed(int shipId) {
         int currentShip[] = getShipLocation(shipId);
         int textViewId = currentShip[0];
-        if(shipOutsideLayout(shipId) & shipCheckArea(shipId, 0, 0)) {
+        if (shipOutsideLayout(shipId) & shipCheckArea(shipId, 0, 0)) {
             for (int i = 0; i < 5; i++) {
                 arrTextViewsUsed[shipId][i] = -1;
             }
@@ -533,7 +549,11 @@ public class GameLayoutActivity extends Activity implements Serializable {
         boolean top = false;
         boolean bottom = false;
 
-        if(start != -1) {textViewId = start;} else {textViewId = getShipLocation(shipId)[0];}//startpunkt manuell setzen
+        if (start != -1) {
+            textViewId = start;
+        } else {
+            textViewId = getShipLocation(shipId)[0];
+        }//startpunkt manuell setzen
 
         //Schiff-Image drehen (nur innerhalb des Spielfeldes)
         if (((lastShipTouched[1] != 0) /*& !shipOutsideLayout(shipId) */)) {
@@ -543,20 +563,20 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 matrix.setRotate(90f);
                 align = 2;                //horizontal
             } else {
-                matrix.setRotate(180f);
+                matrix.setRotate(0f);
                 align = 1;                //vertikal
             }
             Bitmap rotated = Bitmap.createBitmap(shipImage, 0, 0, shipImage.getWidth(), shipImage.getHeight(), matrix, false);
 
             //Schiff um enstrechende Felder nach innen bewegen, wenn gedrehtes Schiff außerhalb des Spielfeldes liegt
-            if(arrTextViews[arrTextViewsUsed[shipId][0]].getX() + rotated.getWidth() > arrTextViews[9].getX() + textViewSize) {
+            if (arrTextViews[arrTextViewsUsed[shipId][0]].getX() + rotated.getWidth() > arrTextViews[9].getX() + textViewSize) {
                 int temp = (int) (((ship.getX() + rotated.getWidth()) - (arrTextViews[9].getX() + textViewSize)) / textViewSize) - 1;
                 textViewId -= temp;
                 xEnd -= temp;
             }
-            if(arrTextViews[arrTextViewsUsed[shipId][0]].getY() + rotated.getHeight() > arrTextViews[90].getY() + textViewSize) {
+            if (arrTextViews[arrTextViewsUsed[shipId][0]].getY() + rotated.getHeight() > arrTextViews[90].getY() + textViewSize) {
                 int temp = (int) (((ship.getY() + rotated.getHeight()) - (arrTextViews[90].getY() + textViewSize)) / textViewSize) - 1;
-                textViewId -= temp*10;
+                textViewId -= temp * 10;
                 yEnd -= temp;
             }
 
@@ -575,7 +595,9 @@ public class GameLayoutActivity extends Activity implements Serializable {
                                 textViewId++;
                             }
                         }
-                        if(step == 4) {break;}
+                        if (step == 4) {
+                            break;
+                        }
                         step = 1;
                         break;
                     case 1:
@@ -589,7 +611,9 @@ public class GameLayoutActivity extends Activity implements Serializable {
                                 textViewId--;
                             }
                         }
-                        if(step == 4) {break;}
+                        if (step == 4) {
+                            break;
+                        }
                         step = 2;
                         break;
                     case 2:
@@ -603,7 +627,9 @@ public class GameLayoutActivity extends Activity implements Serializable {
                                 textViewId += 10;
                             }
                         }
-                        if(step == 4) {break;}
+                        if (step == 4) {
+                            break;
+                        }
                         step = 3;
                         break;
                     case 3:
@@ -617,20 +643,28 @@ public class GameLayoutActivity extends Activity implements Serializable {
                                 textViewId -= 10;
                             }
                         }
-                        if(step == 4) {break;}
+                        if (step == 4) {
+                            break;
+                        }
                         step = 0;
                         if (!bottom) {
-                            bottom = (textViewStart > 89);}       //wenn die unterste Zeile erreicht ist
+                            bottom = (textViewStart > 89);
+                        }       //wenn die unterste Zeile erreicht ist
                         if (!top) {
-                            top = (textViewStart < 11);}             //wenn die oberste Zeile erreicht ist
+                            top = (textViewStart < 11);
+                        }             //wenn die oberste Zeile erreicht ist
                         if (!bottom & top) {
-                            textViewStart += 10;}
+                            textViewStart += 10;
+                        }
                         if (!top & bottom) {
-                            textViewStart -= 10;}
-                        if(!bottom & !top) {
-                            textViewStart += 10;}
-                        if(bottom & top) {
-                            step = 5;}                        //wenn nichts frei ist, dann exit
+                            textViewStart -= 10;
+                        }
+                        if (!bottom & !top) {
+                            textViewStart += 10;
+                        }
+                        if (bottom & top) {
+                            step = 5;
+                        }                        //wenn nichts frei ist, dann exit
                         break;
                     case 4:
                         ship.setImageBitmap(rotated);
@@ -665,6 +699,62 @@ public class GameLayoutActivity extends Activity implements Serializable {
 
             arrShips[shipId].setX(x);
             arrShips[shipId].setY(y);
+        }
+    }
+
+    private void setShipsRandom() {
+        int val1, val2;
+
+        for (int i = 0; i < 2; i++) {
+            val1 = (int) (Math.random() * 100);
+            val2 = (int) (Math.random() * 2);
+            boolean rotate = (val2 == 0);
+
+            getShipLastTouched(i);
+            arrTextViewsUsed[i][0] = val1;
+            setValidShipLocation(rotate, val1);
+            arrShipOrigins[i][2] = 1;
+        }
+
+        for (int i = 2; i < 5; i++) {
+            val1 = (int) (Math.random() * 10);
+            val1 = val1 * 10 + 4;
+            val2 = (int) (Math.random() * 2);
+            boolean rotate = (val2 == 0);
+
+            getShipLastTouched(i);
+            arrTextViewsUsed[i][0] = val1;
+            setValidShipLocation(rotate, val1);
+            arrShipOrigins[i][2] = 1;
+        }
+
+        for (int i = 5; i < 8; i++) {
+            val2 = (int) (Math.random() * 2);
+            boolean rotate = (val2 == 0);
+
+            getShipLastTouched(i);
+            arrTextViewsUsed[i][0] = 44;
+            setValidShipLocation(rotate, 44);
+            arrShipOrigins[i][2] = 1;
+        }
+        if (firstTimeRandom) {
+            for (int i = 0; i < 4; i++) {
+                arrShipCounters[i].setText("0×");
+                arrShipPlaced[i] = 0;
+            }
+        }
+        checkIfReady();
+    }
+
+    private void shipResetOrientation(int shipId) {
+        if (arrShips[shipId].getWidth() < arrShips[shipId].getHeight()) {
+            getShipLastTouched(shipId);
+            Matrix matrix = new Matrix();
+
+            Bitmap shipImage = scaleShipImage(lastShipTouched[2], lastShipTouched[1]);
+            matrix.setRotate(0f);
+            Bitmap rotated = Bitmap.createBitmap(shipImage, 0, 0, shipImage.getWidth(), shipImage.getHeight(), matrix, false);
+            arrShips[shipId].setImageBitmap(rotated);
         }
     }
 
@@ -730,23 +820,23 @@ public class GameLayoutActivity extends Activity implements Serializable {
 
     private boolean shipCheckArea(int shipId, int align, int textViewStartId) {
         int a;
-        if(align == 0 & textViewStartId == 0) {
+        if (align == 0 & textViewStartId == 0) {
             int currentShip[] = getShipLocation(shipId);
             align = currentShip[2];
             textViewStartId = currentShip[0];
         }
 
         int currentShip[] = getShipLocation(shipId);
-        for(int i = 0; i < arrShips.length; i++) {
-            if(i != shipId) {
+        for (int i = 0; i < arrShips.length; i++) {
+            if (i != shipId) {
                 for (int j = 0; j < 5; j++) {
-                    if(arrTextViewsUsed[i][j] == -1) {                                          //wenn Schiff schon gesetzt wurde, dann...
+                    if (arrTextViewsUsed[i][j] == -1) {                                          //wenn Schiff schon gesetzt wurde, dann...
                         break;
                     } else {
                         for (int k = 0; k < arrTextViewsLocked.length; k++) {
-                            if(arrTextViewsLocked[k] == -1) {                                        //suche nach unbenutztem Platz...
+                            if (arrTextViewsLocked[k] == -1) {                                        //suche nach unbenutztem Platz...
                                 arrTextViewsLocked[k] = arrTextViewsUsed[i][j];
-                                switch(isTextViewAtBorder(arrTextViewsUsed[i][j])) {
+                                switch (isTextViewAtBorder(arrTextViewsUsed[i][j])) {
                                     case 0:
                                         a = 0;
                                         do {
@@ -830,19 +920,19 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 }
             }
         }
-        for(int l = 0; l < currentShip[1]; l++) {
+        for (int l = 0; l < currentShip[1]; l++) {
             switch (align) {
                 case 1:
-                    for(int m = 0; m < arrTextViewsLocked.length; m++) {
-                        if((textViewStartId + l) == arrTextViewsLocked[m]) {
+                    for (int m = 0; m < arrTextViewsLocked.length; m++) {
+                        if ((textViewStartId + l) == arrTextViewsLocked[m]) {
                             initTextViewLocked();
                             return false;
                         }
                     }
                     break;
                 case 2:
-                    for(int m = 0; m < arrTextViewsLocked.length; m++) {
-                        if((textViewStartId + l * 10) == arrTextViewsLocked[m]) {
+                    for (int m = 0; m < arrTextViewsLocked.length; m++) {
+                        if ((textViewStartId + l * 10) == arrTextViewsLocked[m]) {
                             initTextViewLocked();
                             return false;
                         }
@@ -856,7 +946,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
 
     private boolean checkNewLocation(int align, int tv) {
         boolean exists = true;
-        for(int i = 0; i < lastShipTouched[2] /*=Länge des Schiffs*/; i++) {
+        for (int i = 0; i < lastShipTouched[2] /*=Länge des Schiffs*/; i++) {
             if (checkTextViewExist(arrTextViewsUsed[lastShipTouched[0]][i]) == -1) {
                 exists = false;
                 break;
@@ -864,12 +954,12 @@ public class GameLayoutActivity extends Activity implements Serializable {
         }
         switch (align) {
             case 1:
-                if (exists & (tv%10 > (tv + lastShipTouched[2]-1)%10)) {
+                if (exists & (tv % 10 > (tv + lastShipTouched[2] - 1) % 10)) {
                     exists = false;
                 }
                 break;
             case 2:
-                if (exists & (tv%10 < (tv + (lastShipTouched[2]-1)*10)%10)) {
+                if (exists & (tv % 10 < (tv + (lastShipTouched[2] - 1) * 10) % 10)) {
                     exists = false;
                 }
                 break;
@@ -917,8 +1007,8 @@ public class GameLayoutActivity extends Activity implements Serializable {
     private int isTextViewAtBorder(int textViewId) {                                                //0 = nicht am Rand, 1 = linker Rand, 2 = rechter Rand
         String val = Integer.toString(textViewId);
         int start = val.length();
-        val = val.substring(start-1);
-        switch(val) {
+        val = val.substring(start - 1);
+        switch (val) {
             case "9":
                 return 2;
             case "0":
@@ -948,7 +1038,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
     }
 
     private void initTextViewUsed() {
-        for(int i = 0; i < arrShips.length; i++) {
+        for (int i = 0; i < arrShips.length; i++) {
             for (int j = 0; j < 5; j++) {
                 arrTextViewsUsed[i][j] = -1;
             }
@@ -956,19 +1046,15 @@ public class GameLayoutActivity extends Activity implements Serializable {
     }
 
     private void initTextViewLocked() {
-            for (int i = 0; i < arrTextViewsLocked.length; i++) {
-                arrTextViewsLocked[i] = -1;
-            }
+        for (int i = 0; i < arrTextViewsLocked.length; i++) {
+            arrTextViewsLocked[i] = -1;
+        }
     }
 
     public float dpToPx(int dp) {
         Resources r = getResources();
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
     }
-
-    //------------------------------------------------------------------------------//
-    //----------------------------- UNDER DEVELOPMENT ------------------------------//
-    //------------------------------------------------------------------------------//
 
     private void checkIfReady() {
         if (arrShipPlaced[0] == 0 & arrShipPlaced[1] == 0 & arrShipPlaced[2] == 0 & arrShipPlaced[3] == 0) {
@@ -981,7 +1067,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
         for (ImageView arrShip : arrShips) {
             arrShip.setAlpha(0.0f);
         }
-        for(int i = 0; i < arrShips.length; i++) {
+        for (int i = 0; i < arrShips.length; i++) {
             System.arraycopy(arrTextViewsUsed[i], 0, arrTextViewsUsedPlayer[i], 0, 5);
         }
         initTextViewUsed();
@@ -993,52 +1079,20 @@ public class GameLayoutActivity extends Activity implements Serializable {
         startActivity(startGameIntent);
     }
 
-    private void setShipsRandom() {
-        int val1, val2;
+    //------------------------------------------------------------------------------//
+    //----------------------------- UNDER DEVELOPMENT ------------------------------//
+    //------------------------------------------------------------------------------//
 
-        getShipOrigin();
+    //TODO: Statt rotate-button, shot-click zum drehen?
 
-        for (int i = 0; i < 2; i++) {
-            val1 = (int) (Math.random() * 100);
-            val2 = (int) (Math.random() * 2);
-            boolean rotate = (val2 == 0);
 
-            getShipLastTouched(i);
-            arrTextViewsUsed[i][0] = val1;
-            setValidShipLocation(rotate, val1);
-            arrShipOrigins[i][2] = 1;
-        }
 
-        for (int i = 2; i < 5; i++) {
-            val1 = (int) (Math.random() * 10);
-            val1 = val1*10 + 4;
-            val2 = (int) (Math.random() * 2);
-            boolean rotate = (val2 == 0);
 
-            getShipLastTouched(i);
-            arrTextViewsUsed[i][0] = val1;
-            setValidShipLocation(rotate, val1);
-            arrShipOrigins[i][2] = 1;
-        }
 
-        for (int i = 5; i < 8; i++) {
-            val2 = (int) (Math.random() * 2);
-            boolean rotate = (val2 == 0);
 
-            getShipLastTouched(i);
-            arrTextViewsUsed[i][0] = 44;
-            setValidShipLocation(rotate, 44);
-            arrShipOrigins[i][2] = 1;
-        }
-        if(firstTimeRandom) {
-            for (int i = 0; i < 4; i++) {
-                arrShipCounters[i].setText("0×");
-                arrShipPlaced[i] = 0;
-            }
-        }
-        checkIfReady();
-    }
-}
+
+
+    private void old() {
 /*
     private void btnRotate() {
         ImageView ship = arrShips[lastShipTouched[0]];
@@ -1050,7 +1104,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 ship.setY((int) (ship.getY()-(Math.ceil(lastShipTouched[2]/2))*textViewSize));
                 ship.setX((int) (ship.getX()+(Math.ceil(lastShipTouched[2]/2))*textViewSize));
             } else {
-                matrix.setRotate(180f);
+                matrix.setRotate(0f);
                 ship.setX((int) (ship.getX()-(Math.ceil(lastShipTouched[2]/2))*textViewSize));
                 ship.setY((int) (ship.getY()+(Math.ceil(lastShipTouched[2]/2))*textViewSize));
             }
@@ -1214,7 +1268,7 @@ public void createColumnsRowsNames() {
                 matrix.setRotate(90f);
                 align = 2;
             } else {
-                matrix.setRotate(180f);
+                matrix.setRotate(0f);
                 align = 1;
             }
             Bitmap rotated = Bitmap.createBitmap(shipImage, 0, 0, shipImage.getWidth(), shipImage.getHeight(), matrix, false);
@@ -1304,3 +1358,5 @@ public void createColumnsRowsNames() {
         }
     }
 */
+    }
+}
