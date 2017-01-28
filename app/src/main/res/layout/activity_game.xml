@@ -33,8 +33,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewArrow"
-        android:text="test-asdf-asdf -asdf "
+        android:text="Moritz ist schwul!"
+        android:layout_marginTop="15dp"
         android:layout_below="@+id/gridLayout"
-        android:layout_alignStart="@+id/gridLayout"
-        android:layout_marginTop="9dp" />
+        android:layout_alignStart="@+id/gridLayout" />
+
+    <Button
+        android:text="@string/strAgain"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnAgain" />
+
+    <Button
+        android:text="@string/strBackToMenu"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnBackToMenu" />
 </RelativeLayout>

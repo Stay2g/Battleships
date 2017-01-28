@@ -8,13 +8,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -32,6 +36,9 @@ public class GameActivity extends Activity implements View.OnClickListener{
     GridLayout gridLayoutPlayer, gridLayoutEnemy;
     TextView textViewArrow;
     ImageView imageViewBackground;
+
+    Button btnBack, btnAgain;
+
     int firstHit = -1;
     int nextShot[] = {-1, 0};                                                                      // arr[0] = nextShot, arr[1] = textViewId + x (x wird gemerkt)
     int playerShots[] = new int[100];
@@ -51,9 +58,12 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
         textViewSizeEnemy = (int) dpToPx(28);
         textViewSizePlayer = (int) dpToPx(20);
-        //textViewArrow.setText("...");
 
-        //findViewById(R.id.btnTest).setOnClickListener(this);
+        btnBack = (Button) findViewById(R.id.btnBackToMenu);
+        btnAgain = (Button) findViewById(R.id.btnAgain);
+
+        btnAgain.setOnClickListener(this);
+        btnBack.setOnClickListener(this);
 
         createViews(gridLayoutPlayer, 100, textViewSizePlayer);
         createViews(gridLayoutEnemy, 0, textViewSizeEnemy);
@@ -83,6 +93,14 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 playerShot(v.getId());
                 break;
             }
+        }
+        switch(v.getId()) {
+            case R.id.btnAgain:
+                finish();
+                break;
+            case R.id.btnBackToMenu:
+                finish();
+                break;
         }
         //if(v.getId() == findViewById(R.id.btnTest).getId()) {        }
     }
@@ -320,8 +338,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                                 }
                             }
                             if (checkIfWon(arrTextViewsEnemy, playerShots)) {
-                                Toast.makeText(this, "Du hast gewonnen!", Toast.LENGTH_LONG).show();
-                                textViewArrow.setText("Du hast gewonnen!");
+                                gameIsOver(1);
                             }
                             botLevel9000();
                             return;
@@ -351,6 +368,58 @@ public class GameActivity extends Activity implements View.OnClickListener{
         return true;
     }
 
+    private void gameIsOver(int wonLost) {
+        RelativeLayout rl = (RelativeLayout) findViewById(R.id.rlActivityGame);
+        RelativeLayout.LayoutParams lpScreen =
+                new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        RelativeLayout.LayoutParams lpText =
+                new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams lpBtnBack =
+                new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams lpBtnAgain =
+                new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+        TextView gameOverScreen = new TextView(this);
+        TextView gameOverText = new TextView(this);
+
+        gameOverScreen.setBackgroundColor(Color.BLACK);
+        gameOverScreen.setAlpha(0.7f);
+
+
+        gameOverText.setTextSize(25);
+        gameOverText.setMaxLines(3);
+        gameOverText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        gameOverText.setTypeface(null, Typeface.BOLD);
+        lpText.addRule(RelativeLayout.CENTER_IN_PARENT);
+
+        if(wonLost == 1) {
+            gameOverText.setText(getString(R.string.strWon) + "\n \n" + getString(R.string.strVictory));
+        } else {
+            gameOverText.setText(getString(R.string.strLost) + "\n \n" + getString(R.string.strGameOver));
+        }
+
+        lpBtnBack.addRule(RelativeLayout.ALIGN_PARENT_START);
+        lpBtnBack.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        lpBtnBack.setMargins((int) dpToPx(40), 0, 0, (int) dpToPx(40));
+
+        lpBtnAgain.addRule(RelativeLayout.ALIGN_PARENT_END);
+        lpBtnAgain.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        lpBtnAgain.setMargins(0, 0, (int) dpToPx(40), (int) dpToPx(40));
+
+        btnBack.setText(getResources().getString(R.string.strBackToMenu));
+        btnBack.setBackgroundColor(Color.TRANSPARENT);
+        btnBack.setVisibility(View.VISIBLE);
+        btnBack.setLayoutParams(lpBtnBack);
+
+        btnAgain.setText(getResources().getString(R.string.strAgain));
+        btnAgain.setBackgroundColor(Color.TRANSPARENT);
+        btnAgain.setVisibility(View.VISIBLE);
+        btnAgain.setLayoutParams(lpBtnAgain);
+
+        rl.addView(gameOverScreen, lpScreen);
+        rl.addView(gameOverText, lpText);
+    }
+
     private void randomShot() {
         int textViewId;
         while(true) {
@@ -364,7 +433,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                                 arrTextViews[i + 100].setBackgroundColor(Color.RED);
                                 enemyShots[i] = -1;
                                 if (checkIfWon(arrTextViewsUsed, enemyShots)) {
-                                    Toast.makeText(this, "Dein Gegner hat gewonnen.", Toast.LENGTH_SHORT).show();
+                                    gameIsOver(0);
                                 }
                                 return;
                             }
@@ -438,8 +507,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                                     nextShot[0] = textViewId + ext;
                                 }
                                 if (checkIfWon(arrTextViewsUsed, enemyShots)) {
-                                    Toast.makeText(this, "Dein Gegner hat gewonnen.", Toast.LENGTH_SHORT).show();
-                                    textViewArrow.setText("Dein Gegner hat gewonnen.");
+                                    gameIsOver(0);
                                 }
                                 if(firstHit == -1) {
                                     firstHit = i;
@@ -531,8 +599,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                                 enemyShots[i] = -1;
                                 anArrTextViewsUsed[k] = -1;
                                 if (checkIfWon(arrTextViewsUsed, enemyShots)) {
-                                    textViewArrow.setText("Dein Gegner hat gewonnen.");
-                                    Toast.makeText(this, "Dein Gegner hat gewonnen.", Toast.LENGTH_SHORT).show();
+                                    gameIsOver(0);
                                 }
                                 return;
                             }

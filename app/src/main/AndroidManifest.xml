@@ -23,7 +23,7 @@
         <activity
             android:name=".GameLayoutActivity"
             android:screenOrientation="sensorLandscape"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         </activity>
         <activity
             android:name=".RegisterActivity"

@@ -19,4 +19,9 @@
     <string name="strGast">Gast</string>
     <string name="strGuestLogin">Als Gast einloggen</string>
     <string name="strSearchForPlayer">Suche...</string>
+    <string name="strAgain">Nochmal</string>
+    <string name="strBackToMenu">Zurück zum Hauptmenü</string>
+    <string name="strWon">Du hast gewonnen.</string>
+    <string name="strLost">Du hast verloren.</string>
+    <string name="strVictory">Sieg!</string>
 </resources>

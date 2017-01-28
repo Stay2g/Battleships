@@ -21,4 +21,10 @@
     <string name="strAbortReg">Registration Cancelled</string>
     <string name="strGuestLogin">Login As Guest</string>
     <string name="strSearchForPlayer">Search...</string>
+    <string name="strAgain">Again</string>
+    <string name="strBackToMenu">Back to main menu</string>
+    <string name="strWon">You won!</string>
+    <string name="strLost">You lost!</string>
+    <string name="strGameOver" translatable="false">Game Over!</string>
+    <string name="strVictory">Victory!</string>
 </resources>
