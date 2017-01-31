@@ -340,7 +340,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             if (checkIfWon(arrTextViewsEnemy, playerShots)) {
                                 gameIsOver(1);
                             }
-                            botLevel9000();
+                            botLevel1();
                             return;
                         }
                     }
@@ -348,7 +348,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 }
                 //arrTextViews[x].setBackgroundColor(Color.BLUE);
                 setTextViewImage(false, x, textViewSizeEnemy);
-                botLevel9000();
+                botLevel1();
                 playerShots[x] = -1;
                 return;
             }
