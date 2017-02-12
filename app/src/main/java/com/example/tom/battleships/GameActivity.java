@@ -13,6 +13,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,9 +26,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static java.util.Arrays.binarySearch;
+import static java.util.Arrays.sort;
+
 
 public class GameActivity extends Activity implements View.OnClickListener{
     int arrTextViewsUsed[][] = new int[8][5];
+
+    int arrAllUsedTextViews[] = new int[24];
+    int arrBot[] = new int[100];
+    int arrNextShot[] = {-1, -1, -1};                                                               //Erster Treffer, aktueller Schuss,
+
     int arrTextViewsEnemy[][] = new int[arrTextViewsUsed.length][5];
     TextView arrTextViews[] = new TextView[200];
     ImageView arrShipsPlayer[] = new ImageView[arrTextViewsUsed.length];
@@ -40,7 +49,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
     Button btnBack, btnAgain;
 
     int firstHit = -1;
-    int nextShot[] = {-1, 0};                                                                      // arr[0] = nextShot, arr[1] = textViewId + x (x wird gemerkt)
+    //int nextShot[] = {-1, 0};                                                                      // arr[0] = nextShot, arr[1] = textViewId + x (x wird gemerkt)
     int playerShots[] = new int[100];
     int enemyShots[] = new int[100];
 
@@ -304,6 +313,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
         for(int i = 0; i < 100; i++) {
             enemyShots[i] = i;
             playerShots[i] = i;
+            arrBot[i] = i;
         }
     }
 
@@ -340,7 +350,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             if (checkIfWon(arrTextViewsEnemy, playerShots)) {
                                 gameIsOver(1);
                             }
-                            botLevel1();
+                            bot();
                             return;
                         }
                     }
@@ -348,7 +358,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 }
                 //arrTextViews[x].setBackgroundColor(Color.BLUE);
                 setTextViewImage(false, x, textViewSizeEnemy);
-                botLevel1();
+                bot();
                 playerShots[x] = -1;
                 return;
             }
@@ -447,7 +457,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
             }
         }
     }
-
+/*
     private void botLevel1() {
         int textViewId;
         while(true) {
@@ -571,6 +581,124 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
 
         //TODO: Wenn Schiff zerstört, auch Felder um das Schiff nicht mehr beschießen
+    }
+*/
+
+
+    private void getAllUsedTV() {
+        int count = 0;
+        for(int i = 0; i < arrTextViewsUsed.length; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (arrTextViewsUsed[i][j] != -1) {
+                    arrAllUsedTextViews[count] = arrTextViewsUsed[i][j];
+                    count++;
+                }
+            }
+        }
+        sort(arrAllUsedTextViews);
+    }
+
+    private boolean checkIfHit(int shot) {
+        for (int i = 0; i < arrAllUsedTextViews.length; i++) {
+            if (shot == arrAllUsedTextViews[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void bot() {
+        getAllUsedTV();
+        int targetTextView = 0;
+        boolean hit = false;
+
+        if (!hit) {             //Vorheriger Schuss war KEIN Treffer
+            int ret;
+            do {                //Sucht neues Feld, auf das noch nicht geschossen wurde
+                targetTextView = (int) (Math.random()*100);
+                ret = binarySearch(arrBot, targetTextView);
+            } while (ret < 0);
+
+            arrBot[ret] = -1;   //Feld aus zu schießenden Feldern entfernen
+
+            hit = checkIfHit(targetTextView);
+            if (hit) {
+                arrNextShot[0] = ret;
+                arrNextShot[1] = ret;
+            }
+
+            setTextViewImage(hit, targetTextView + 100, textViewSizeEnemy);
+
+        } else {                //Vorheriger Schuss war EIN Treffer
+            int step = 0;
+            int treffer = arrNextShot[1];
+            int ret;
+            do {
+                switch (step) {
+                    case 0:         //links
+                        treffer++;
+                        ret = binarySearch(arrBot, treffer);
+                        if (ret < 0) {
+                            step++;
+                        } else {
+                            hit = checkIfHit(treffer);
+                            arrBot[ret] = -1;
+                            setTextViewImage(hit, treffer + 100, textViewSizeEnemy);
+                            arrNextShot[1] = ret;
+                            step = 4;
+                        }
+                        break;
+                    case 1:         //rechts
+                        treffer = -2;
+                        ret = binarySearch(arrBot, treffer);
+                        if (ret < 0) {
+                            step++;
+                        } else {
+                            hit = checkIfHit(treffer);
+                            arrBot[ret] = -1;
+                            setTextViewImage(hit, treffer + 100, textViewSizeEnemy);
+                            arrNextShot[1] = ret;
+                            step = 4;
+                        }
+                        break;
+                    case 2:         //oben
+                        treffer = -9;
+                        ret = binarySearch(arrBot, treffer);
+                        if (ret < 0) {
+                            step++;
+                        } else {
+                            hit = checkIfHit(treffer);
+                            arrBot[ret] = -1;
+                            setTextViewImage(hit, treffer + 100, textViewSizeEnemy);
+                            arrNextShot[1] = ret;
+                            step = 4;
+                        }
+                        break;
+                    case 3:         //unten
+                        treffer += 20;
+                        ret = binarySearch(arrBot, treffer);
+                        if (ret < 0) {
+                            step++;
+                        } else {
+                            hit = checkIfHit(treffer);
+                            arrBot[ret] = -1;
+                            setTextViewImage(hit, treffer + 100, textViewSizeEnemy);
+                            arrNextShot[1] = ret;
+                            step = 4;
+                        }
+                        break;
+                    case 4:
+                        int val = (arrNextShot[0] - arrNextShot[1]);
+                        if (val < 10 & val > -10) {
+
+                        }
+                        break;
+                }
+            } while (step != 4);
+
+        }
+
+
     }
 
     private void botLevel9000() {
