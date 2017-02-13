@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 
@@ -14,6 +15,7 @@ import android.widget.TextView;
 public class MainMenuActivity extends BaseActivity{
 
     TextView textView;
+    Button btnMultiplayer, btnSingleplayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,27 +29,29 @@ public class MainMenuActivity extends BaseActivity{
         } /*else if (!strLoginName.isEmpty()){
             textView.setText(strLoginName);
         }*/
+
+        btnSingleplayer = (Button) findViewById(R.id.btnSingleplayer);
+        btnMultiplayer = (Button) findViewById(R.id.btnMultiplayer);
+        btnSingleplayer.setOnClickListener(this);
+        btnMultiplayer.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        /*
         switch (view.getId()){
             case R.id.btnSingleplayer:
                 Intent startShipSettingIntent = new Intent(this, GameLayoutActivity.class);
                 startActivity(startShipSettingIntent);
                 break;
             case R.id.btnMultiplayer:
-                ProgressDialog progressDialog = new ProgressDialog(this);
-                progressDialog.setTitle(getString(R.string.strSearchForPlayer));
-                progressDialog.show();
-                searchForPlayer();
+                Intent intent = new Intent(this, MpPreActivity.class);
+                startActivity(intent);
                 break;
-
+/*
             case R.id.btnSettings:
                 break;
+                */
         }
-        */
     }
 
     private void searchForPlayer() {

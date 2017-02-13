@@ -24,4 +24,7 @@
     <string name="strWon">Du hast gewonnen.</string>
     <string name="strLost">Du hast verloren.</string>
     <string name="strVictory">Sieg!</string>
+    <string name="strYourIPAddress">Deine IP-Adresse lautet:</string>
+    <string name="strHostText">Klicke auf den Host-Button um einen Server zu starten.</string>
+    <string name="strClientText">Klicke auf den Client-Button und trage die IP-Adresse, die auf dem anderen Smartphone angezeigt wird, ein.</string>
 </resources>
