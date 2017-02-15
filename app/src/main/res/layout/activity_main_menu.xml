@@ -1,25 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/background">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="151dp"
         android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/textViewUsername"
-            android:text="@string/strGast"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/btnLogout"
-            android:text="@string/strLogout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
     </RelativeLayout>
 
@@ -28,14 +15,56 @@
         android:text="@string/strSingleplayer"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/custom_button"/>
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="57dp"
+        android:layout_below="@+id/relativeLayout2"
+        android:layout_alignStart="@+id/btnMultiplayer" />
 
     <Button
-    android:id="@+id/btnMultiplayer"
-    android:text="@string/strMultiplayer"
-    android:layout_width="150dp"
-    android:layout_height="wrap_content"
-    android:background="@drawable/custom_button"/>
+        android:id="@+id/btnMultiplayer"
+        android:text="@string/strMultiplayer"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/btnSingleplayer"
+        android:layout_alignStart="@+id/btnSettings"
+        android:layout_marginTop="14dp" />
+
+    <Button
+        android:id="@+id/btnSettings"
+        android:text="@string/strBtnSettings"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="107dp"
+        android:layout_marginTop="13dp"
+        android:layout_below="@+id/btnMultiplayer"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:text="@string/strLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="14dp"
+        android:layout_alignBaseline="@+id/btnSettings"
+        android:layout_alignBottom="@+id/btnSettings"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:id="@+id/textViewUsername"
+        android:text="@string/strGast"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="67dp"
+        android:layout_alignTop="@+id/btnSingleplayer"
+        android:layout_toStartOf="@+id/btnLogout" />
 
 
-</LinearLayout>
+</RelativeLayout>

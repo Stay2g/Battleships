@@ -116,18 +116,6 @@ public class GameLayoutActivity extends Activity implements Serializable {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-
-        final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-
-        com.example.tom.battleships.SystemUiHelper uiHelper =                                       //Aufrufen einer Helper-Klasse, die einen "richtigen" Vollbildmodus hervorruft
-                new com.example.tom.battleships.SystemUiHelper(
-                        this, com.example.tom.battleships.SystemUiHelper.LEVEL_IMMERSIVE, flags);
-        uiHelper.hide();
         setShipOrigins();
     }
 

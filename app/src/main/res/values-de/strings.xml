@@ -18,7 +18,7 @@
     <string name="strTextViewReg">Keinen Account?</string>
     <string name="strGast">Gast</string>
     <string name="strGuestLogin">Als Gast einloggen</string>
-    <string name="strSearchForPlayer">Suche...</string>
+    <string name="strSearchForPlayer">Warte auf weiteren Spieler...</string>
     <string name="strAgain">Nochmal</string>
     <string name="strBackToMenu">Zurück zum Hauptmenü</string>
     <string name="strWon">Du hast gewonnen.</string>
@@ -27,4 +27,6 @@
     <string name="strYourIPAddress">Deine IP-Adresse lautet:</string>
     <string name="strHostText">Klicke auf den Host-Button um einen Server zu starten.</string>
     <string name="strClientText">Klicke auf den Client-Button und trage die IP-Adresse, die auf dem anderen Smartphone angezeigt wird, ein.</string>
+    <string name="strBtnSettings">Einstellungen</string>
+    <string name="strLogoutCompleted">Erfolgreich ausgeloggt</string>
 </resources>
