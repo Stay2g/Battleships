@@ -6,6 +6,14 @@
     android:layout_height="match_parent"
     tools:context="com.example.tom.battleships.GameLayoutActivity">
 
+    <TextView
+        android:text=""
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:id="@+id/tvServerStatus" />
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -56,15 +64,6 @@
         android:layout_marginTop="18dp"
         android:layout_below="@+id/textViewPlaceholder1"
         android:layout_alignEnd="@+id/textViewPlaceholder1" />
-
-    <Button
-        android:text="↻"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:id="@+id/buttonRotate"
-        android:layout_marginEnd="16dp"
-        android:layout_alignTop="@+id/buttonSetShipsRandom"
-        android:layout_toStartOf="@+id/buttonSetShipsRandom" />
 
     <Button
         android:text="Zufällig setzen"

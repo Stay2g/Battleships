@@ -11,7 +11,9 @@ import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,7 +27,17 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.Locale;
 
 
@@ -34,12 +46,13 @@ public class GameLayoutActivity extends Activity implements Serializable {
     TextView arrTextViews[] = new TextView[100];
     TextView arrShipCounters[] = new TextView[4];
     TextView arrPlaceholder[] = new TextView[4];
+    TextView serverStatus;
     ImageView arrShips[] = new ImageView[8];
     ImageView imageViewBackgroundLayout;
     boolean firstTimeRandom = true;                                                                 //setShipRandom muss 2 mal ausgeführt werden beim 1. Mal
     View.OnClickListener ocl;
     GridLayout gridLayout;
-    Button btnStart, btnSetShipsRandom, btnRotate;
+    Button btnStart, btnSetShipsRandom; //btnRotate;
 
     int textViewSize, marginShips;
     int lastShipTouched[] = new int[3];                                                             //Schiff-ID, Bild-ID, Länge
@@ -59,7 +72,8 @@ public class GameLayoutActivity extends Activity implements Serializable {
         setContentView(R.layout.activity_game_layout);
 
         imageViewBackgroundLayout = (ImageView) findViewById(R.id.imageViewBackgroundLayout);
-        btnRotate = (Button) findViewById(R.id.buttonRotate);
+        //btnRotate = (Button) findViewById(R.id.buttonRotate);
+        serverStatus = (TextView) findViewById(R.id.tvServerStatus);
         btnStart = (Button) findViewById(R.id.buttonStart);
         btnSetShipsRandom = (Button) findViewById(R.id.buttonSetShipsRandom);
         gridLayout = (GridLayout) findViewById(R.id.gridLayout);
@@ -88,9 +102,6 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         }
                         setShipsRandom();
                         break;
-                    case R.id.buttonRotate:
-                        setValidShipLocation(true, -1);
-                        break;
                 }
                 for (ImageView arrShip : arrShips) {
                     if (v.getId() == arrShip.getId()) {
@@ -104,7 +115,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
         btnStart.setClickable(false);
         btnStart.setAlpha(0.5f);
         btnSetShipsRandom.setOnClickListener(ocl);
-        btnRotate.setOnClickListener(ocl);
+        //btnRotate.setOnClickListener(ocl);
     }
 
     @Override
@@ -1018,7 +1029,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
     }
 
     //------------------------------------------------------------------------------//
-    //------------------------------------- Other ----------------------------------//
+    //----------------------------------- Other ------------------------------------//
     //------------------------------------------------------------------------------//
 
     private void initPlaceholder() {
@@ -1072,6 +1083,10 @@ public class GameLayoutActivity extends Activity implements Serializable {
     }
 
     //------------------------------------------------------------------------------//
+    //--------------------------------- MULTIPLAYER --------------------------------//
+    //------------------------------------------------------------------------------//
+
+        //------------------------------------------------------------------------------//
     //----------------------------- UNDER DEVELOPMENT ------------------------------//
     //------------------------------------------------------------------------------//
 

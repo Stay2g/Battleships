@@ -20,7 +20,6 @@
     <string name="strTextViewReg">No Account?</string>
     <string name="strAbortReg">Registration Cancelled</string>
     <string name="strGuestLogin">Login As Guest</string>
-    <string name="strSearchForPlayer">Waiting for another player…</string>
     <string name="strAgain">Again</string>
     <string name="strBackToMenu">Back to main menu</string>
     <string name="strWon">You won!</string>
@@ -29,7 +28,10 @@
     <string name="strVictory">Victory!</string>
     <string name="strYourIPAddress">Your IP-address is:</string>
     <string name="strHostText">Click the Host-Button to open up a server.</string>
+    <string name="strClientText">Enter the IP-Address from the other phone in the field below and click the \'Client\'-Button.</string>
+    <string name="strCustomDialog">Please enter the IP-address below:</string>
     <string name="strClientText">Click the Client-Button and enter the displayed IP-address on the other phone.</string>
     <string name="strBtnSettings">Settings</string>
     <string name="strLogoutCompleted">You logged out successfully</string>
+    <string name="strSearchForPlayer">Waiting for another player...</string>
 </resources>

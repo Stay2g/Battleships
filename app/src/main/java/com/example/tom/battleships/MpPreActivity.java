@@ -1,31 +1,32 @@
 package com.example.tom.battleships;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.Editable;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
-/**
- * Created by Alrik on 10.02.2017.
- */
-
 public class MpPreActivity extends MainMenuActivity {
 
-    Button btnHost, btnClient;
-
+    Handler uiHandler;
+    Button btnHost, btnClient, btnSend2Client, btnSendToServer;
+    EditText serverIPText;
+    public static String SERVERIP = "0.0.0.0";
+    public static int SERVERPORT = 8080;
+    public static ServerThread serverThread;
+    public static ClientThread clientThread;
+    public static ProgressDialog pdHost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,36 +44,66 @@ public class MpPreActivity extends MainMenuActivity {
                 case R.id.btnClient:
                     initClient();
                     break;
-
+                case R.id.btnSendToClient:
+                    PrintWriter outS;
+                    try {
+                        outS = new PrintWriter(new BufferedWriter(new OutputStreamWriter(serverThread.getSocket().getOutputStream())), true);
+                        outS.println("Server is talking");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case R.id.btnSendToServer:
+                    PrintWriter outC;
+                    try {
+                        outC = new PrintWriter(new BufferedWriter(new OutputStreamWriter(clientThread.getSocket().getOutputStream())), true);
+                        outC.println("IP" + "Client is talking");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
             }
         }
     };
         btnHost = (Button) findViewById(R.id.btnHost);
+        btnSend2Client = (Button) findViewById(R.id.btnSendToClient);
         btnClient = (Button) findViewById(R.id.btnClient);
+        serverIPText = (EditText) findViewById(R.id.editTextIP);
+        btnSendToServer = (Button) findViewById(R.id.btnSendToServer);
 
         btnHost.setOnClickListener(cl);
         btnClient.setOnClickListener(cl);
+        btnSend2Client.setOnClickListener(cl);
+        btnSendToServer.setOnClickListener(cl);
+
+        btnSend2Client.setEnabled(false);
+        btnSendToServer.setEnabled(false);
+        uiHandler = new Handler();
     }
 
     private void initHost() {
-        ProgressDialog pdHost = new ProgressDialog(this);
+        serverThread = new ServerThread();
+        serverThread.setHdl(uiHandler);
+        Thread st = new Thread(serverThread);
+        st.start();
+        pdHost = new ProgressDialog(this);
         pdHost.setMessage(getString(R.string.strSearchForPlayer) + "\n" + getString(R.string.strYourIPAddress) + " " + getLocalIpAddress());
         pdHost.setCanceledOnTouchOutside(true);
         pdHost.show();
+        btnSend2Client.setEnabled(true);
     }
 
     private void initClient() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        final EditText ipAddress = new EditText(this);
-        alert.setMessage("Please enter the IP-Address below:");
-        alert.setView(ipAddress);
-
-        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String YouEditTextValue = ipAddress.getText().toString();
-            }
-        });
-        alert.show();
+        SERVERIP = serverIPText.getText().toString();
+        if (!SERVERIP.equals("")) {
+            clientThread = new ClientThread();
+            Thread cThread = new Thread(clientThread);
+            cThread.start();
+        }
+        btnSendToServer.setEnabled(true);
+        //Intent startGameIntent = new Intent(this, GameActivity.class);
+        //startGameIntent.putExtra("mode", 2);
+        //startActivity(startGameIntent);
     }
 
     private String getLocalIpAddress() {
@@ -92,4 +123,5 @@ public class MpPreActivity extends MainMenuActivity {
         }
         return null;
     }
+
 }
