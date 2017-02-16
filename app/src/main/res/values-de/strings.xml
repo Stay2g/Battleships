@@ -30,4 +30,5 @@
     <string name="strCustomDialog">Bitte IP-Addresse im Feld eintragen:</string>
     <string name="strBtnSettings">Einstellungen</string>
     <string name="strLogoutCompleted">Erfolgreich ausgeloggt</string>
+    <string name="strWaitingForPlayer">Warte auf anderen Spieler...</string>
 </resources>

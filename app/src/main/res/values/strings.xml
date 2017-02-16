@@ -33,4 +33,5 @@
     <string name="strBtnSettings">Settings</string>
     <string name="strLogoutCompleted">You logged out successfully</string>
     <string name="strSearchForPlayer">Waiting for another player...</string>
+    <string name="strWaitingForPlayer">Waiting for other player...</string>
 </resources>

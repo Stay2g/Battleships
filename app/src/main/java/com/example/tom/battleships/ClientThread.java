@@ -12,7 +12,7 @@ class ClientThread implements Runnable {
     private int actionCategory = 1;
     private Socket socket = null;
 
-    public void setActionCategory(int actionCategory) {
+    void setActionCategory(int actionCategory) {
         this.actionCategory = actionCategory;
     }
 

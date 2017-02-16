@@ -1,6 +1,7 @@
 package com.example.tom.battleships;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -66,6 +67,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
     int arrTextViewsUsed[][] = new int[arrShips.length][5];
     int arrTextViewsUsedPlayer[][] = new int[arrShips.length][5];
     int arrTextViewsLocked[] = new int[240];
+    ProgressDialog pd;
     boolean moving;
     boolean multiplayer;
     boolean playerReady = false;
@@ -77,6 +79,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game_layout);
+
 
         imageViewBackgroundLayout = (ImageView) findViewById(R.id.imageViewBackgroundLayout);
         //btnRotate = (Button) findViewById(R.id.buttonRotate);
@@ -134,6 +137,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                     boolean stop = false;
                     if(ENEMYREADY & playerReady) {                                                  //wartet auf Gegner bis er fertig ist.
                         stop = true;
+                        pd.cancel();
                         Intent intent = new Intent(getBaseContext(), GameActivity.class);
                         //TODO: ----------->> Schiffe an anderes Gerät übergeben
                         startActivity(intent);
@@ -1127,6 +1131,10 @@ public class GameLayoutActivity extends Activity implements Serializable {
                     e.printStackTrace();
                 }
             }
+            pd = new ProgressDialog(this);
+            pd.setMessage(getString(R.string.strWaitingForPlayer));
+            pd.setCanceledOnTouchOutside(false);
+            pd.show();
         } else {
             for (ImageView arrShip : arrShips) {
                 arrShip.setAlpha(0.0f);
