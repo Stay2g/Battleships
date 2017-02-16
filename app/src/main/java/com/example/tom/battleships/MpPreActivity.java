@@ -67,7 +67,6 @@ public class MpPreActivity extends MainMenuActivity {
                     Intent intent = new Intent(getBaseContext(), GameLayoutActivity.class);
                     intent.putExtra("mode", true);
                     intent.putExtra("server", true);
-                    SERVERTHREAD.setActionCategory(1);
                     startActivity(intent);
                     stop = true;
                 }

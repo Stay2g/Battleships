@@ -146,6 +146,9 @@ public class GameLayoutActivity extends Activity implements Serializable {
             }, 500);
         }
 
+        MpPreActivity.CLIENTTHREAD.setActionCategory(1);
+        MpPreActivity.SERVERTHREAD.setActionCategory(1);
+
     }
 
     @Override
@@ -1146,7 +1149,9 @@ public class GameLayoutActivity extends Activity implements Serializable {
     //--------------------------------- MULTIPLAYER --------------------------------//
     //------------------------------------------------------------------------------//
 
-        //------------------------------------------------------------------------------//
+
+
+    //------------------------------------------------------------------------------//
     //----------------------------- UNDER DEVELOPMENT ------------------------------//
     //------------------------------------------------------------------------------//
 

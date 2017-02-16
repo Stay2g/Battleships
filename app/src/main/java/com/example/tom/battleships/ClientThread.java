@@ -9,7 +9,12 @@ import java.net.Socket;
 
 
 class ClientThread implements Runnable {
+    private int actionCategory = 1;
     private Socket socket = null;
+
+    public void setActionCategory(int actionCategory) {
+        this.actionCategory = actionCategory;
+    }
 
     Socket getSocket() {
         return socket;
@@ -26,6 +31,14 @@ class ClientThread implements Runnable {
                     String line;
                     while ((line = in.readLine()) != null) {
                         Log.d("ClientThread", line);
+                        switch (actionCategory) {
+                            case 1:                     //GameLayoutActivity
+                                handlerLayout(line);
+                                break;
+                            case 2:                     //GameActivity
+                                handlerGame(line);
+                                break;
+                        }
                     }
                 } catch (IOException e) {
                     Log.d("ClientThread", "Error@Reader");
@@ -44,6 +57,13 @@ class ClientThread implements Runnable {
         switch (actionCode) {
             case "READY":
                 GameLayoutActivity.ENEMYREADY = true;
+                break;
+        }
+    }
+
+    private void handlerGame(String actionCode) {
+        switch (actionCode) {
+            case "OVER":
                 break;
         }
     }
