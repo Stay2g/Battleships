@@ -26,9 +26,8 @@
     <string name="strVictory">Sieg!</string>
     <string name="strYourIPAddress">Deine IP-Adresse lautet:</string>
     <string name="strHostText">Klicke auf den Host-Button um einen Server zu starten.</string>
-    <string name="strClientText">Trage die IP-Adresse des anderen Smartphones in das nebenstehende Feld ein und Clicke auf den Client-Button.</string>
+    <string name="strClientText">Trage die IP-Adresse des anderen Smartphones in das nebenstehende Feld ein und klicke auf den Client-Button.</string>
     <string name="strCustomDialog">Bitte IP-Addresse im Feld eintragen:</string>
-    <string name="strClientText">Klicke auf den Client-Button und trage die IP-Adresse, die auf dem anderen Smartphone angezeigt wird, ein.</string>
     <string name="strBtnSettings">Einstellungen</string>
     <string name="strLogoutCompleted">Erfolgreich ausgeloggt</string>
 </resources>

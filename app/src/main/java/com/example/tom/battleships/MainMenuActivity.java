@@ -9,10 +9,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
-/**
- * Created by Kaden on 08.12.2016.
- */
-
 public class MainMenuActivity extends BaseActivity{
 
     TextView textViewLoggedInUser;
@@ -42,8 +38,9 @@ public class MainMenuActivity extends BaseActivity{
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btnSingleplayer:
-                Intent startShipSettingIntent = new Intent(this, GameLayoutActivity.class);
-                startActivity(startShipSettingIntent);
+                Intent startGameLayout = new Intent(this, GameLayoutActivity.class);
+                startGameLayout.putExtra("mode", false);
+                startActivity(startGameLayout);
                 break;
 
             case R.id.btnMultiplayer:
@@ -60,11 +57,5 @@ public class MainMenuActivity extends BaseActivity{
                 break;
 
         }
-    }
-
-    private void searchForPlayer() {
-        //TODO: Spielersuche
-        //per Bluetooth?
-        //
     }
 }

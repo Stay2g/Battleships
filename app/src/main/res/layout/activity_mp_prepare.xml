@@ -42,29 +42,12 @@
         android:layout_alignBottom="@+id/btnClient"
         android:layout_toEndOf="@+id/btnClient" />
 
-    <Button
-        android:text="Send to Client"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnSendToClient"
-        android:layout_below="@+id/btnHost"
-        android:layout_alignStart="@+id/textViewClient"
-        android:layout_marginTop="20dp" />
-
     <TextView
         android:text="@string/strClientText"
         android:layout_height="wrap_content"
         android:id="@+id/textViewClient"
         android:layout_width="400dp"
-        android:layout_marginTop="19dp"
-        android:layout_below="@+id/btnSendToClient"
+        android:layout_centerVertical="true"
         android:layout_alignStart="@+id/btnHost" />
 
-    <Button
-        android:text="Send to Server"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btnClient"
-        android:layout_alignStart="@+id/btnClient"
-        android:id="@+id/btnSendToServer" />
 </RelativeLayout>

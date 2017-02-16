@@ -11,6 +11,7 @@ import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -28,8 +29,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -63,6 +67,9 @@ public class GameLayoutActivity extends Activity implements Serializable {
     int arrTextViewsUsedPlayer[][] = new int[arrShips.length][5];
     int arrTextViewsLocked[] = new int[240];
     boolean moving;
+    boolean multiplayer;
+    boolean playerReady = false;
+    public static boolean ENEMYREADY = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +87,8 @@ public class GameLayoutActivity extends Activity implements Serializable {
 
         textViewSize = (int) dpToPx(28);
         marginShips = (int) dpToPx(28);
+
+        final Handler layoutHandler = new Handler();
 
         createViews((GridLayout) findViewById(R.id.gridLayout), 0);
         createShips();
@@ -115,7 +124,28 @@ public class GameLayoutActivity extends Activity implements Serializable {
         btnStart.setClickable(false);
         btnStart.setAlpha(0.5f);
         btnSetShipsRandom.setOnClickListener(ocl);
-        //btnRotate.setOnClickListener(ocl);
+
+        multiplayer = (boolean) getIntent().getSerializableExtra("mode");
+
+        if (multiplayer) {
+            layoutHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    boolean stop = false;
+                    if(ENEMYREADY & playerReady) {                                                  //wartet auf Gegner bis er fertig ist.
+                        stop = true;
+                        Intent intent = new Intent(getBaseContext(), GameActivity.class);
+                        //TODO: ----------->> Schiffe an anderes Gerät übergeben
+                        startActivity(intent);
+                        finish();
+                    }
+                    if(!stop) {
+                        layoutHandler.postDelayed(this, 500);
+                    }
+                }
+            }, 500);
+        }
+
     }
 
     @Override
@@ -1066,20 +1096,50 @@ public class GameLayoutActivity extends Activity implements Serializable {
     }
 
     private void btnStart() {
-        for (ImageView arrShip : arrShips) {
-            arrShip.setAlpha(0.0f);
+        if(multiplayer) {
+            boolean server = (boolean) getIntent().getSerializableExtra("server");
+            playerReady = true;
+            if (server) {
+                PrintWriter outS;
+                try {
+                    if(MpPreActivity.SERVERTHREAD.getSocket() != null) {
+                        outS = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.SERVERTHREAD.getSocket().getOutputStream())), true);
+                        outS.println("READY");
+                    } else {
+                        Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                PrintWriter outC;
+                try {
+                    if(MpPreActivity.CLIENTTHREAD.getSocket() != null) {
+                        outC = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.CLIENTTHREAD.getSocket().getOutputStream())), true);
+                        outC.println("READY");
+                    } else {
+                        Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            for (ImageView arrShip : arrShips) {
+                arrShip.setAlpha(0.0f);
+            }
+            for (int i = 0; i < arrShips.length; i++) {
+                System.arraycopy(arrTextViewsUsed[i], 0, arrTextViewsUsedPlayer[i], 0, 5);
+            }
+            initTextViewUsed();
+            setShipsRandom();
+            setShipsRandom();
+            Intent startGameIntent = new Intent(this, GameActivity.class);
+            startGameIntent.putExtra("textViewUsedPlayer", arrTextViewsUsedPlayer);
+            startGameIntent.putExtra("textViewUsedEnemy", arrTextViewsUsed);
+            startActivity(startGameIntent);
+            finish();
         }
-        for (int i = 0; i < arrShips.length; i++) {
-            System.arraycopy(arrTextViewsUsed[i], 0, arrTextViewsUsedPlayer[i], 0, 5);
-        }
-        initTextViewUsed();
-        setShipsRandom();
-        setShipsRandom();
-        Intent startGameIntent = new Intent(this, GameActivity.class);
-        startGameIntent.putExtra("textViewUsedPlayer", arrTextViewsUsedPlayer);
-        startGameIntent.putExtra("textViewUsedEnemy", arrTextViewsUsed);
-        startActivity(startGameIntent);
-        finish();
     }
 
     //------------------------------------------------------------------------------//

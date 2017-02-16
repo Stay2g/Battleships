@@ -1,12 +1,15 @@
 package com.example.tom.battleships;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -20,13 +23,14 @@ import java.util.Enumeration;
 public class MpPreActivity extends MainMenuActivity {
 
     Handler uiHandler;
-    Button btnHost, btnClient, btnSend2Client, btnSendToServer;
+    Button btnHost, btnClient;
     EditText serverIPText;
     public static String SERVERIP = "0.0.0.0";
     public static int SERVERPORT = 8080;
-    public static ServerThread serverThread;
-    public static ClientThread clientThread;
+    public static ServerThread SERVERTHREAD;
+    public static ClientThread CLIENTTHREAD;
     public static ProgressDialog pdHost;
+    public static boolean DONE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,66 +48,79 @@ public class MpPreActivity extends MainMenuActivity {
                 case R.id.btnClient:
                     initClient();
                     break;
-                case R.id.btnSendToClient:
-                    PrintWriter outS;
-                    try {
-                        outS = new PrintWriter(new BufferedWriter(new OutputStreamWriter(serverThread.getSocket().getOutputStream())), true);
-                        outS.println("Server is talking");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case R.id.btnSendToServer:
-                    PrintWriter outC;
-                    try {
-                        outC = new PrintWriter(new BufferedWriter(new OutputStreamWriter(clientThread.getSocket().getOutputStream())), true);
-                        outC.println("IP" + "Client is talking");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    break;
             }
         }
     };
         btnHost = (Button) findViewById(R.id.btnHost);
-        btnSend2Client = (Button) findViewById(R.id.btnSendToClient);
         btnClient = (Button) findViewById(R.id.btnClient);
         serverIPText = (EditText) findViewById(R.id.editTextIP);
-        btnSendToServer = (Button) findViewById(R.id.btnSendToServer);
 
         btnHost.setOnClickListener(cl);
         btnClient.setOnClickListener(cl);
-        btnSend2Client.setOnClickListener(cl);
-        btnSendToServer.setOnClickListener(cl);
-
-        btnSend2Client.setEnabled(false);
-        btnSendToServer.setEnabled(false);
+        
         uiHandler = new Handler();
+        uiHandler.postDelayed(new Runnable() {                                                      //Wenn Client sagt, ich bin bereit, dann zu Layout wechseln
+            @Override
+            public void run() {
+                boolean stop = false;
+                if (DONE) {
+                    Intent intent = new Intent(getBaseContext(), GameLayoutActivity.class);
+                    intent.putExtra("mode", true);
+                    intent.putExtra("server", true);
+                    SERVERTHREAD.setActionCategory(1);
+                    startActivity(intent);
+                    stop = true;
+                }
+                if(!stop) {
+                    uiHandler.postDelayed(this, 500);
+                }
+            }
+        }, 500);
     }
 
     private void initHost() {
-        serverThread = new ServerThread();
-        serverThread.setHdl(uiHandler);
-        Thread st = new Thread(serverThread);
+        SERVERTHREAD = new ServerThread();
+        SERVERTHREAD.setHdl(uiHandler);
+        SERVERTHREAD.setActionCategory(0);
+        Thread st = new Thread(SERVERTHREAD);
         st.start();
         pdHost = new ProgressDialog(this);
         pdHost.setMessage(getString(R.string.strSearchForPlayer) + "\n" + getString(R.string.strYourIPAddress) + " " + getLocalIpAddress());
         pdHost.setCanceledOnTouchOutside(true);
         pdHost.show();
-        btnSend2Client.setEnabled(true);
     }
 
     private void initClient() {
         SERVERIP = serverIPText.getText().toString();
         if (!SERVERIP.equals("")) {
-            clientThread = new ClientThread();
-            Thread cThread = new Thread(clientThread);
+            CLIENTTHREAD = new ClientThread();
+            Thread cThread = new Thread(CLIENTTHREAD);
             cThread.start();
+
+            uiHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    PrintWriter outC;
+                    try {
+                        if(CLIENTTHREAD.getSocket() != null) {
+                            outC = new PrintWriter(new BufferedWriter(new OutputStreamWriter(CLIENTTHREAD.getSocket().getOutputStream())), true);
+                            outC.println("READY");
+                            Intent intent = new Intent(getBaseContext(), GameLayoutActivity.class);
+                            intent.putExtra("mode", true);
+                            intent.putExtra("server", false);
+                            startActivity(intent);
+                        } else {
+                            Toast.makeText(getBaseContext(), "noClientSocket", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, 300);
         }
-        btnSendToServer.setEnabled(true);
-        //Intent startGameIntent = new Intent(this, GameActivity.class);
-        //startGameIntent.putExtra("mode", 2);
-        //startActivity(startGameIntent);
+
+        //Intent intent = new Intent(this, GameLayoutActivity.class);
+        //startActivity(intent);
     }
 
     private String getLocalIpAddress() {

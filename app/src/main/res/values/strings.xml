@@ -30,7 +30,6 @@
     <string name="strHostText">Click the Host-Button to open up a server.</string>
     <string name="strClientText">Enter the IP-Address from the other phone in the field below and click the \'Client\'-Button.</string>
     <string name="strCustomDialog">Please enter the IP-address below:</string>
-    <string name="strClientText">Click the Client-Button and enter the displayed IP-address on the other phone.</string>
     <string name="strBtnSettings">Settings</string>
     <string name="strLogoutCompleted">You logged out successfully</string>
     <string name="strSearchForPlayer">Waiting for another player...</string>
