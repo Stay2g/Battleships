@@ -13,9 +13,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,20 +27,15 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
-import java.util.Enumeration;
 import java.util.Locale;
 
 
@@ -71,6 +64,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
     boolean moving;
     boolean multiplayer;
     boolean playerReady = false;
+    boolean server = false;
     public static boolean ENEMYREADY = false;
 
     @Override
@@ -137,9 +131,37 @@ public class GameLayoutActivity extends Activity implements Serializable {
                     boolean stop = false;
                     if(ENEMYREADY & playerReady) {                                                  //wartet auf Gegner bis er fertig ist.
                         stop = true;
+
+                        if(server) {
+                            while (!MpPreActivity.SERVERTHREAD.getAllShipsRecived()) {
+                                btnStart.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        btnStart.postDelayed(this, 200);
+                                    }
+                                }, 200);
+                            }
+                        } else {
+                            while (!MpPreActivity.CLIENTTHREAD.getAllShipsRecived()) {
+                                btnStart.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        btnStart.postDelayed(this, 200);
+                                    }
+                                }, 200);
+                            }
+                        }
                         pd.cancel();
+
                         Intent intent = new Intent(getBaseContext(), GameActivity.class);
-                        //TODO: ----------->> Schiffe an anderes Gerät übergeben
+                        intent.putExtra("textViewUsedPlayer", arrTextViewsUsed);
+                        intent.putExtra("server", server);
+                        intent.putExtra("multiplayer", multiplayer);
+                        if (server) {
+                            intent.putExtra("textViewUsedEnemy", MpPreActivity.SERVERTHREAD.getArrTextViewsEnemy());
+                        } else {
+                            intent.putExtra("textViewUsedEnemy", MpPreActivity.CLIENTTHREAD.getArrTextViewsEnemy());
+                        }
                         startActivity(intent);
                         finish();
                     }
@@ -150,8 +172,13 @@ public class GameLayoutActivity extends Activity implements Serializable {
             }, 500);
         }
 
-        MpPreActivity.CLIENTTHREAD.setActionCategory(1);
-        MpPreActivity.SERVERTHREAD.setActionCategory(1);
+        if(multiplayer) {
+            if (server = (boolean) getIntent().getSerializableExtra("server")) {
+                MpPreActivity.SERVERTHREAD.setActionCategory(1);
+            } else {
+                MpPreActivity.CLIENTTHREAD.setActionCategory(1);
+            }
+        }
 
     }
 
@@ -1104,7 +1131,6 @@ public class GameLayoutActivity extends Activity implements Serializable {
 
     private void btnStart() {
         if(multiplayer) {
-            boolean server = (boolean) getIntent().getSerializableExtra("server");
             playerReady = true;
             if (server) {
                 PrintWriter outS;
@@ -1112,6 +1138,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                     if(MpPreActivity.SERVERTHREAD.getSocket() != null) {
                         outS = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.SERVERTHREAD.getSocket().getOutputStream())), true);
                         outS.println("READY");
+                        outS.println("SHIPS" + convArrToJSON().toString());
                     } else {
                         Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
                     }
@@ -1124,6 +1151,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                     if(MpPreActivity.CLIENTTHREAD.getSocket() != null) {
                         outC = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.CLIENTTHREAD.getSocket().getOutputStream())), true);
                         outC.println("READY");
+                        outC.println("SHIPS" + convArrToJSON().toString());
                     } else {
                         Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
                     }
@@ -1157,6 +1185,24 @@ public class GameLayoutActivity extends Activity implements Serializable {
     //--------------------------------- MULTIPLAYER --------------------------------//
     //------------------------------------------------------------------------------//
 
+    private JSONArray convArrToJSON() {
+        JSONArray arrJson = new JSONArray();
+        for (int i = 0; i < arrTextViewsUsed.length; i++) {
+            JSONObject objJson = new JSONObject();
+            try {
+                objJson.put("textView1", arrTextViewsUsed[i][0]);
+                objJson.put("textView2", arrTextViewsUsed[i][1]);
+                objJson.put("textView3", arrTextViewsUsed[i][2]);
+                objJson.put("textView4", arrTextViewsUsed[i][3]);
+                objJson.put("textView5", arrTextViewsUsed[i][4]);
+            } catch (JSONException e) {
+                Toast.makeText(this, "FUCK JSON!", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+            arrJson.put(objJson);
+        }
+        return arrJson;
+    }
 
 
     //------------------------------------------------------------------------------//

@@ -11,20 +11,23 @@ import android.graphics.Matrix;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.os.Handler;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 import static java.util.Arrays.binarySearch;
 import static java.util.Arrays.sort;
@@ -32,6 +35,8 @@ import static java.util.Arrays.sort;
 
 public class GameActivity extends Activity implements View.OnClickListener{
     int arrTextViewsUsed[][] = new int[8][5];
+    boolean ready = false;
+    Handler handler = new Handler();
 
     int arrAllUsedTextViews[] = new int[24];
     int arrBot[] = new int[100];
@@ -43,15 +48,17 @@ public class GameActivity extends Activity implements View.OnClickListener{
     ImageView arrShipsEnemy[] = new ImageView[arrTextViewsUsed.length];
     int textViewSizePlayer, textViewSizeEnemy;
     GridLayout gridLayoutPlayer, gridLayoutEnemy;
-    TextView textViewArrow;
+    TextView textViewTurn;
+    ImageButton buttonLocked;
     ImageView imageViewBackground;
 
     Button btnBack, btnAgain;
 
-    int firstHit = -1;
+    //int firstHit = -1;
     //int nextShot[] = {-1, 0};                                                                      // arr[0] = nextShot, arr[1] = textViewId + x (x wird gemerkt)
     int playerShots[] = new int[100];
     int enemyShots[] = new int[100];
+    boolean server, multiplayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +67,8 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
         gridLayoutPlayer = (GridLayout) findViewById(R.id.gridLayout);
         gridLayoutEnemy = (GridLayout) findViewById(R.id.gridLayoutEnemy);
-        textViewArrow = (TextView) findViewById(R.id.textViewArrow);
+        textViewTurn = (TextView) findViewById(R.id.textViewTurn);
+        buttonLocked = (ImageButton) findViewById(R.id.buttonLocked);
         imageViewBackground = (ImageView) findViewById(R.id.imageViewBackground);
 
         textViewSizeEnemy = (int) dpToPx(28);
@@ -77,7 +85,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
         initTextView4Game();
         initBackground();
         initGridBackgrounds();
-        textViewArrow.postDelayed(new Runnable() {
+        textViewTurn.postDelayed(new Runnable() {
             @Override
             public void run() {
                 initShipsPlayer();
@@ -85,19 +93,65 @@ public class GameActivity extends Activity implements View.OnClickListener{
             }
         }, 50);
 
-        textViewArrow.postDelayed(new Runnable() {
+        buttonLocked.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ready = true;
+            }
+        }, 500);
+        buttonLocked.setAlpha(0.0f);
+
+        textViewTurn.postDelayed(new Runnable() {
             @Override
             public void run() {
                 animShowShips();
             }
         }, 100);
+
+        server = (boolean) getIntent().getSerializableExtra("server");
+        multiplayer = (boolean) getIntent().getSerializableExtra("multiplayer");
+
+        if(multiplayer) {
+            if (server) {
+                MpPreActivity.SERVERTHREAD.setActionCategory(2);
+            } else {
+                MpPreActivity.CLIENTTHREAD.setActionCategory(2);
+            }
+        }
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                boolean myTurn;
+
+                if (server) {
+                    myTurn = MpPreActivity.SERVERTHREAD.isMyTurn();
+                } else {
+                    myTurn = MpPreActivity.CLIENTTHREAD.isMyTurn();
+                }
+
+                if (ready) {
+                    if (myTurn) {
+                        gridLayoutEnemy.bringToFront();
+                    } else {
+                        buttonLocked.bringToFront();
+                        enemyShotMultiplayer();
+                    }
+                }
+                handler.postDelayed(this, 50);
+            }
+        }, 50);
     }
 
     @Override
     public void onClick(View v) {
         for (int i = 0; i < 100; i++) {
             if (arrTextViews[i].getId() == v.getId()) {
-                playerShot(v.getId());
+                if(multiplayer) {
+                    playerShotMultiplayer(v.getId());
+                } else {
+                    playerShot(v.getId());
+                }
                 break;
             }
         }
@@ -352,7 +406,6 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             return;
                         }
                     }
-
                 }
                 //arrTextViews[x].setBackgroundColor(Color.BLUE);
                 setTextViewImage(false, x, textViewSizeEnemy);
@@ -362,6 +415,80 @@ public class GameActivity extends Activity implements View.OnClickListener{
             }
         }
     }
+
+    //Multiplayer
+
+    private void playerShotMultiplayer(int vId) {
+        for (int textViewId = 0; textViewId < 100; textViewId++) {                                  //Durchläuft alle TextViews und schaut, ob auf textView noch nicht geschossen wurde
+            if (playerShots[textViewId] == vId) {
+                for (int ship = 0; ship < arrShipsEnemy.length; ship++) {                           //Wenn nicht, dann wird geschaut, ob es ein Treffer ist
+                    int shipTextViews[] = arrTextViewsEnemy[ship];                                  //Array mit textViews eines Schiffs wird erzeugt (For-each-loop)
+                    for (int i = 0; i < shipTextViews.length; i++) {                                //und durchlaufen
+                        if (vId == shipTextViews[i]) {
+                            setTextViewImage(true, textViewId, textViewSizeEnemy);                  //Treffer -> Rot
+                            playerShots[textViewId] = -1;                                           //auf -1 gesetzt -> es wurde darauf geschossen
+                            shipTextViews[i] = -1;                                                  //selbe wie oben -> kann Schiffversenkt berechnen
+
+                            sendAction(Integer.toString(vId));                                      //Sendet TextViewId an anderes Gerät
+
+                            for (int u = 0; u < 5; u++) {                                           //alle TextViewIds auf -1? Wenn ja, Treffer
+                                if (shipTextViews[u] != -1) {
+                                    break;
+                                }
+                                if (u == 4) {                                                       //Schleife komplett durchlaufen -> Schiff versenkt
+                                    arrShipsEnemy[i].animate().alpha(1.0f).setDuration(100);
+                                    arrShipsEnemy[i].bringToFront();
+                                }
+                            }
+                            if (checkIfWon(arrTextViewsEnemy, playerShots)) {
+                                gameIsOver(1);
+                            }
+                            //enemys turn
+                            return;
+                        }
+                    }
+                }
+                setTextViewImage(false, textViewId, textViewSizeEnemy);
+                playerShots[textViewId] = -1;
+                sendAction(Integer.toString(vId));
+                //enemys turn
+                return;
+            }
+        }
+
+    }
+
+    private void enemyShotMultiplayer() {
+
+        int vId;
+        if(server) {
+            vId = MpPreActivity.SERVERTHREAD.getEnemyShot();
+        } else {
+            vId = MpPreActivity.CLIENTTHREAD.getEnemyShot();
+        }
+
+        if(vId != -1) {
+            getAllUsedTV();
+            enemyShots[vId] = -1;
+            boolean hit = checkIfHit(vId);
+            setTextViewImage(hit, vId + 100, textViewSizePlayer);
+
+            if (checkIfWon(arrTextViewsUsed, enemyShots)) {
+                gameIsOver(1);
+                //sagen das er gewonnen hat
+            }
+
+            if (server) {
+                MpPreActivity.SERVERTHREAD.setMyTurn(false);
+            } else {
+                MpPreActivity.CLIENTTHREAD.setMyTurn(false);
+            }
+        }
+    }
+
+
+
+
 
     private boolean checkIfWon(int arr[][], int shots[]) {
         for (int[] anArr : arr) {
@@ -428,6 +555,36 @@ public class GameActivity extends Activity implements View.OnClickListener{
         rl.addView(gameOverText, lpText);
     }
 
+    private void sendAction(String action) {
+        if(server) {
+            PrintWriter outS;
+            try {
+                if(MpPreActivity.SERVERTHREAD.getSocket() != null) {
+                    outS = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.SERVERTHREAD.getSocket().getOutputStream())), true);
+                    outS.println(action);
+                } else {
+                    Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(getBaseContext(), "Socked closed.", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            PrintWriter outC;
+            try {
+                if(MpPreActivity.CLIENTTHREAD.getSocket() != null) {
+                    outC = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.CLIENTTHREAD.getSocket().getOutputStream())), true);
+                    outC.println(action);
+                } else {
+                    Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(getBaseContext(), "Socked closed.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus){
         super.onWindowFocusChanged(hasFocus);
@@ -442,6 +599,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
         }
     }
 
+/*
     private void randomShot() {
         int textViewId;
         while(true) {
@@ -469,7 +627,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
             }
         }
     }
-/*
+
     private void botLevel1() {
         int textViewId;
         while(true) {
@@ -621,7 +779,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
     private void bot() {
         getAllUsedTV();
-        int targetTextView = 0;
+        int targetTextView;
         boolean hit = false;
 
         if (!hit) {             //Vorheriger Schuss war KEIN Treffer
