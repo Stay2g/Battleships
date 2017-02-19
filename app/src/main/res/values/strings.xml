@@ -28,10 +28,11 @@
     <string name="strVictory">Victory!</string>
     <string name="strYourIPAddress">Your IP-address is:</string>
     <string name="strHostText">Click the Host-Button to open up a server.</string>
-    <string name="strClientText">Enter the IP-Address from the other phone in the field below and click the \'Client\'-Button.</string>
+    <string name="strClientText">Enter the code from the other phone in the field below and click \"connect\".</string>
     <string name="strCustomDialog">Please enter the IP-address below:</string>
     <string name="strBtnSettings">Settings</string>
     <string name="strLogoutCompleted">You logged out successfully</string>
     <string name="strSearchForPlayer">Waiting for another player...</string>
     <string name="strWaitingForPlayer">Waiting for other player...</string>
+    <string name="strYourCode">Your code is:</string>
 </resources>

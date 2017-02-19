@@ -123,7 +123,6 @@ public class GameActivity extends Activity implements View.OnClickListener{
             @Override
             public void run() {
                 boolean myTurn;
-
                 if (server) {
                     myTurn = MpPreActivity.SERVERTHREAD.isMyTurn();
                 } else {
@@ -443,7 +442,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             if (checkIfWon(arrTextViewsEnemy, playerShots)) {
                                 gameIsOver(1);
                             }
-                            //enemys turn
+                            //myTurn = false;
                             return;
                         }
                     }
@@ -451,7 +450,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 setTextViewImage(false, textViewId, textViewSizeEnemy);
                 playerShots[textViewId] = -1;
                 sendAction(Integer.toString(vId));
-                //enemys turn
+                //myTurn = false;
                 return;
             }
         }
@@ -479,9 +478,9 @@ public class GameActivity extends Activity implements View.OnClickListener{
             }
 
             if (server) {
-                MpPreActivity.SERVERTHREAD.setMyTurn(false);
+                MpPreActivity.SERVERTHREAD.setMyTurn(true);
             } else {
-                MpPreActivity.CLIENTTHREAD.setMyTurn(false);
+                MpPreActivity.CLIENTTHREAD.setMyTurn(true);
             }
         }
     }

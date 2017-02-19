@@ -27,6 +27,7 @@ class ServerThread implements Runnable {
     private int enemyShot = -1;
     private boolean myTurn = true;
     private boolean sReady;
+    private boolean runThread = true;
 
     public boolean issReady() {
         return sReady;
@@ -43,6 +44,7 @@ class ServerThread implements Runnable {
     int getEnemyShot() {
         return this.enemyShot;
     }
+
     int[][] getArrTextViewsEnemy() {
         return this.arrTextViewsEnemy;
     }
@@ -65,10 +67,11 @@ class ServerThread implements Runnable {
 
     @Override
     public void run() {
+        ServerSocket ss = null;
         try {
-            ServerSocket ss = new ServerSocket(MpPreActivity.SERVERPORT);
+            ss = new ServerSocket(MpPreActivity.SERVERPORT);
             Log.d("ServerThread", "ServerSocket");
-            while(true) {
+            while(runThread) {
                 socket = ss.accept();
                 Log.d("ServerThread", "accept");
                 if(hdl != null & actionCategory == 0) {
@@ -105,7 +108,20 @@ class ServerThread implements Runnable {
             Log.d("ServerThread", "Error@ServerSocket");
             e.printStackTrace();
         }
+        try {
+            if (ss != null) {if (!ss.isClosed()) {
+                ss.close();
+            }}
+            if(socket != null) { if (!socket.isClosed()) {
+                    socket.close();
+                }}
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    void stop() {
+        runThread = false;
     }
 
     private void handlerPrepare(String actionCode) {

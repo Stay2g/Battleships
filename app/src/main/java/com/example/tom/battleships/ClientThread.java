@@ -21,6 +21,7 @@ class ClientThread implements Runnable {
     private int enemyShot = -1;
     private boolean myTurn;
     private boolean cReady;
+    private boolean runThread = true;
 
     public boolean iscReady() {
         return cReady;
@@ -57,14 +58,14 @@ class ClientThread implements Runnable {
     public void run() {
         try {
             InetAddress serverAddr = InetAddress.getByName(MpPreActivity.SERVERIP);
-            Log.d("ClientActivity", "C: Connecting...");
+            Log.d("ClientActivity", "C: Waiting for Client...");
             socket = new Socket(serverAddr, MpPreActivity.SERVERPORT);
-            while (true) {
+            while (runThread) {
                 try {
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String line;
                     while ((line = in.readLine()) != null) {
-                        Log.d("ClientThread", line);
+                        Log.d("ClientThread", "Incoming message: " + line);
                         switch (actionCategory) {
                             case 1:                     //GameLayoutActivity
                                 handlerLayout(line);
@@ -81,10 +82,14 @@ class ClientThread implements Runnable {
                 }
             }
             socket.close();
-            Log.d("ClientActivity", "C: Closed.");
+            Log.d("ClientThread", "Closed.");
         } catch (Exception e) {
-            Log.e("ClientActivity", "C: Error", e);
+            Log.e("ClientThread", "Error", e);
         }
+    }
+
+    void stop() {
+        runThread = false;
     }
 
     private void handlerLayout(String actionCode) {

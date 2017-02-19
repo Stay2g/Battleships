@@ -46,7 +46,7 @@
         android:layout_marginEnd="21dp"
         android:layout_marginTop="8dp"
         android:layout_alignParentTop="true"
-        android:layout_alignEnd="@+id/buttonStart" />
+        android:layout_alignParentEnd="true"/>
 
     <TextView
         android:layout_width="60dp"
@@ -66,22 +66,21 @@
         android:layout_alignEnd="@+id/textViewPlaceholder1" />
 
     <Button
-        android:text="Zufällig setzen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/buttonSetShipsRandom"
-        android:layout_marginBottom="8dp"
-        android:layout_above="@+id/buttonStart"
-        android:layout_alignStart="@+id/textViewPlaceholder1" />
-
-    <Button
         android:text="Start"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:id="@+id/buttonStart"
-        android:layout_marginEnd="12dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="14dp" />
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/textViewPlaceholder3"
+        android:layout_alignEnd="@id/textViewPlaceholder3"/>
+
+    <Button
+        android:text="Zufällig setzen"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:id="@+id/buttonSetShipsRandom"
+        android:layout_below="@+id/buttonStart"
+        android:layout_alignEnd="@+id/buttonStart"
+        android:layout_marginTop="20dp" />
 
 </RelativeLayout>

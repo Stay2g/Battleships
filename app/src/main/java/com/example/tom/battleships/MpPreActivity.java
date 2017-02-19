@@ -25,7 +25,7 @@ public class MpPreActivity extends MainMenuActivity {
     Handler uiHandler;
     Button btnHost, btnClient;
     EditText serverIPText;
-    public static String SERVERIP = "0.0.0.0";
+    public static String SERVERIP = "";
     public static int SERVERPORT = 8080;
     public static ServerThread SERVERTHREAD;
     public static ClientThread CLIENTTHREAD;
@@ -77,6 +77,17 @@ public class MpPreActivity extends MainMenuActivity {
         }, 500);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(CLIENTTHREAD != null) {
+            CLIENTTHREAD.stop();
+        }
+        if (SERVERTHREAD != null) {
+            SERVERTHREAD.stop();
+        }
+    }
+
     private void initHost() {
         SERVERTHREAD = new ServerThread();
         SERVERTHREAD.setHdl(uiHandler);
@@ -84,13 +95,19 @@ public class MpPreActivity extends MainMenuActivity {
         Thread st = new Thread(SERVERTHREAD);
         st.start();
         pdHost = new ProgressDialog(this);
-        pdHost.setMessage(getString(R.string.strSearchForPlayer) + "\n" + getString(R.string.strYourIPAddress) + " " + getLocalIpAddress());
+        if (getLocalIpAddress() != null) {
+            pdHost.setMessage(getString(R.string.strSearchForPlayer) + "\n" + getString(R.string.strYourCode) + " " + getLocalIpAddress().substring(getLocalIpAddress().indexOf(".", 9) + 1));
+        } else {
+            pdHost.setMessage("Please check your network!");
+        }
         pdHost.setCanceledOnTouchOutside(true);
         pdHost.show();
     }
 
     private void initClient() {
-        SERVERIP = serverIPText.getText().toString();
+        if(getLocalIpAddress() != null & (!serverIPText.getText().toString().equals(""))) {
+            SERVERIP = getLocalIpAddress().substring(0, getLocalIpAddress().indexOf(".", 9)) + "." + serverIPText.getText().toString();
+        }
         if (!SERVERIP.equals("")) {
             CLIENTTHREAD = new ClientThread();
             Thread cThread = new Thread(CLIENTTHREAD);
@@ -109,7 +126,7 @@ public class MpPreActivity extends MainMenuActivity {
                             intent.putExtra("server", false);
                             startActivity(intent);
                         } else {
-                            Toast.makeText(getBaseContext(), "noClientSocket", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "Can´t find host :(", Toast.LENGTH_SHORT).show();
                         }
                     } catch (IOException e) {
                         e.printStackTrace();

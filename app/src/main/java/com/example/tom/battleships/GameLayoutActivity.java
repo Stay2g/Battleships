@@ -1140,7 +1140,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         outS.println("READY");
                         outS.println("SHIPS" + convArrToJSON().toString());
                     } else {
-                        Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), "Can´t create ouput stream (SERVERTHREAD)", Toast.LENGTH_SHORT).show();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -1153,7 +1153,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         outC.println("READY");
                         outC.println("SHIPS" + convArrToJSON().toString());
                     } else {
-                        Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), "Can´t create output stream (CLIENTTHREAD)", Toast.LENGTH_SHORT).show();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

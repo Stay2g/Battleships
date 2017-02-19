@@ -22,7 +22,7 @@
         android:layout_alignParentStart="true" />
 
     <Button
-        android:text="Client"
+        android:text="Verbinden"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btnClient"
@@ -33,10 +33,10 @@
     <EditText
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:inputType="text|number"
+        android:inputType="number"
         android:ems="10"
         android:id="@+id/editTextIP"
-        android:hint="192.168.100.100"
+        android:hint="enter code here"
         android:layout_marginStart="30dp"
         android:layout_alignBaseline="@+id/btnClient"
         android:layout_alignBottom="@+id/btnClient"
