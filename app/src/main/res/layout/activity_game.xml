@@ -5,13 +5,6 @@
     android:layout_height="match_parent"
     android:id="@+id/rlActivityGame">
 
-    <ImageButton
-        android:layout_width="280dp"
-        android:layout_height="280dp"
-        android:layout_alignStart="@+id/gridLayoutEnemy"
-        android:layout_alignTop="@+id/gridLayoutEnemy"
-        android:id="@+id/buttonLocked" />
-
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

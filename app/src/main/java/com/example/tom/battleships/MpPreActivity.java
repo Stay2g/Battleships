@@ -116,11 +116,8 @@ public class MpPreActivity extends MainMenuActivity {
             uiHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    PrintWriter outC;
-                    try {
                         if(CLIENTTHREAD.getSocket() != null) {
-                            outC = new PrintWriter(new BufferedWriter(new OutputStreamWriter(CLIENTTHREAD.getSocket().getOutputStream())), true);
-                            outC.println("READY");
+                            CLIENTTHREAD.setAction("READY");
                             Intent intent = new Intent(getBaseContext(), GameLayoutActivity.class);
                             intent.putExtra("mode", true);
                             intent.putExtra("server", false);
@@ -128,15 +125,9 @@ public class MpPreActivity extends MainMenuActivity {
                         } else {
                             Toast.makeText(getBaseContext(), "Can´t find host :(", Toast.LENGTH_SHORT).show();
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                 }
             }, 300);
         }
-
-        //Intent intent = new Intent(this, GameLayoutActivity.class);
-        //startActivity(intent);
     }
 
     private String getLocalIpAddress() {

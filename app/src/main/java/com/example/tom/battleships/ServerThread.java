@@ -8,8 +8,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -22,48 +25,13 @@ class ServerThread implements Runnable {
     private Socket socket = null;
     private Handler hdl = null;
     private int actionCategory = 0;
-    private boolean allShipsRecived = false;
+    private boolean allShipsReceived = false;
     private int[][] arrTextViewsEnemy= new int[8][5];
     private int enemyShot = -1;
-    private boolean myTurn = true;
     private boolean sReady;
     private boolean runThread = true;
+    private String action = null;
 
-    public boolean issReady() {
-        return sReady;
-    }
-
-    boolean isMyTurn() {
-        return myTurn;
-    }
-
-    void setMyTurn(boolean myTurn) {
-        this.myTurn = myTurn;
-    }
-
-    int getEnemyShot() {
-        return this.enemyShot;
-    }
-
-    int[][] getArrTextViewsEnemy() {
-        return this.arrTextViewsEnemy;
-    }
-
-    boolean getAllShipsRecived() {
-        return this.allShipsRecived;
-    }
-
-    void setActionCategory(int actionCategory) {
-        this.actionCategory = actionCategory;
-    }
-
-    void setHdl(Handler hdl) {
-        this.hdl = hdl;
-    }
-
-    Socket getSocket() {
-        return socket;
-    }
 
     @Override
     public void run() {
@@ -82,6 +50,8 @@ class ServerThread implements Runnable {
                         }
                     });
                 }
+                Thread t = new Thread(new ServerThreadWriter());
+                t.start();
                 try {
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String line;
@@ -113,8 +83,8 @@ class ServerThread implements Runnable {
                 ss.close();
             }}
             if(socket != null) { if (!socket.isClosed()) {
-                    socket.close();
-                }}
+                socket.close();
+            }}
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -124,13 +94,41 @@ class ServerThread implements Runnable {
         runThread = false;
     }
 
+    void setAction(String action) {
+        this.action = action;
+    }
+    void setActionCategory(int actionCategory) {
+        this.actionCategory = actionCategory;
+    }
+    void setHdl(Handler hdl) {
+        this.hdl = hdl;
+    }
+    public void setEnemyShot(int enemyShot) {
+        this.enemyShot = enemyShot;
+    }
+
+    public boolean issReady() {
+        return sReady;
+    }
+    int[][] getArrTextViewsEnemy() {
+        return this.arrTextViewsEnemy;
+    }
+    int getEnemyShot() {
+        return this.enemyShot;
+    }
+    boolean getAllShipsReceived() {
+        return this.allShipsReceived;
+    }
+    Socket getSocket() {
+        return socket;
+    }
+
     private void handlerPrepare(String actionCode) {
         switch (actionCode) {
             case "READY":
                 MpPreActivity.DONE = true;
         }
     }
-
     private void handlerLayout(String actionCode) {
         switch (actionCode) {
             case "READY":
@@ -152,12 +150,11 @@ class ServerThread implements Runnable {
                         Log.d("JSON", "Can´t create JSONArray");
                         e.printStackTrace();
                     }
-                    allShipsRecived = true;
+                    allShipsReceived = true;
                 }
                 break;
         }
     }
-
     private void handlerGame(String actionCode) {
         switch (actionCode) {
             case "READY":
@@ -167,8 +164,28 @@ class ServerThread implements Runnable {
                 break;
             default:
                 enemyShot = Integer.parseInt(actionCode);
-                myTurn = false;
                 break;
         }
     }
+
+    private class ServerThreadWriter implements Runnable {
+        @Override
+        public void run() {
+            while (runThread) {
+                if (action != null) {
+                    PrintWriter outC;
+                    try {
+                        outC = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+                        outC.println(action);
+                        action = null;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Log.d("ServerThreadWriter", "Error@PrintWriter");
+                    }
+                }
+            }
+        }
+    }
 }
+
+

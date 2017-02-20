@@ -36,6 +36,7 @@ import static java.util.Arrays.sort;
 public class GameActivity extends Activity implements View.OnClickListener{
     int arrTextViewsUsed[][] = new int[8][5];
     boolean ready = false;
+    boolean myTurn;
     Handler handler = new Handler();
 
     int arrAllUsedTextViews[] = new int[24];
@@ -49,7 +50,6 @@ public class GameActivity extends Activity implements View.OnClickListener{
     int textViewSizePlayer, textViewSizeEnemy;
     GridLayout gridLayoutPlayer, gridLayoutEnemy;
     TextView textViewTurn;
-    ImageButton buttonLocked;
     ImageView imageViewBackground;
 
     Button btnBack, btnAgain;
@@ -68,7 +68,6 @@ public class GameActivity extends Activity implements View.OnClickListener{
         gridLayoutPlayer = (GridLayout) findViewById(R.id.gridLayout);
         gridLayoutEnemy = (GridLayout) findViewById(R.id.gridLayoutEnemy);
         textViewTurn = (TextView) findViewById(R.id.textViewTurn);
-        buttonLocked = (ImageButton) findViewById(R.id.buttonLocked);
         imageViewBackground = (ImageView) findViewById(R.id.imageViewBackground);
 
         textViewSizeEnemy = (int) dpToPx(28);
@@ -93,13 +92,12 @@ public class GameActivity extends Activity implements View.OnClickListener{
             }
         }, 50);
 
-        buttonLocked.postDelayed(new Runnable() {
+        btnBack.postDelayed(new Runnable() {
             @Override
             public void run() {
                 ready = true;
             }
         }, 500);
-        buttonLocked.setAlpha(0.0f);
 
         textViewTurn.postDelayed(new Runnable() {
             @Override
@@ -108,38 +106,27 @@ public class GameActivity extends Activity implements View.OnClickListener{
             }
         }, 100);
 
-        server = (boolean) getIntent().getSerializableExtra("server");
+
         multiplayer = (boolean) getIntent().getSerializableExtra("multiplayer");
 
-        if(multiplayer) {
+        if (multiplayer) {
+            server = (boolean) getIntent().getSerializableExtra("server");
             if (server) {
                 MpPreActivity.SERVERTHREAD.setActionCategory(2);
+                myTurn = true;
             } else {
                 MpPreActivity.CLIENTTHREAD.setActionCategory(2);
+                myTurn = false;
             }
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    enemyShotMultiplayer();
+                    handler.postDelayed(this, 50);
+                }
+            }, 50);
         }
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                boolean myTurn;
-                if (server) {
-                    myTurn = MpPreActivity.SERVERTHREAD.isMyTurn();
-                } else {
-                    myTurn = MpPreActivity.CLIENTTHREAD.isMyTurn();
-                }
-
-                if (ready) {
-                    if (myTurn) {
-                        gridLayoutEnemy.bringToFront();
-                    } else {
-                        buttonLocked.bringToFront();
-                        enemyShotMultiplayer();
-                    }
-                }
-                handler.postDelayed(this, 50);
-            }
-        }, 50);
     }
 
     @Override
@@ -147,7 +134,11 @@ public class GameActivity extends Activity implements View.OnClickListener{
         for (int i = 0; i < 100; i++) {
             if (arrTextViews[i].getId() == v.getId()) {
                 if(multiplayer) {
-                    playerShotMultiplayer(v.getId());
+                    if (myTurn) {
+                        textViewTurn.setText("Der Gegner ist derzeit an der Reihe.");
+                        playerShotMultiplayer(v.getId());
+
+                    }
                 } else {
                     playerShot(v.getId());
                 }
@@ -156,13 +147,29 @@ public class GameActivity extends Activity implements View.OnClickListener{
         }
         switch(v.getId()) {
             case R.id.btnAgain:
+                if(server) {MpPreActivity.SERVERTHREAD.stop();} else {MpPreActivity.CLIENTTHREAD.stop();}
                 finish();
                 break;
             case R.id.btnBackToMenu:
+                if(server) {MpPreActivity.SERVERTHREAD.stop();} else {MpPreActivity.CLIENTTHREAD.stop();}
                 finish();
                 break;
         }
         //if(v.getId() == findViewById(R.id.btnTest).getId()) {        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus){
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus){
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
     }
 
     public void createViews(GridLayout gl, int idOffset, int tvSize) {
@@ -435,14 +442,14 @@ public class GameActivity extends Activity implements View.OnClickListener{
                                     break;
                                 }
                                 if (u == 4) {                                                       //Schleife komplett durchlaufen -> Schiff versenkt
-                                    arrShipsEnemy[i].animate().alpha(1.0f).setDuration(100);
-                                    arrShipsEnemy[i].bringToFront();
+                                    arrShipsEnemy[ship].animate().alpha(1.0f).setDuration(100);
+                                    arrShipsEnemy[ship].bringToFront();
                                 }
                             }
                             if (checkIfWon(arrTextViewsEnemy, playerShots)) {
                                 gameIsOver(1);
                             }
-                            //myTurn = false;
+                            myTurn = false;
                             return;
                         }
                     }
@@ -450,7 +457,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 setTextViewImage(false, textViewId, textViewSizeEnemy);
                 playerShots[textViewId] = -1;
                 sendAction(Integer.toString(vId));
-                //myTurn = false;
+                myTurn = false;
                 return;
             }
         }
@@ -462,8 +469,10 @@ public class GameActivity extends Activity implements View.OnClickListener{
         int vId;
         if(server) {
             vId = MpPreActivity.SERVERTHREAD.getEnemyShot();
+            MpPreActivity.SERVERTHREAD.setEnemyShot(-1);
         } else {
             vId = MpPreActivity.CLIENTTHREAD.getEnemyShot();
+            MpPreActivity.CLIENTTHREAD.setEnemyShot(-1);
         }
 
         if(vId != -1) {
@@ -476,16 +485,29 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 gameIsOver(1);
                 //sagen das er gewonnen hat
             }
+            textViewTurn.setText("Du bist an der Reihe.");
+            myTurn = true;
 
-            if (server) {
-                MpPreActivity.SERVERTHREAD.setMyTurn(true);
-            } else {
-                MpPreActivity.CLIENTTHREAD.setMyTurn(true);
-            }
         }
+
     }
 
+    private void sendAction(String action) {
+        if (server) {
+            if (MpPreActivity.SERVERTHREAD.getSocket() != null) {
+                MpPreActivity.SERVERTHREAD.setAction(action);
+            } else {
+                Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            if (MpPreActivity.CLIENTTHREAD.getSocket() != null) {
+                MpPreActivity.CLIENTTHREAD.setAction(action);
+            } else {
+                Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
+            }
+        }
 
+    }
 
 
 
@@ -553,206 +575,6 @@ public class GameActivity extends Activity implements View.OnClickListener{
         rl.addView(gameOverScreen, lpScreen);
         rl.addView(gameOverText, lpText);
     }
-
-    private void sendAction(String action) {
-        if(server) {
-            PrintWriter outS;
-            try {
-                if(MpPreActivity.SERVERTHREAD.getSocket() != null) {
-                    outS = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.SERVERTHREAD.getSocket().getOutputStream())), true);
-                    outS.println(action);
-                } else {
-                    Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(getBaseContext(), "Socked closed.", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            PrintWriter outC;
-            try {
-                if(MpPreActivity.CLIENTTHREAD.getSocket() != null) {
-                    outC = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.CLIENTTHREAD.getSocket().getOutputStream())), true);
-                    outC.println(action);
-                } else {
-                    Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(getBaseContext(), "Socked closed.", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus){
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus){
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        }
-    }
-
-/*
-    private void randomShot() {
-        int textViewId;
-        while(true) {
-            textViewId = (int) (Math.random()*101);
-
-            for (int i = 0; i < 100; i++) {
-                if(enemyShots[i] == textViewId) {
-                    for (int[] anArrTextViewsUsed : arrTextViewsUsed) {
-                        for (int k = 0; k < 5; k++) {
-                            if (textViewId == anArrTextViewsUsed[k]) {
-                                arrTextViews[i + 100].setBackgroundColor(Color.RED);
-                                enemyShots[i] = -1;
-                                if (checkIfWon(arrTextViewsUsed, enemyShots)) {
-                                    gameIsOver(0);
-                                }
-                                return;
-                            }
-                        }
-                    }
-
-                    arrTextViews[i + 100].setBackgroundColor(Color.BLUE);
-                    enemyShots[i] = -1;
-                    return;
-                }
-            }
-        }
-    }
-
-    private void botLevel1() {
-        int textViewId;
-        while(true) {
-            if (nextShot[0] == -1) {
-                textViewId = (int) (Math.random() * 101);
-            } else {
-                textViewId = nextShot[0];
-            }
-            for (int i = 0; i < 100; i++) {
-                if(enemyShots[i] == textViewId) {
-                    for (int[] anArrTextViewsUsed : arrTextViewsUsed) {
-                        for (int k = 0; k < 5; k++) {
-                            if (textViewId == anArrTextViewsUsed[k]) {
-                                //arrTextViews[i + 100].setBackgroundColor(Color.RED);
-                                setTextViewImage(true, i + 100, textViewSizeEnemy);
-                                enemyShots[i] = -1;
-                                anArrTextViewsUsed[k] = -1;
-                                if (nextShot[1] == 0) {
-                                    for (int y = 0; y < 100; y++) {
-                                        if (enemyShots[y] == ((textViewId + 1)) & ((textViewId + 1) < 100)) {
-                                            nextShot[0] = textViewId + 1;
-                                            nextShot[1] = 1;
-                                            break;
-                                        }
-                                        if (enemyShots[y] == ((textViewId - 1)) & ((textViewId - 1) >= 0)) {
-                                            nextShot[0] = textViewId - 1;
-                                            nextShot[1] = -1;
-                                            break;
-                                        }
-                                        if (enemyShots[y] == ((textViewId + 10)) & ((textViewId + 10) < 100)) {
-                                            nextShot[0] = textViewId + 10;
-                                            nextShot[1] = 10;
-                                            break;
-                                        }
-                                        if (enemyShots[y] == ((textViewId - 10)) & ((textViewId - 10 >= 0))) {
-                                            nextShot[0] = textViewId - 10;
-                                            nextShot[1] = -10;
-                                            break;
-                                        }
-                                    }
-                                } else {
-                                    int ext = 0;
-                                    switch (nextShot[1]) {
-                                        case 1:
-                                            ext += 1;
-                                            break;
-                                        case -1:
-                                            ext += -1;
-                                            break;
-                                        case 10:
-                                            ext += 10;
-                                            break;
-                                        case -10:
-                                            ext += -10;
-                                            break;
-                                    }
-                                    nextShot[0] = textViewId + ext;
-                                }
-                                if (checkIfWon(arrTextViewsUsed, enemyShots)) {
-                                    gameIsOver(0);
-                                }
-                                if(firstHit == -1) {
-                                    firstHit = i;
-                                }
-                                for (int u = 0; u < 5; u++) {
-                                    if (anArrTextViewsUsed[u] != -1) {
-                                        break;
-                                    }
-                                    if (u == 4) {
-                                        firstHit = -1;
-                                        nextShot[0] = -1;
-                                        nextShot[1] = 0;
-                                    }
-                                }
-                                return;
-                            }
-                        }
-                    }
-                    //arrTextViews[i + 100].setBackgroundColor(Color.BLUE);
-                    setTextViewImage(false, i + 100, textViewSizeEnemy);
-                    enemyShots[i] = -1;
-                    if(firstHit != -1) {
-                        for (int y = 0; y < 100; y++) {
-                            if (enemyShots[y] == (firstHit + 1)) {
-                                nextShot[0] = firstHit + 1;
-                                nextShot[1] = 1;
-                                break;
-                            }
-                            if (enemyShots[y] == (firstHit - 1)) {
-                                nextShot[0] = firstHit - 1;
-                                nextShot[1] = -1;
-                                break;
-                            }
-                            if (enemyShots[y] == (firstHit + 10)) {
-                                nextShot[0] = firstHit + 10;
-                                nextShot[1] = 10;
-                                break;
-                            }
-                            if (enemyShots[y] == (firstHit - 10)) {
-                                nextShot[0] = firstHit - 10;
-                                nextShot[1] = -10;
-                                break;
-                            }
-                        }
-                    }
-                    return;
-                }
-            }
-        }
-    }
-
-    private void botLevel2()  {
-        int textViewId;
-        int nextShot = -1;
-
-        if (nextShot == -1) {
-            textViewId = (int) (Math.random() * 101);
-        }
-
-
-
-
-        //TODO: Wenn Schiff zerstört, auch Felder um das Schiff nicht mehr beschießen
-    }
-*/
-
 
     private void getAllUsedTV() {
         int count = 0;
@@ -910,4 +732,157 @@ public class GameActivity extends Activity implements View.OnClickListener{
             }
         }
     } //unschaffbar (jeder Schuss = 1 Treffer)
+
+
+/*
+    private void randomShot() {
+        int textViewId;
+        while(true) {
+            textViewId = (int) (Math.random()*101);
+
+            for (int i = 0; i < 100; i++) {
+                if(enemyShots[i] == textViewId) {
+                    for (int[] anArrTextViewsUsed : arrTextViewsUsed) {
+                        for (int k = 0; k < 5; k++) {
+                            if (textViewId == anArrTextViewsUsed[k]) {
+                                arrTextViews[i + 100].setBackgroundColor(Color.RED);
+                                enemyShots[i] = -1;
+                                if (checkIfWon(arrTextViewsUsed, enemyShots)) {
+                                    gameIsOver(0);
+                                }
+                                return;
+                            }
+                        }
+                    }
+
+                    arrTextViews[i + 100].setBackgroundColor(Color.BLUE);
+                    enemyShots[i] = -1;
+                    return;
+                }
+            }
+        }
+    }
+
+    private void botLevel1() {
+        int textViewId;
+        while(true) {
+            if (nextShot[0] == -1) {
+                textViewId = (int) (Math.random() * 101);
+            } else {
+                textViewId = nextShot[0];
+            }
+            for (int i = 0; i < 100; i++) {
+                if(enemyShots[i] == textViewId) {
+                    for (int[] anArrTextViewsUsed : arrTextViewsUsed) {
+                        for (int k = 0; k < 5; k++) {
+                            if (textViewId == anArrTextViewsUsed[k]) {
+                                //arrTextViews[i + 100].setBackgroundColor(Color.RED);
+                                setTextViewImage(true, i + 100, textViewSizeEnemy);
+                                enemyShots[i] = -1;
+                                anArrTextViewsUsed[k] = -1;
+                                if (nextShot[1] == 0) {
+                                    for (int y = 0; y < 100; y++) {
+                                        if (enemyShots[y] == ((textViewId + 1)) & ((textViewId + 1) < 100)) {
+                                            nextShot[0] = textViewId + 1;
+                                            nextShot[1] = 1;
+                                            break;
+                                        }
+                                        if (enemyShots[y] == ((textViewId - 1)) & ((textViewId - 1) >= 0)) {
+                                            nextShot[0] = textViewId - 1;
+                                            nextShot[1] = -1;
+                                            break;
+                                        }
+                                        if (enemyShots[y] == ((textViewId + 10)) & ((textViewId + 10) < 100)) {
+                                            nextShot[0] = textViewId + 10;
+                                            nextShot[1] = 10;
+                                            break;
+                                        }
+                                        if (enemyShots[y] == ((textViewId - 10)) & ((textViewId - 10 >= 0))) {
+                                            nextShot[0] = textViewId - 10;
+                                            nextShot[1] = -10;
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    int ext = 0;
+                                    switch (nextShot[1]) {
+                                        case 1:
+                                            ext += 1;
+                                            break;
+                                        case -1:
+                                            ext += -1;
+                                            break;
+                                        case 10:
+                                            ext += 10;
+                                            break;
+                                        case -10:
+                                            ext += -10;
+                                            break;
+                                    }
+                                    nextShot[0] = textViewId + ext;
+                                }
+                                if (checkIfWon(arrTextViewsUsed, enemyShots)) {
+                                    gameIsOver(0);
+                                }
+                                if(firstHit == -1) {
+                                    firstHit = i;
+                                }
+                                for (int u = 0; u < 5; u++) {
+                                    if (anArrTextViewsUsed[u] != -1) {
+                                        break;
+                                    }
+                                    if (u == 4) {
+                                        firstHit = -1;
+                                        nextShot[0] = -1;
+                                        nextShot[1] = 0;
+                                    }
+                                }
+                                return;
+                            }
+                        }
+                    }
+                    //arrTextViews[i + 100].setBackgroundColor(Color.BLUE);
+                    setTextViewImage(false, i + 100, textViewSizeEnemy);
+                    enemyShots[i] = -1;
+                    if(firstHit != -1) {
+                        for (int y = 0; y < 100; y++) {
+                            if (enemyShots[y] == (firstHit + 1)) {
+                                nextShot[0] = firstHit + 1;
+                                nextShot[1] = 1;
+                                break;
+                            }
+                            if (enemyShots[y] == (firstHit - 1)) {
+                                nextShot[0] = firstHit - 1;
+                                nextShot[1] = -1;
+                                break;
+                            }
+                            if (enemyShots[y] == (firstHit + 10)) {
+                                nextShot[0] = firstHit + 10;
+                                nextShot[1] = 10;
+                                break;
+                            }
+                            if (enemyShots[y] == (firstHit - 10)) {
+                                nextShot[0] = firstHit - 10;
+                                nextShot[1] = -10;
+                                break;
+                            }
+                        }
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
+    private void botLevel2()  {
+        int textViewId;
+        int nextShot = -1;
+
+        if (nextShot == -1) {
+            textViewId = (int) (Math.random() * 101);
+        }
+    }
+*/
+
+
 }

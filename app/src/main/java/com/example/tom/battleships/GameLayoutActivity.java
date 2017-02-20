@@ -133,7 +133,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         stop = true;
 
                         if(server) {
-                            while (!MpPreActivity.SERVERTHREAD.getAllShipsRecived()) {
+                            while (!MpPreActivity.SERVERTHREAD.getAllShipsReceived()) {
                                 btnStart.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
@@ -142,7 +142,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                                 }, 200);
                             }
                         } else {
-                            while (!MpPreActivity.CLIENTTHREAD.getAllShipsRecived()) {
+                            while (!MpPreActivity.CLIENTTHREAD.getAllShipsReceived()) {
                                 btnStart.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
@@ -1132,33 +1132,42 @@ public class GameLayoutActivity extends Activity implements Serializable {
     private void btnStart() {
         if(multiplayer) {
             playerReady = true;
-            if (server) {
-                PrintWriter outS;
-                try {
-                    if(MpPreActivity.SERVERTHREAD.getSocket() != null) {
-                        outS = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.SERVERTHREAD.getSocket().getOutputStream())), true);
-                        outS.println("READY");
-                        outS.println("SHIPS" + convArrToJSON().toString());
+
+            Thread t = new Thread (new Runnable() {
+                @Override
+                public void run() {
+                    if (server) {
+                        PrintWriter outS;
+                        try {
+                            if (MpPreActivity.SERVERTHREAD.getSocket() != null) {
+                                outS = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.SERVERTHREAD.getSocket().getOutputStream())), true);
+                                outS.println("READY");
+                                outS.println("SHIPS" + convArrToJSON().toString());
+                            } else {
+                                Toast.makeText(getBaseContext(), "Can´t create ouput stream (SERVERTHREAD)", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     } else {
-                        Toast.makeText(getBaseContext(), "Can´t create ouput stream (SERVERTHREAD)", Toast.LENGTH_SHORT).show();
+                        PrintWriter outC;
+                        try {
+                            if (MpPreActivity.CLIENTTHREAD.getSocket() != null) {
+                                outC = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.CLIENTTHREAD.getSocket().getOutputStream())), true);
+                                outC.println("READY");
+                                outC.println("SHIPS" + convArrToJSON().toString());
+                            } else {
+                                Toast.makeText(getBaseContext(), "Can´t create output stream (CLIENTTHREAD)", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
                 }
-            } else {
-                PrintWriter outC;
-                try {
-                    if(MpPreActivity.CLIENTTHREAD.getSocket() != null) {
-                        outC = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.CLIENTTHREAD.getSocket().getOutputStream())), true);
-                        outC.println("READY");
-                        outC.println("SHIPS" + convArrToJSON().toString());
-                    } else {
-                        Toast.makeText(getBaseContext(), "Can´t create output stream (CLIENTTHREAD)", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            });
+            t.start();
+
             pd = new ProgressDialog(this);
             pd.setMessage(getString(R.string.strWaitingForPlayer));
             pd.setCanceledOnTouchOutside(false);
@@ -1176,6 +1185,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
             Intent startGameIntent = new Intent(this, GameActivity.class);
             startGameIntent.putExtra("textViewUsedPlayer", arrTextViewsUsedPlayer);
             startGameIntent.putExtra("textViewUsedEnemy", arrTextViewsUsed);
+            startGameIntent.putExtra("multiplayer", false);
             startActivity(startGameIntent);
             finish();
         }
