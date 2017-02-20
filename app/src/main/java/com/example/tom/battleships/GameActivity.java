@@ -16,6 +16,10 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
@@ -102,9 +106,17 @@ public class GameActivity extends Activity implements View.OnClickListener{
         textViewTurn.postDelayed(new Runnable() {
             @Override
             public void run() {
-                animShowShips();
+                for (int i = 0; i < arrTextViewsEnemy.length; i++) {
+                    Animation fadeIn = new AlphaAnimation(0, 1);
+                    fadeIn.setInterpolator(new DecelerateInterpolator());
+                    fadeIn.setDuration(200);
+                    fadeIn.setStartOffset(i*200);
+                    arrShipsPlayer[i].startAnimation(fadeIn);
+                    arrShipsPlayer[i].setAlpha(1.0f);
+                }
+
             }
-        }, 100);
+        }, 200);
 
 
         multiplayer = (boolean) getIntent().getSerializableExtra("multiplayer");
@@ -113,15 +125,33 @@ public class GameActivity extends Activity implements View.OnClickListener{
             server = (boolean) getIntent().getSerializableExtra("server");
             if (server) {
                 MpPreActivity.SERVERTHREAD.setActionCategory(2);
+                textViewTurn.setText("Du bist an der Reihe.");
                 myTurn = true;
             } else {
                 MpPreActivity.CLIENTTHREAD.setActionCategory(2);
+                textViewTurn.setText("Dein Gegner ist dran.");
                 myTurn = false;
             }
 
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    if (server) {
+                        if (MpPreActivity.SERVERTHREAD.isCanceled()) {
+                            Toast.makeText(getBaseContext(), "Game canceled.", Toast.LENGTH_SHORT).show();
+                            MpPreActivity.SERVERTHREAD.stop();
+                            finish();
+                            return;
+                        }
+                    } else {
+                        if (MpPreActivity.CLIENTTHREAD.isCanceled()) {
+                            Toast.makeText(getBaseContext(), "Game canceled.", Toast.LENGTH_SHORT).show();
+                            MpPreActivity.CLIENTTHREAD.stop();
+                            finish();
+                            return;
+                        }
+                    }
+
                     enemyShotMultiplayer();
                     handler.postDelayed(this, 50);
                 }
@@ -172,6 +202,21 @@ public class GameActivity extends Activity implements View.OnClickListener{
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (multiplayer) {
+            if (server) {
+                MpPreActivity.SERVERTHREAD.setAction("CANCEL");
+                MpPreActivity.SERVERTHREAD.setCanceled(true);
+            } else {
+                MpPreActivity.CLIENTTHREAD.setAction("CANCEL");
+                MpPreActivity.CLIENTTHREAD.setCanceled(true);
+
+            }
+        }
+    }
+
     public void createViews(GridLayout gl, int idOffset, int tvSize) {
         gl.setColumnCount(10);
         gl.setRowCount(10);
@@ -194,8 +239,10 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
     private void animShowShips() {
         for (int i = 0; i < arrTextViewsEnemy.length; i++) {
-            arrShipsPlayer[i].animate().alpha(1.0f).setDuration(100);
-            arrShipsPlayer[i].postDelayed(new Runnable() {@Override public void run() {}}, 100);
+            Animation fadeIn = new AlphaAnimation(0, 1);
+            fadeIn.setInterpolator(new DecelerateInterpolator());
+            fadeIn.setDuration(200);
+            arrShipsPlayer[i].startAnimation(fadeIn);
         }
     }
 
@@ -482,7 +529,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
             setTextViewImage(hit, vId + 100, textViewSizePlayer);
 
             if (checkIfWon(arrTextViewsUsed, enemyShots)) {
-                gameIsOver(1);
+                gameIsOver(0);
                 //sagen das er gewonnen hat
             }
             textViewTurn.setText("Du bist an der Reihe.");
@@ -506,6 +553,10 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
             }
         }
+
+    }
+
+    private void drawBorder() {
 
     }
 
@@ -612,7 +663,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
             arrBot[ret] = -1;   //Feld aus zu schießenden Feldern entfernen
 
-            hit = checkIfHit(targetTextView);
+                hit = checkIfHit(targetTextView);
             if (hit) {
                 arrNextShot[0] = ret;
                 arrNextShot[1] = ret;

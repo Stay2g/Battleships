@@ -26,6 +26,7 @@ class ClientThread implements Runnable {
     private boolean cReady;
     private boolean runThread = true;
     private String action = null;
+    private boolean canceled;
 
     public void run() {
         try {
@@ -64,8 +65,16 @@ class ClientThread implements Runnable {
 
     void stop() {
         runThread = false;
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
     void setAction(String action) {
         this.action = action;
     }
@@ -75,10 +84,13 @@ class ClientThread implements Runnable {
     Socket getSocket() {
         return socket;
     }
-    public void setEnemyShot(int enemyShot) {
+    void setEnemyShot(int enemyShot) {
         this.enemyShot = enemyShot;
     }
 
+    boolean isCanceled() {
+        return canceled;
+    }
     boolean iscReady() {
         return cReady;
     }
@@ -127,6 +139,7 @@ class ClientThread implements Runnable {
             case "OVER":
                 break;
             case "CANCEL":
+                canceled = true;
                 break;
             default:
                 enemyShot = Integer.parseInt(actionCode);

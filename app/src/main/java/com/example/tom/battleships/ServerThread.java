@@ -31,6 +31,7 @@ class ServerThread implements Runnable {
     private boolean sReady;
     private boolean runThread = true;
     private String action = null;
+    private boolean canceled;
 
 
     @Override
@@ -92,7 +93,13 @@ class ServerThread implements Runnable {
 
     void stop() {
         runThread = false;
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
     void setAction(String action) {
         this.action = action;
@@ -103,10 +110,16 @@ class ServerThread implements Runnable {
     void setHdl(Handler hdl) {
         this.hdl = hdl;
     }
-    public void setEnemyShot(int enemyShot) {
+    void setEnemyShot(int enemyShot) {
         this.enemyShot = enemyShot;
     }
+    void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
 
+    boolean isCanceled() {
+        return canceled;
+    }
     public boolean issReady() {
         return sReady;
     }
@@ -160,7 +173,8 @@ class ServerThread implements Runnable {
             case "READY":
                 sReady = true;
                 break;
-            case "OVER":
+            case "CANCEL":
+                canceled = true;
                 break;
             default:
                 enemyShot = Integer.parseInt(actionCode);
