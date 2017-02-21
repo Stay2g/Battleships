@@ -38,19 +38,20 @@ import static java.util.Arrays.sort;
 
 
 public class GameActivity extends Activity implements View.OnClickListener{
-    int arrTextViewsUsed[][] = new int[8][5];
+    int arrTextViewsPlayer[][] = new int[8][5];
     boolean ready = false;
     boolean myTurn;
+    boolean hit = false;
     Handler handler = new Handler();
 
     int arrAllUsedTextViews[] = new int[24];
     int arrBot[] = new int[100];
-    int arrNextShot[] = {-1, -1, -1};                                                               //Erster Treffer, aktueller Schuss,
+    int arrNextShot[] = {-1, -1, -1};                                                               //Erster Treffer, aktueller Schuss, last shot hitted?
 
-    int arrTextViewsEnemy[][] = new int[arrTextViewsUsed.length][5];
+    int arrTextViewsEnemy[][] = new int[arrTextViewsPlayer.length][5];
     TextView arrTextViews[] = new TextView[200];
-    ImageView arrShipsPlayer[] = new ImageView[arrTextViewsUsed.length];
-    ImageView arrShipsEnemy[] = new ImageView[arrTextViewsUsed.length];
+    ImageView arrShipsPlayer[] = new ImageView[arrTextViewsPlayer.length];
+    ImageView arrShipsEnemy[] = new ImageView[arrTextViewsPlayer.length];
     int textViewSizePlayer, textViewSizeEnemy;
     GridLayout gridLayoutPlayer, gridLayoutEnemy;
     TextView textViewTurn;
@@ -138,14 +139,14 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 public void run() {
                     if (server) {
                         if (MpPreActivity.SERVERTHREAD.isCanceled()) {
-                            Toast.makeText(getBaseContext(), "Game canceled.", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getBaseContext(), "Game canceled.", Toast.LENGTH_SHORT).show();
                             MpPreActivity.SERVERTHREAD.stop();
                             finish();
                             return;
                         }
                     } else {
                         if (MpPreActivity.CLIENTTHREAD.isCanceled()) {
-                            Toast.makeText(getBaseContext(), "Game canceled.", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getBaseContext(), "Game canceled.", Toast.LENGTH_SHORT).show();
                             MpPreActivity.CLIENTTHREAD.stop();
                             finish();
                             return;
@@ -311,7 +312,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 matrix.setRotate(180f);
             }
         } else {
-            if ((arrTextViewsUsed[i][1] - arrTextViewsUsed[i][0]) == 10) {
+            if ((arrTextViewsPlayer[i][1] - arrTextViewsPlayer[i][0]) == 10) {
                 shipImage = scaleShipImage(l, id, 2);
                 matrix.setRotate(90f);
             } else {
@@ -325,13 +326,13 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
     private void initShipsPlayer() {
         Intent intent = getIntent();
-        arrTextViewsUsed = (int[][]) intent.getSerializableExtra("textViewUsedPlayer");
+        arrTextViewsPlayer = (int[][]) intent.getSerializableExtra("textViewUsedPlayer");
 
         RelativeLayout rl = (RelativeLayout) findViewById(R.id.rlActivityGame);
         int extX = (int) gridLayoutPlayer.getX();
         int extY = (int) gridLayoutPlayer.getY();
 
-        for (int i = 0; i < arrTextViewsUsed.length; i++) {
+        for (int i = 0; i < arrTextViewsPlayer.length; i++) {
             arrShipsPlayer[i] = new ImageView(this);
             arrShipsPlayer[i].setId(400+i);
             arrShipsPlayer[i].setAlpha(0.0f);
@@ -340,29 +341,29 @@ public class GameActivity extends Activity implements View.OnClickListener{
             switch (i) {
                 case 0:
                     rotate(i, R.drawable.ship_giant, 5, arrShipsPlayer);
-                    arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
-                    arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
+                    arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsPlayer[i][0]+100].getX());
+                    arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsPlayer[i][0]+100].getY());
                     break;
                 case 1:
                 //case 2:
                     rotate(i, R.drawable.ship_big, 4, arrShipsPlayer);
-                    arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
-                    arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
+                    arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsPlayer[i][0]+100].getX());
+                    arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsPlayer[i][0]+100].getY());
                     break;
                 case 2: //3
                 case 3: //4
                 case 4: //5
                     rotate(i, R.drawable.ship_medium, 3, arrShipsPlayer);
-                    arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
-                    arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
+                    arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsPlayer[i][0]+100].getX());
+                    arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsPlayer[i][0]+100].getY());
                     break;
                 case 5: //6
                 case 6: //7
                 //case 8:
                 case 7: //9
                     rotate(i, R.drawable.ship_small, 2, arrShipsPlayer);
-                    arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsUsed[i][0]+100].getX());
-                    arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsUsed[i][0]+100].getY());
+                    arrShipsPlayer[i].setX(extX + arrTextViews[arrTextViewsPlayer[i][0]+100].getX());
+                    arrShipsPlayer[i].setY(extY + arrTextViews[arrTextViewsPlayer[i][0]+100].getY());
                     break;
             }
         }
@@ -528,7 +529,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
             boolean hit = checkIfHit(vId);
             setTextViewImage(hit, vId + 100, textViewSizePlayer);
 
-            if (checkIfWon(arrTextViewsUsed, enemyShots)) {
+            if (checkIfWon(arrTextViewsPlayer, enemyShots)) {
                 gameIsOver(0);
                 //sagen das er gewonnen hat
             }
@@ -629,10 +630,10 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
     private void getAllUsedTV() {
         int count = 0;
-        for(int i = 0; i < arrTextViewsUsed.length; i++) {
+        for(int i = 0; i < arrTextViewsPlayer.length; i++) {
             for (int j = 0; j < 5; j++) {
-                if (arrTextViewsUsed[i][j] != -1) {
-                    arrAllUsedTextViews[count] = arrTextViewsUsed[i][j];
+                if (arrTextViewsPlayer[i][j] != -1) {
+                    arrAllUsedTextViews[count] = arrTextViewsPlayer[i][j];
                     count++;
                 }
             }
@@ -652,13 +653,12 @@ public class GameActivity extends Activity implements View.OnClickListener{
     private void bot() {
         getAllUsedTV();
         int targetTextView;
-        boolean hit = false;
 
         if (!hit) {             //Vorheriger Schuss war KEIN Treffer
             int ret;
             do {                //Sucht neues Feld, auf das noch nicht geschossen wurde
                 targetTextView = (int) (Math.random()*100);
-                ret = binarySearch(arrBot, targetTextView);
+                ret = arraySearch(arrBot, targetTextView);
             } while (ret < 0);
 
             arrBot[ret] = -1;   //Feld aus zu schießenden Feldern entfernen
@@ -677,77 +677,148 @@ public class GameActivity extends Activity implements View.OnClickListener{
             int ret;
             do {
                 switch (step) {
-                    case 0:         //links
+                    case 0:         //rechts
                         treffer++;
-                        ret = binarySearch(arrBot, treffer);
+                        ret = arraySearch(arrBot, treffer);
                         if (ret < 0) {
                             step++;
                         } else {
-                            hit = checkIfHit(treffer);
+                            boolean hit = checkIfHit(treffer);
+                            if (hit) {arrNextShot[2] = 1;                                           //Wenn Treffer, dann TV -1 setzten und nextShot[2] auf Treffer(==1) setzen
+                                array2DimReplace(arrTextViewsPlayer, ret);
+                            } else {
+                                arrNextShot[2] = 0;
+                            }
                             arrBot[ret] = -1;
                             setTextViewImage(hit, treffer + 100, textViewSizeEnemy);
-                            arrNextShot[1] = ret;
-                            step = 4;
+                            if(arrNextShot[2] == 1) {
+                                arrNextShot[1] = ret;
+                            }
+                            step = 5;
                         }
                         break;
-                    case 1:         //rechts
-                        treffer = -2;
-                        ret = binarySearch(arrBot, treffer);
+                    case 1:         //links
+                        if(arrNextShot[2] == 0) {
+                            treffer = arrNextShot[0] - 1;
+                        } else {
+                            treffer = arrNextShot[1] - 1;
+                        }
+                        ret = arraySearch(arrBot, treffer);
                         if (ret < 0) {
                             step++;
                         } else {
-                            hit = checkIfHit(treffer);
+                            boolean hit = checkIfHit(treffer);
+                            if (hit) {arrNextShot[2] = 1;                                           //Wenn Treffer, dann TV -1 setzten und nextShot[2] auf Treffer(==1) setzen
+                                array2DimReplace(arrTextViewsPlayer, ret);
+                            } else {
+                                arrNextShot[2] = 0;
+                            }
                             arrBot[ret] = -1;
                             setTextViewImage(hit, treffer + 100, textViewSizeEnemy);
                             arrNextShot[1] = ret;
-                            step = 4;
+                            step = 5;
                         }
                         break;
                     case 2:         //oben
-                        treffer = -9;
-                        ret = binarySearch(arrBot, treffer);
+                        if(arrNextShot[2] == 0) {
+                            treffer = arrNextShot[0] - 10;
+                        } else {
+                            treffer = arrNextShot[1] - 10;
+                        }
+                        ret = arraySearch(arrBot, treffer);
                         if (ret < 0) {
                             step++;
                         } else {
-                            hit = checkIfHit(treffer);
+                            boolean hit = checkIfHit(treffer);
+                            if (hit) {arrNextShot[2] = 1;                                           //Wenn Treffer, dann TV -1 setzten und nextShot[2] auf Treffer(==1) setzen
+                                array2DimReplace(arrTextViewsPlayer, ret);
+                            } else {
+                                arrNextShot[2] = 0;
+                            }
                             arrBot[ret] = -1;
                             setTextViewImage(hit, treffer + 100, textViewSizeEnemy);
                             arrNextShot[1] = ret;
-                            step = 4;
+                            step = 5;
                         }
                         break;
                     case 3:         //unten
-                        treffer += 20;
-                        ret = binarySearch(arrBot, treffer);
+                        if(arrNextShot[2] == 0) {
+                            treffer = arrNextShot[0] + 10;
+                        } else {
+                            treffer = arrNextShot[1] + 10;
+                        }
+                        ret = arraySearch(arrBot, treffer);
                         if (ret < 0) {
                             step++;
                         } else {
-                            hit = checkIfHit(treffer);
+                            boolean hit = checkIfHit(treffer);                                      //Treffer?
+                            if (hit) {arrNextShot[2] = 1;                                           //Wenn Treffer, dann TV -1 setzten und nextShot[2] auf Treffer(==1) setzen
+                                array2DimReplace(arrTextViewsPlayer, ret);
+                            } else {
+                                arrNextShot[2] = 0;
+                            }
                             arrBot[ret] = -1;
                             setTextViewImage(hit, treffer + 100, textViewSizeEnemy);
                             arrNextShot[1] = ret;
-                            step = 4;
+                            step = 5;
                         }
                         break;
                     case 4:
                         int val = (arrNextShot[0] - arrNextShot[1]);
                         if (val < 10 & val > -10) {
-
+                            Toast.makeText(this, "val < 10 & val > -10", Toast.LENGTH_SHORT).show();
                         }
+
+                        for (int ship = 0; ship < arrShipsPlayer.length; ship++) {                           //Wenn nicht, dann wird geschaut, ob es ein Treffer ist
+                            int shipTextViews[] = arrTextViewsPlayer[ship];                                  //Array mit textViews eines Schiffs wird erzeugt (For-each-loop)
+                            for (int u = 0; u < 5; u++) {                                           //alle TextViewIds auf -1? Wenn ja, Treffer
+                                if (shipTextViews[u] != -1) {
+                                    break;
+                                }
+                                if (u == 4) {                                                       //Schleife komplett durchlaufen -> Schiff versenkt
+                                    hit = false;                                                    //false = wieder Random schießen
+                                }
+                            }
+                        }
+                        //if (checkIfWon(arrTextViewsPlayer, playerShots)) {gameIsOver(0);}
+
+                        step ++;
                         break;
                 }
-            } while (step != 4);
+            } while (step != 5);
 
         }
 
 
     }
 
+    private int arraySearch(int[] arr, int val) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == val) {
+                arr[i] = -1;
+                return val;
+            }
+        }
+        return -1;
+    }
+
+    private void array2DimReplace(int[][] arr, int val) {                                           //Sucht wert in 2dim Array und ersetzt (falls gefunden) durch -1;
+        for (int dim1 = 0; dim1 < arr.length; dim1++) {
+            for (int dim2 = 0; dim2 < arr[0].length; dim2++) {
+                if(arr[dim1][dim2] == val) {
+                    arr[dim1][dim2] = -1;
+                    return;
+                }
+            }
+        }
+        return;
+    }
+
     private void botLevel9000() {
         int textViewId = -1;
         while(true) {
 
-            for(int[] arr : arrTextViewsUsed) {
+            for(int[] arr : arrTextViewsPlayer) {
                 for (int j = 0; j < 5; j++) {
                     if (arr[j] != -1) {
                         textViewId = arr[j];
@@ -761,14 +832,14 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
             for (int i = 0; i < 100; i++) {
                 if(enemyShots[i] == textViewId) {
-                    for (int[] anArrTextViewsUsed : arrTextViewsUsed) {
+                    for (int[] anArrTextViewsUsed : arrTextViewsPlayer) {
                         for (int k = 0; k < 5; k++) {
                             if (textViewId == anArrTextViewsUsed[k]) {
                                 //arrTextViews[i + 100].setBackgroundColor(Color.RED);
                                 setTextViewImage(true, i + 100, textViewSizeEnemy);
                                 enemyShots[i] = -1;
                                 anArrTextViewsUsed[k] = -1;
-                                if (checkIfWon(arrTextViewsUsed, enemyShots)) {
+                                if (checkIfWon(arrTextViewsPlayer, enemyShots)) {
                                     gameIsOver(0);
                                 }
                                 return;
@@ -793,12 +864,12 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
             for (int i = 0; i < 100; i++) {
                 if(enemyShots[i] == textViewId) {
-                    for (int[] anArrTextViewsUsed : arrTextViewsUsed) {
+                    for (int[] anArrTextViewsUsed : arrTextViewsPlayer) {
                         for (int k = 0; k < 5; k++) {
                             if (textViewId == anArrTextViewsUsed[k]) {
                                 arrTextViews[i + 100].setBackgroundColor(Color.RED);
                                 enemyShots[i] = -1;
-                                if (checkIfWon(arrTextViewsUsed, enemyShots)) {
+                                if (checkIfWon(arrTextViewsPlayer, enemyShots)) {
                                     gameIsOver(0);
                                 }
                                 return;
@@ -824,7 +895,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
             }
             for (int i = 0; i < 100; i++) {
                 if(enemyShots[i] == textViewId) {
-                    for (int[] anArrTextViewsUsed : arrTextViewsUsed) {
+                    for (int[] anArrTextViewsUsed : arrTextViewsPlayer) {
                         for (int k = 0; k < 5; k++) {
                             if (textViewId == anArrTextViewsUsed[k]) {
                                 //arrTextViews[i + 100].setBackgroundColor(Color.RED);
@@ -872,7 +943,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                                     }
                                     nextShot[0] = textViewId + ext;
                                 }
-                                if (checkIfWon(arrTextViewsUsed, enemyShots)) {
+                                if (checkIfWon(arrTextViewsPlayer, enemyShots)) {
                                     gameIsOver(0);
                                 }
                                 if(firstHit == -1) {
@@ -922,15 +993,6 @@ public class GameActivity extends Activity implements View.OnClickListener{
                     return;
                 }
             }
-        }
-    }
-
-    private void botLevel2()  {
-        int textViewId;
-        int nextShot = -1;
-
-        if (nextShot == -1) {
-            textViewId = (int) (Math.random() * 101);
         }
     }
 */

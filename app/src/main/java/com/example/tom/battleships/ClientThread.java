@@ -72,7 +72,7 @@ class ClientThread implements Runnable {
         }
     }
 
-    public void setCanceled(boolean canceled) {
+    void setCanceled(boolean canceled) {
         this.canceled = canceled;
     }
     void setAction(String action) {
@@ -135,8 +135,6 @@ class ClientThread implements Runnable {
         switch (actionCode) {
             case "READY":
                 cReady = true;
-                break;
-            case "OVER":
                 break;
             case "CANCEL":
                 canceled = true;
