@@ -1,5 +1,6 @@
 package com.example.tom.battleships;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,20 +38,19 @@ public class MpPreActivity extends MainMenuActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mp_prepare);
 
-
-    View.OnClickListener cl = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            switch(view.getId()) {
-                case R.id.btnHost:
-                    initHost();
-                    break;
-                case R.id.btnClient:
-                    initClient();
-                    break;
+        View.OnClickListener cl = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch(view.getId()) {
+                    case R.id.btnHost:
+                        initHost();
+                        break;
+                    case R.id.btnClient:
+                        initClient();
+                        break;
+                }
             }
-        }
-    };
+        };
         btnHost = (Button) findViewById(R.id.btnHost);
         btnClient = (Button) findViewById(R.id.btnClient);
         serverIPText = (EditText) findViewById(R.id.editTextIP);

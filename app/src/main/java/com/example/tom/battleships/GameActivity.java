@@ -12,28 +12,20 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.GridLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-
-import static java.util.Arrays.binarySearch;
 import static java.util.Arrays.sort;
 
 
@@ -54,7 +46,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
     ImageView arrShipsEnemy[] = new ImageView[arrTextViewsPlayer.length];
     int textViewSizePlayer, textViewSizeEnemy;
     GridLayout gridLayoutPlayer, gridLayoutEnemy;
-    TextView textViewTurn;
+    TextView textViewTurn, enemyBorder, playerBorder;
     ImageView imageViewBackground;
 
     Button btnBack, btnAgain;
@@ -69,11 +61,14 @@ public class GameActivity extends Activity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        Looper.prepare();
 
         gridLayoutPlayer = (GridLayout) findViewById(R.id.gridLayout);
         gridLayoutEnemy = (GridLayout) findViewById(R.id.gridLayoutEnemy);
         textViewTurn = (TextView) findViewById(R.id.textViewTurn);
         imageViewBackground = (ImageView) findViewById(R.id.imageViewBackground);
+        enemyBorder = (TextView) findViewById(R.id.gridLayoutEnemyBorder);
+        playerBorder = (TextView) findViewById(R.id.gridLayoutPlayerBorder);
 
         textViewSizeEnemy = (int) dpToPx(28);
         textViewSizePlayer = (int) dpToPx(20);
@@ -101,23 +96,26 @@ public class GameActivity extends Activity implements View.OnClickListener{
             @Override
             public void run() {
                 ready = true;
+                playerBorder.setText("");
+                enemyBorder.setText("");
             }
-        }, 500);
+        }, 1000);
 
+        // ---- Ship fadeIn animation
         textViewTurn.postDelayed(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < arrTextViewsEnemy.length; i++) {
                     Animation fadeIn = new AlphaAnimation(0, 1);
                     fadeIn.setInterpolator(new DecelerateInterpolator());
-                    fadeIn.setDuration(200);
-                    fadeIn.setStartOffset(i*200);
+                    fadeIn.setDuration(100);
+                    fadeIn.setStartOffset(i*100);
                     arrShipsPlayer[i].startAnimation(fadeIn);
                     arrShipsPlayer[i].setAlpha(1.0f);
                 }
 
             }
-        }, 200);
+        }, 100);
 
 
         multiplayer = (boolean) getIntent().getSerializableExtra("multiplayer");
@@ -152,7 +150,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             return;
                         }
                     }
-
+                    
                     enemyShotMultiplayer();
                     handler.postDelayed(this, 50);
                 }
@@ -162,27 +160,31 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        for (int i = 0; i < 100; i++) {
-            if (arrTextViews[i].getId() == v.getId()) {
-                if(multiplayer) {
-                    if (myTurn) {
-                        textViewTurn.setText("Der Gegner ist derzeit an der Reihe.");
-                        playerShotMultiplayer(v.getId());
+        if(ready) {
+            for (int i = 0; i < 100; i++) {
+                if (arrTextViews[i].getId() == v.getId()) {
+                    if (multiplayer) {
+                        if (myTurn) {
+                            textViewTurn.setText("Der Gegner ist derzeit an der Reihe.");
+                            playerShotMultiplayer(v.getId());
 
+                        }
+                    } else {
+                        playerShot(v.getId());
                     }
-                } else {
-                    playerShot(v.getId());
+                    break;
                 }
-                break;
             }
         }
         switch(v.getId()) {
             case R.id.btnAgain:
-                if(server) {MpPreActivity.SERVERTHREAD.stop();} else {MpPreActivity.CLIENTTHREAD.stop();}
+                if(server & multiplayer) {MpPreActivity.SERVERTHREAD.stop();} else {MpPreActivity.CLIENTTHREAD.stop();}
+                Intent intent = new Intent(this, GameLayoutActivity.class);
+                startActivity(intent);
                 finish();
                 break;
             case R.id.btnBackToMenu:
-                if(server) {MpPreActivity.SERVERTHREAD.stop();} else {MpPreActivity.CLIENTTHREAD.stop();}
+                if(server & multiplayer) {MpPreActivity.SERVERTHREAD.stop();} else {MpPreActivity.CLIENTTHREAD.stop();}
                 finish();
                 break;
         }
@@ -498,6 +500,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                                 gameIsOver(1);
                             }
                             myTurn = false;
+                            drawBorder();
                             return;
                         }
                     }
@@ -506,6 +509,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 playerShots[textViewId] = -1;
                 sendAction(Integer.toString(vId));
                 myTurn = false;
+                drawBorder();
                 return;
             }
         }
@@ -535,6 +539,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
             }
             textViewTurn.setText("Du bist an der Reihe.");
             myTurn = true;
+            drawBorder();
 
         }
 
@@ -558,7 +563,13 @@ public class GameActivity extends Activity implements View.OnClickListener{
     }
 
     private void drawBorder() {
-
+        if(myTurn) {
+            enemyBorder.animate().alpha(1.0f).setDuration(100);
+            playerBorder.animate().alpha(0.0f).setDuration(100);
+        } else {
+            playerBorder.animate().alpha(1.0f).setDuration(100);
+            enemyBorder.animate().alpha(0.0f).setDuration(100);
+        }
     }
 
 
@@ -570,6 +581,17 @@ public class GameActivity extends Activity implements View.OnClickListener{
                     if ((anArr[k] == shots[i]) & anArr[k] != -1) {
                         return false;
                     }
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean checkIfWonBot() {
+        for (int[] ships : arrTextViewsPlayer) {
+            for (int ship : ships) {
+                if (ship != -1) {
+                    return false;
                 }
             }
         }
@@ -665,6 +687,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
                 hit = checkIfHit(targetTextView);
             if (hit) {
+                array2DimReplace(arrTextViewsPlayer, ret);
                 arrNextShot[0] = ret;
                 arrNextShot[1] = ret;
             }
@@ -673,19 +696,26 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
         } else {                //Vorheriger Schuss war EIN Treffer
             int step = 0;
+            if(((arrNextShot[0] - arrNextShot[1]) >= 10) | ((arrNextShot[0] - arrNextShot[1]) <= -10)) {
+                step = 2;
+            }
             int treffer = arrNextShot[1];
             int ret;
+            int[] shipTextViews = null;
             do {
                 switch (step) {
                     case 0:         //rechts
                         treffer++;
                         ret = arraySearch(arrBot, treffer);
+                        if (!checkNextShot(treffer)) {
+                            ret = -1;
+                        }
                         if (ret < 0) {
                             step++;
                         } else {
                             boolean hit = checkIfHit(treffer);
                             if (hit) {arrNextShot[2] = 1;                                           //Wenn Treffer, dann TV -1 setzten und nextShot[2] auf Treffer(==1) setzen
-                                array2DimReplace(arrTextViewsPlayer, ret);
+                                shipTextViews = array2DimReplace(arrTextViewsPlayer, ret);
                             } else {
                                 arrNextShot[2] = 0;
                             }
@@ -694,83 +724,92 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             if(arrNextShot[2] == 1) {
                                 arrNextShot[1] = ret;
                             }
-                            step = 5;
+                            step = 4;
                         }
                         break;
                     case 1:         //links
-                        if(arrNextShot[2] == 0) {
-                            treffer = arrNextShot[0] - 1;
-                        } else {
+                        if(arrNextShot[2] == 1) {
                             treffer = arrNextShot[1] - 1;
+                        } else {
+                            treffer = arrNextShot[0] - 1;
                         }
                         ret = arraySearch(arrBot, treffer);
+                        if (!checkNextShot(treffer)) {
+                            ret = -1;
+                        }
                         if (ret < 0) {
                             step++;
                         } else {
                             boolean hit = checkIfHit(treffer);
                             if (hit) {arrNextShot[2] = 1;                                           //Wenn Treffer, dann TV -1 setzten und nextShot[2] auf Treffer(==1) setzen
-                                array2DimReplace(arrTextViewsPlayer, ret);
+                                shipTextViews = array2DimReplace(arrTextViewsPlayer, ret);
                             } else {
                                 arrNextShot[2] = 0;
                             }
                             arrBot[ret] = -1;
                             setTextViewImage(hit, treffer + 100, textViewSizeEnemy);
-                            arrNextShot[1] = ret;
-                            step = 5;
+                            if(arrNextShot[2] == 1) {
+                                arrNextShot[1] = ret;
+                            }
+                            step = 4;
                         }
                         break;
                     case 2:         //oben
-                        if(arrNextShot[2] == 0) {
-                            treffer = arrNextShot[0] - 10;
-                        } else {
+                        if(arrNextShot[2] == 1) {
                             treffer = arrNextShot[1] - 10;
+                        } else {
+                            treffer = arrNextShot[0] - 10;
                         }
                         ret = arraySearch(arrBot, treffer);
+                        if (!checkNextShot(treffer)) {
+                            ret = -1;
+                        }
                         if (ret < 0) {
                             step++;
                         } else {
                             boolean hit = checkIfHit(treffer);
                             if (hit) {arrNextShot[2] = 1;                                           //Wenn Treffer, dann TV -1 setzten und nextShot[2] auf Treffer(==1) setzen
-                                array2DimReplace(arrTextViewsPlayer, ret);
+                                shipTextViews = array2DimReplace(arrTextViewsPlayer, ret);
                             } else {
                                 arrNextShot[2] = 0;
                             }
                             arrBot[ret] = -1;
                             setTextViewImage(hit, treffer + 100, textViewSizeEnemy);
-                            arrNextShot[1] = ret;
-                            step = 5;
+                            if(arrNextShot[2] == 1) {
+                                arrNextShot[1] = ret;
+                            }
+                            step = 4;
                         }
                         break;
                     case 3:         //unten
-                        if(arrNextShot[2] == 0) {
-                            treffer = arrNextShot[0] + 10;
-                        } else {
+                        if(arrNextShot[2] == 1) {
                             treffer = arrNextShot[1] + 10;
+                        } else {
+                            treffer = arrNextShot[0] + 10;
                         }
                         ret = arraySearch(arrBot, treffer);
+                        if (!checkNextShot(treffer)) {
+                            ret = -1;
+                        }
                         if (ret < 0) {
                             step++;
                         } else {
                             boolean hit = checkIfHit(treffer);                                      //Treffer?
                             if (hit) {arrNextShot[2] = 1;                                           //Wenn Treffer, dann TV -1 setzten und nextShot[2] auf Treffer(==1) setzen
-                                array2DimReplace(arrTextViewsPlayer, ret);
+                                shipTextViews = array2DimReplace(arrTextViewsPlayer, ret);
                             } else {
                                 arrNextShot[2] = 0;
                             }
                             arrBot[ret] = -1;
                             setTextViewImage(hit, treffer + 100, textViewSizeEnemy);
-                            arrNextShot[1] = ret;
-                            step = 5;
+                            if(arrNextShot[2] == 1) {
+                                arrNextShot[1] = ret;
+                            }
+                            step = 4;
                         }
                         break;
                     case 4:
-                        int val = (arrNextShot[0] - arrNextShot[1]);
-                        if (val < 10 & val > -10) {
-                            Toast.makeText(this, "val < 10 & val > -10", Toast.LENGTH_SHORT).show();
-                        }
-
-                        for (int ship = 0; ship < arrShipsPlayer.length; ship++) {                           //Wenn nicht, dann wird geschaut, ob es ein Treffer ist
-                            int shipTextViews[] = arrTextViewsPlayer[ship];                                  //Array mit textViews eines Schiffs wird erzeugt (For-each-loop)
+                        if(shipTextViews != null) {
                             for (int u = 0; u < 5; u++) {                                           //alle TextViewIds auf -1? Wenn ja, Treffer
                                 if (shipTextViews[u] != -1) {
                                     break;
@@ -780,15 +819,26 @@ public class GameActivity extends Activity implements View.OnClickListener{
                                 }
                             }
                         }
-                        //if (checkIfWon(arrTextViewsPlayer, playerShots)) {gameIsOver(0);}
+                        if (checkIfWonBot()) {gameIsOver(0);}
 
                         step ++;
+                        break;
+
+                    default:
                         break;
                 }
             } while (step != 5);
 
         }
 
+
+    }
+
+    private boolean checkNextShot(int tvId) {
+        //Can be simplifyed they said...so I simplifiyed it :^)
+        return !((tvId > 99) | (tvId < 0))
+                && !((tvId % 10 == 0) & ((arrNextShot[1] % 10 == 9) | (arrNextShot[0] % 10 == 9)))
+                && !((tvId % 10 == 9) & ((arrNextShot[1] % 10 == 0) | (arrNextShot[0] % 10 == 0)));
 
     }
 
@@ -802,16 +852,16 @@ public class GameActivity extends Activity implements View.OnClickListener{
         return -1;
     }
 
-    private void array2DimReplace(int[][] arr, int val) {                                           //Sucht wert in 2dim Array und ersetzt (falls gefunden) durch -1;
+    private int[] array2DimReplace(int[][] arr, int val) {                                           //Sucht wert in 2dim Array und ersetzt (falls gefunden) durch -1;
         for (int dim1 = 0; dim1 < arr.length; dim1++) {
             for (int dim2 = 0; dim2 < arr[0].length; dim2++) {
                 if(arr[dim1][dim2] == val) {
                     arr[dim1][dim2] = -1;
-                    return;
+                    return arr[dim1];
                 }
             }
         }
-        return;
+        return null;
     }
 
     private void botLevel9000() {
