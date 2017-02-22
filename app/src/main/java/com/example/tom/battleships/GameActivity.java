@@ -128,11 +128,11 @@ public class GameActivity extends Activity implements View.OnClickListener{
         if (multiplayer) {
             server = (boolean) getIntent().getSerializableExtra("server");
             if (server) {
-                MpPreActivity.SERVERTHREAD.setActionCategory(2);
+                MainMenuActivity.SERVERTHREAD.setActionCategory(2);
                 textViewTurn.setText("Du bist an der Reihe.");
                 myTurn = true;
             } else {
-                MpPreActivity.CLIENTTHREAD.setActionCategory(2);
+                MainMenuActivity.CLIENTTHREAD.setActionCategory(2);
                 textViewTurn.setText("Dein Gegner ist dran.");
                 myTurn = false;
             }
@@ -141,16 +141,16 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 @Override
                 public void run() {
                     if (server) {
-                        if (MpPreActivity.SERVERTHREAD.isCanceled()) {
+                        if (MainMenuActivity.SERVERTHREAD.isCanceled()) {
                             //Toast.makeText(getBaseContext(), "Game canceled.", Toast.LENGTH_SHORT).show();
-                            MpPreActivity.SERVERTHREAD.stop();
+                            MainMenuActivity.SERVERTHREAD.stop();
                             finish();
                             return;
                         }
                     } else {
-                        if (MpPreActivity.CLIENTTHREAD.isCanceled()) {
+                        if (MainMenuActivity.CLIENTTHREAD.isCanceled()) {
                             //Toast.makeText(getBaseContext(), "Game canceled.", Toast.LENGTH_SHORT).show();
-                            MpPreActivity.CLIENTTHREAD.stop();
+                            MainMenuActivity.CLIENTTHREAD.stop();
                             finish();
                             return;
                         }
@@ -183,13 +183,13 @@ public class GameActivity extends Activity implements View.OnClickListener{
         }
         switch(v.getId()) {
             case R.id.btnAgain:
-                if(server & multiplayer) {MpPreActivity.SERVERTHREAD.stop();} else {MpPreActivity.CLIENTTHREAD.stop();}
+                if(server & multiplayer) {MainMenuActivity.SERVERTHREAD.stop();} else {MainMenuActivity.CLIENTTHREAD.stop();}
                 Intent intent = new Intent(this, GameLayoutActivity.class);
                 startActivity(intent);
                 finish();
                 break;
             case R.id.btnBackToMenu:
-                if(server & multiplayer) {MpPreActivity.SERVERTHREAD.stop();} else {MpPreActivity.CLIENTTHREAD.stop();}
+                if(server & multiplayer) {MainMenuActivity.SERVERTHREAD.stop();} else {MainMenuActivity.CLIENTTHREAD.stop();}
                 finish();
                 break;
         }
@@ -215,11 +215,11 @@ public class GameActivity extends Activity implements View.OnClickListener{
         super.onDestroy();
         if (multiplayer) {
             if (server) {
-                MpPreActivity.SERVERTHREAD.setAction("CANCEL");
-                MpPreActivity.SERVERTHREAD.setCanceled(true);
+                MainMenuActivity.SERVERTHREAD.setAction("CANCEL");
+                MainMenuActivity.SERVERTHREAD.setCanceled(true);
             } else {
-                MpPreActivity.CLIENTTHREAD.setAction("CANCEL");
-                MpPreActivity.CLIENTTHREAD.setCanceled(true);
+                MainMenuActivity.CLIENTTHREAD.setAction("CANCEL");
+                MainMenuActivity.CLIENTTHREAD.setCanceled(true);
 
             }
         }
@@ -525,11 +525,11 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
         int vId;
         if(server) {
-            vId = MpPreActivity.SERVERTHREAD.getEnemyShot();
-            MpPreActivity.SERVERTHREAD.setEnemyShot(-1);
+            vId = MainMenuActivity.SERVERTHREAD.getEnemyShot();
+            MainMenuActivity.SERVERTHREAD.setEnemyShot(-1);
         } else {
-            vId = MpPreActivity.CLIENTTHREAD.getEnemyShot();
-            MpPreActivity.CLIENTTHREAD.setEnemyShot(-1);
+            vId = MainMenuActivity.CLIENTTHREAD.getEnemyShot();
+            MainMenuActivity.CLIENTTHREAD.setEnemyShot(-1);
         }
 
         if(vId != -1) {
@@ -552,14 +552,14 @@ public class GameActivity extends Activity implements View.OnClickListener{
 
     private void sendAction(String action) {
         if (server) {
-            if (MpPreActivity.SERVERTHREAD.getSocket() != null) {
-                MpPreActivity.SERVERTHREAD.setAction(action);
+            if (MainMenuActivity.SERVERTHREAD.getSocket() != null) {
+                MainMenuActivity.SERVERTHREAD.setAction(action);
             } else {
                 Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
             }
         } else {
-            if (MpPreActivity.CLIENTTHREAD.getSocket() != null) {
-                MpPreActivity.CLIENTTHREAD.setAction(action);
+            if (MainMenuActivity.CLIENTTHREAD.getSocket() != null) {
+                MainMenuActivity.CLIENTTHREAD.setAction(action);
             } else {
                 Toast.makeText(getBaseContext(), "Connection lost", Toast.LENGTH_SHORT).show();
             }

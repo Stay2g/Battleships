@@ -133,7 +133,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         stop = true;
 
                         if(server) {
-                            while (!MpPreActivity.SERVERTHREAD.getAllShipsReceived()) {
+                            while (!MainMenuActivity.SERVERTHREAD.getAllShipsReceived()) {
                                 btnStart.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
@@ -142,7 +142,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
                                 }, 200);
                             }
                         } else {
-                            while (!MpPreActivity.CLIENTTHREAD.getAllShipsReceived()) {
+                            while (!MainMenuActivity.CLIENTTHREAD.getAllShipsReceived()) {
                                 btnStart.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
@@ -158,9 +158,9 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         intent.putExtra("server", server);
                         intent.putExtra("multiplayer", multiplayer);
                         if (server) {
-                            intent.putExtra("textViewUsedEnemy", MpPreActivity.SERVERTHREAD.getArrTextViewsEnemy());
+                            intent.putExtra("textViewUsedEnemy", MainMenuActivity.SERVERTHREAD.getArrTextViewsEnemy());
                         } else {
-                            intent.putExtra("textViewUsedEnemy", MpPreActivity.CLIENTTHREAD.getArrTextViewsEnemy());
+                            intent.putExtra("textViewUsedEnemy", MainMenuActivity.CLIENTTHREAD.getArrTextViewsEnemy());
                         }
                         startActivity(intent);
                         finish();
@@ -174,9 +174,9 @@ public class GameLayoutActivity extends Activity implements Serializable {
 
         if(multiplayer) {
             if (server = (boolean) getIntent().getSerializableExtra("server")) {
-                MpPreActivity.SERVERTHREAD.setActionCategory(1);
+                MainMenuActivity.SERVERTHREAD.setActionCategory(1);
             } else {
-                MpPreActivity.CLIENTTHREAD.setActionCategory(1);
+                MainMenuActivity.CLIENTTHREAD.setActionCategory(1);
             }
         }
 
@@ -1139,8 +1139,8 @@ public class GameLayoutActivity extends Activity implements Serializable {
                     if (server) {
                         PrintWriter outS;
                         try {
-                            if (MpPreActivity.SERVERTHREAD.getSocket() != null) {
-                                outS = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.SERVERTHREAD.getSocket().getOutputStream())), true);
+                            if (MainMenuActivity.SERVERTHREAD.getSocket() != null) {
+                                outS = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MainMenuActivity.SERVERTHREAD.getSocket().getOutputStream())), true);
                                 outS.println("READY");
                                 outS.println("SHIPS" + convArrToJSON().toString());
                             } else {
@@ -1152,8 +1152,8 @@ public class GameLayoutActivity extends Activity implements Serializable {
                     } else {
                         PrintWriter outC;
                         try {
-                            if (MpPreActivity.CLIENTTHREAD.getSocket() != null) {
-                                outC = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MpPreActivity.CLIENTTHREAD.getSocket().getOutputStream())), true);
+                            if (MainMenuActivity.CLIENTTHREAD.getSocket() != null) {
+                                outC = new PrintWriter(new BufferedWriter(new OutputStreamWriter(MainMenuActivity.CLIENTTHREAD.getSocket().getOutputStream())), true);
                                 outC.println("READY");
                                 outC.println("SHIPS" + convArrToJSON().toString());
                             } else {

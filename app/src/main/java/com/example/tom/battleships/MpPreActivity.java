@@ -26,12 +26,12 @@ public class MpPreActivity extends MainMenuActivity {
     Handler uiHandler;
     Button btnHost, btnClient;
     EditText serverIPText;
-    public static String SERVERIP = "";
-    public static int SERVERPORT = 8080;
-    public static ServerThread SERVERTHREAD;
-    public static ClientThread CLIENTTHREAD;
-    public static ProgressDialog pdHost;
-    public static boolean DONE;
+    //public static String SERVERIP = "";
+    //public static int SERVERPORT = 8080;
+    //public static ServerThread SERVERTHREAD;
+    //public static ClientThread CLIENTTHREAD;
+    //public static ProgressDialog pdHost;
+    //public static boolean DONE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
