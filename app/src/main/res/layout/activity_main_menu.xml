@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/background">
-
-    <RelativeLayout
-        android:layout_width="151dp"
-        android:layout_height="wrap_content">
-
-    </RelativeLayout>
+    android:layout_height="match_parent">
+    <!---android:background="@drawable/background"> -->
 
     <Button
         android:id="@+id/btnSingleplayer"
@@ -16,9 +10,9 @@
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="57dp"
-        android:layout_below="@+id/relativeLayout2"
-        android:layout_alignStart="@+id/btnMultiplayer" />
+        android:layout_marginTop="80dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:id="@+id/btnMultiplayer"
@@ -26,9 +20,9 @@
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
         android:layout_below="@+id/btnSingleplayer"
-        android:layout_alignStart="@+id/btnSettings"
-        android:layout_marginTop="14dp" />
+        android:layout_alignStart="@+id/btnSingleplayer" />
 
     <Button
         android:id="@+id/btnSettings"
@@ -36,35 +30,75 @@
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginStart="107dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="19dp"
         android:layout_below="@+id/btnMultiplayer"
-        android:layout_alignParentStart="true" />
+        android:layout_alignStart="@+id/btnMultiplayer" />
 
     <Button
         android:id="@+id/btnLogout"
         android:text="@string/strLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginEnd="14dp"
-        android:layout_alignBaseline="@+id/btnSettings"
-        android:layout_alignBottom="@+id/btnSettings"
-        android:layout_alignParentEnd="true" />
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/btnSettings"
+        android:layout_alignStart="@+id/btnSettings"
+        android:layout_alignEnd="@+id/btnSettings" />
+
+    <TextView
+        android:text="Hauptmenü"
+        android:textSize="36sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="13dp" />
 
     <TextView
         android:id="@+id/textViewUsername"
         android:text="@string/strGast"
         android:textStyle="bold"
         android:textSize="18sp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="67dp"
-        android:layout_alignTop="@+id/btnSingleplayer"
-        android:layout_toStartOf="@+id/btnLogout" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:text="Server"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnServer"
+        android:layout_above="@+id/btnSettings"
+        android:layout_alignStart="@+id/textView"
+        android:visibility="gone"
+        android:alpha="0"/>
+
+    <Button
+        android:text="Client"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnClient"
+        android:layout_alignBaseline="@+id/btnMultiplayer"
+        android:layout_alignBottom="@+id/btnMultiplayer"
+        android:layout_alignEnd="@+id/textView"
+        android:visibility="gone"
+        android:alpha="0"/>
+
+    <EditText
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/editTextCode"
+        android:alpha="0"
+        android:visibility="gone"
+        android:hint="code"
+        android:textAlignment="center"
+        android:layout_above="@+id/btnSettings"
+        android:layout_toEndOf="@+id/textView" />
 
 
 </RelativeLayout>

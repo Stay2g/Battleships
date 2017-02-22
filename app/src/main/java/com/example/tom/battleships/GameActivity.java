@@ -61,7 +61,6 @@ public class GameActivity extends Activity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-        Looper.prepare();
 
         gridLayoutPlayer = (GridLayout) findViewById(R.id.gridLayout);
         gridLayoutEnemy = (GridLayout) findViewById(R.id.gridLayoutEnemy);
@@ -84,6 +83,10 @@ public class GameActivity extends Activity implements View.OnClickListener{
         initTextView4Game();
         initBackground();
         initGridBackgrounds();
+
+        enemyBorder.bringToFront();
+        playerBorder.bringToFront();
+
         textViewTurn.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -98,8 +101,10 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 ready = true;
                 playerBorder.setText("");
                 enemyBorder.setText("");
+                //playerBorder.setAlpha(0.0f);
+                //enemyBorder.setAlpha(0.0f);
             }
-        }, 1000);
+        }, 2500);
 
         // ---- Ship fadeIn animation
         textViewTurn.postDelayed(new Runnable() {
@@ -150,7 +155,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
                             return;
                         }
                     }
-                    
+
                     enemyShotMultiplayer();
                     handler.postDelayed(this, 50);
                 }

@@ -1,5 +1,6 @@
 package com.example.tom.battleships;
 
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,6 +31,7 @@ class ClientThread implements Runnable {
 
     public void run() {
         try {
+            Looper.prepare();
             InetAddress serverAddr = InetAddress.getByName(MpPreActivity.SERVERIP);
             Log.d("ClientActivity", "C: Waiting for Client...");
             socket = new Socket(serverAddr, MpPreActivity.SERVERPORT);

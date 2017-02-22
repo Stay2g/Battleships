@@ -1,6 +1,7 @@
 package com.example.tom.battleships;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -36,6 +37,7 @@ class ServerThread implements Runnable {
 
     @Override
     public void run() {
+        Looper.prepare();
         ServerSocket ss = null;
         try {
             ss = new ServerSocket(MpPreActivity.SERVERPORT);
