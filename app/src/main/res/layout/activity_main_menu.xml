@@ -104,7 +104,6 @@
         android:text=" ? "
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:id="@+id/btnHelp"
         android:layout_alignTop="@+id/btnLogout"
         android:layout_alignEnd="@+id/textViewUsername" />
 

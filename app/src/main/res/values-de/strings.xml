@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Battleship</string>
-    <string name="strExit">Beenden</string>
     <string name="strLoginFailed">Ihr Nutzername oder Passwort ist falsch</string>
     <string name="strMultiplayer">Mehrspieler</string>
-    <string name="strSettings">Enstellungen</string>
     <string name="strSingleplayer">Einzelspieler</string>
     <string name="strLogin">Anmelden</string>
     <string name="strPwd">Passwort</string>
@@ -12,9 +10,6 @@
     <string name="strRegister">Registrieren</string>
     <string name="strName">Name</string>
     <string name="strLogout">Logout</string>
-    <string name="strMusic">Musik</string>
-    <string name="strSound">Soundeffekte</string>
-    <string name="strAbortReg">Registrierung abgebrochen</string>
     <string name="strTextViewReg">Keinen Account?</string>
     <string name="strGast">Gast</string>
     <string name="strGuestLogin">Als Gast einloggen</string>
@@ -23,10 +18,6 @@
     <string name="strWon">Du hast gewonnen.</string>
     <string name="strLost">Du hast verloren.</string>
     <string name="strVictory">Sieg!</string>
-    <string name="strYourIPAddress">Deine IP-Adresse lautet:</string>
-    <string name="strHostText">Klicke auf den Host-Button um einen Server zu starten.</string>
-    <string name="strClientText">Trage den Code des anderen Smartphones in dem darunterliegenden Feld ein und klicke auf \"verbinden\".</string>
-    <string name="strCustomDialog">Bitte IP-Adresse im Feld eintragen:</string>
     <string name="strBtnSettings">Einstellungen</string>
     <string name="strLogoutCompleted">Erfolgreich ausgeloggt</string>
     <string name="strWaitingForPlayer">Warte auf anderen Spieler....</string>

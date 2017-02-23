@@ -106,6 +106,8 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 playerBorder.setAlpha(0.0f);
                 enemyBorder.setAlpha(0.0f);
                 if(multiplayer) {
+                    enemyBorder.bringToFront();
+                    playerBorder.bringToFront();
                     drawBorder();
                 }
             }

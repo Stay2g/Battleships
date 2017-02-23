@@ -5,14 +5,14 @@ android {
         config {
             keyAlias 'android'
             keyPassword 'android'
-            storeFile file('C:/Users/Kaden/Documents/keystore.jks')
+            storeFile file('C:/Users/Alrik.DE4D/Documents/keystore.jks')
             storePassword 'android'
         }
     }
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "com.example.tom.battleships"
+        applicationId 'com.example.tom.battleships'
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
@@ -26,6 +26,8 @@ android {
             signingConfig signingConfigs.config
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
@@ -33,7 +35,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.1.1'
+    compile 'com.android.support:appcompat-v7:25.2.0'
     compile 'com.google.firebase:firebase-core:10.0.1'
     compile 'com.google.firebase:firebase-auth:10.0.1'
     compile 'com.google.android.gms:play-services-auth:10.0.1'

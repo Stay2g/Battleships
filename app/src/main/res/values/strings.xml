@@ -8,17 +8,12 @@
     <string name="strGast">Guest</string>
     <string name="strSingleplayer">Singleplayer</string>
     <string name="strMultiplayer">Multiplayer</string>
-    <string name="strSettings">Settings</string>
-    <string name="strSound">Sound effects</string>
-    <string name="strMusic">Music</string>
-    <string name="strExit">Exit</string>
 
     <string name="strName">Name</string>
     <string name="strPwd">Password</string>
     <string name="strPwdRpt">Repeat Password</string>
     <string name="strLoginFailed">Your Username or Password is Wrong</string>
     <string name="strTextViewReg">No Account?</string>
-    <string name="strAbortReg">Registration Cancelled</string>
     <string name="strGuestLogin">Login As Guest</string>
     <string name="strAgain">Again</string>
     <string name="strBackToMenu">Back to main menu</string>
@@ -26,10 +21,6 @@
     <string name="strLost">You lost!</string>
     <string name="strGameOver" translatable="false">Game Over!</string>
     <string name="strVictory">Victory!</string>
-    <string name="strYourIPAddress">Your IP-address is:</string>
-    <string name="strHostText">Click the Host-Button to open up a server.</string>
-    <string name="strClientText">Enter the code from the other phone in the field below and click \"connect\".</string>
-    <string name="strCustomDialog">Please enter the IP-address below:</string>
     <string name="strBtnSettings">Settings</string>
     <string name="strLogoutCompleted">You logged out successfully</string>
     <string name="strWaitingForPlayer">Waiting for other player....</string>

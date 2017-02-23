@@ -7,14 +7,8 @@
     <color name="buttonStartColor">#f7f7f7</color>
     <color name="buttonEndColor">#e7e7e7</color>
     <color name="buttonTextStartColor">#747474</color>
-    <color name="buttonTextEndColor">#000</color>
-    <color name="buttonStroke">#4F4F4F</color>
 
-    <color name="colorBackground">#4F4F4F</color>
     <color name="colorText">#000</color>
     <color name="colorTextHint">#696969</color>
-
-    <color name="colorGamePrimaryStart">#0b0a31</color>
-    <color name="colorGamePrimaryEnd">#232249</color>
 
 </resources>
