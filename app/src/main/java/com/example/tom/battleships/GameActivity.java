@@ -105,6 +105,9 @@ public class GameActivity extends Activity implements View.OnClickListener{
                 enemyBorder.setText("");
                 playerBorder.setAlpha(0.0f);
                 enemyBorder.setAlpha(0.0f);
+                if(multiplayer) {
+                    drawBorder();
+                }
             }
         }, 3000);
 
@@ -120,7 +123,6 @@ public class GameActivity extends Activity implements View.OnClickListener{
                     fadeIn.setStartOffset(i*100);
                     arrShipsPlayer[i].startAnimation(fadeIn);
                     arrShipsPlayer[i].setAlpha(1.0f);
-                    drawBorder();
                 }
 
             }
@@ -653,7 +655,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
         btnBack.setVisibility(View.VISIBLE);
         btnBack.setLayoutParams(lpBtnBack);
 
-        if(multiplayer) {
+        if(!multiplayer) {
             btnAgain.setText(getResources().getString(R.string.strAgain));
             btnAgain.setBackgroundColor(Color.TRANSPARENT);
             btnAgain.setVisibility(View.VISIBLE);
