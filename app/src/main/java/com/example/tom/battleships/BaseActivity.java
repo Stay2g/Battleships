@@ -1,14 +1,24 @@
 package com.example.tom.battleships;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class BaseActivity extends FragmentActivity implements View.OnClickListener {
@@ -34,7 +44,13 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        initAll();                                                                                  //initialisiere alle Buttons, TextViews, usw.
+        initAll();
+        initLogo();
+        btnLogin.setVisibility(View.GONE);
+        btnGuestLogin.setVisibility(View.GONE);
+        btnReg.setVisibility(View.GONE);
+        findViewById(R.id.logo2).bringToFront();                                                   //initialisiere alle Buttons, TextViews, usw.
+        findViewById(R.id.logo1).bringToFront();
 
         if (instantGameStart) {                                                                     //loginUmgehung == true -> Loginanzeige wird übersprungen
             Intent intentStartGame = new Intent(this, GameLayoutActivity.class);
@@ -52,6 +68,28 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
             Log.d("EXCEPTION", "NEUER DATENBANKEINTRAG WIRD ANGELEGT");                             //Falls der erste User nicht der ADMIN ist, wird er eingetragen
             dbAdapter.insertNewUser("ADMIN", "ADMIN");                                              //-> Erstbenutzung der App für Login ohne Registrierung
         }
+
+
+        btnLogin.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                    ColorDrawable[] cd = {new ColorDrawable(Color.WHITE), new ColorDrawable(Color.BLACK)};
+                    TransitionDrawable trans = new TransitionDrawable(cd);
+                    findViewById(R.id.logo2).setBackground(trans);
+                    trans.startTransition(2000);
+            }
+        },1000);
+
+        btnGuestLogin.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                findViewById(R.id.logo2).setVisibility(View.GONE);
+                findViewById(R.id.logo1).setVisibility(View.GONE);
+                btnLogin.setVisibility(View.VISIBLE);
+                btnGuestLogin.setVisibility(View.VISIBLE);
+                btnReg.setVisibility(View.VISIBLE);
+            }
+        }, 4000);
     }
 
     @Override
@@ -124,7 +162,6 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
-
     private void initAll() {
 
         editTextLoginName = (EditText) findViewById(R.id.editTextLogin);
@@ -137,5 +174,18 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
         btnReg.setOnClickListener(this);
         btnLogin.setOnClickListener(this);
         btnGuestLogin.setOnClickListener(this);
+    }
+
+    private void initLogo() {
+        Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.av);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        WindowManager wm = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+        wm.getDefaultDisplay().getMetrics(displayMetrics);
+        int w = displayMetrics.widthPixels;
+        int h = displayMetrics.heightPixels;
+
+        ImageView iv = (ImageView) findViewById(R.id.logo1);
+        iv.setImageBitmap(Bitmap.createScaledBitmap(background, w, h, false));
     }
 }

@@ -2,10 +2,11 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-        <EditText
+    <EditText
             android:id="@+id/editTextLogin"
             android:layout_width="210dp"
             android:layout_height="wrap_content"
@@ -66,7 +67,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginStart="5dp"/>
 
-        <Button
+    <Button
             android:id="@+id/btnRegisterCancel"
             android:text="@string/strRegister"
             android:textSize="@dimen/small_text_size"
@@ -78,6 +79,21 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="20dp"
             android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/logo1" />
+
+    <TextView
+        android:id="@+id/logo2"
+        android:background="#FFFFFF"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/btnRegisterCancel"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
 
