@@ -82,7 +82,7 @@ public class GameActivity extends Activity implements View.OnClickListener{
         createViews(gridLayoutEnemy, 0, textViewSizeEnemy);
         initTextView4Game();
         initBackground();
-        initGridBackgrounds();
+        //initGridBackgrounds();
 
         enemyBorder.bringToFront();
         playerBorder.bringToFront();
@@ -95,21 +95,24 @@ public class GameActivity extends Activity implements View.OnClickListener{
             }
         }, 50);
 
+
+
         btnBack.postDelayed(new Runnable() {
             @Override
             public void run() {
                 ready = true;
                 playerBorder.setText("");
                 enemyBorder.setText("");
-                //playerBorder.setAlpha(0.0f);
-                //enemyBorder.setAlpha(0.0f);
+                playerBorder.setAlpha(0.0f);
+                enemyBorder.setAlpha(0.0f);
             }
-        }, 2500);
+        }, 3000);
 
         // ---- Ship fadeIn animation
         textViewTurn.postDelayed(new Runnable() {
             @Override
             public void run() {
+                initGridBackgrounds();
                 for (int i = 0; i < arrTextViewsEnemy.length; i++) {
                     Animation fadeIn = new AlphaAnimation(0, 1);
                     fadeIn.setInterpolator(new DecelerateInterpolator());
@@ -117,10 +120,11 @@ public class GameActivity extends Activity implements View.OnClickListener{
                     fadeIn.setStartOffset(i*100);
                     arrShipsPlayer[i].startAnimation(fadeIn);
                     arrShipsPlayer[i].setAlpha(1.0f);
+                    drawBorder();
                 }
 
             }
-        }, 100);
+        }, 2800);
 
 
         multiplayer = (boolean) getIntent().getSerializableExtra("multiplayer");
@@ -183,13 +187,16 @@ public class GameActivity extends Activity implements View.OnClickListener{
         }
         switch(v.getId()) {
             case R.id.btnAgain:
-                if(server & multiplayer) {MainMenuActivity.SERVERTHREAD.stop();} else {MainMenuActivity.CLIENTTHREAD.stop();}
+                if(server & multiplayer) {MainMenuActivity.SERVERTHREAD.stop();}
+                if(!server & multiplayer) {MainMenuActivity.CLIENTTHREAD.stop();}
                 Intent intent = new Intent(this, GameLayoutActivity.class);
+                intent.putExtra("mode", false);
                 startActivity(intent);
                 finish();
                 break;
             case R.id.btnBackToMenu:
-                if(server & multiplayer) {MainMenuActivity.SERVERTHREAD.stop();} else {MainMenuActivity.CLIENTTHREAD.stop();}
+                if(server & multiplayer) {MainMenuActivity.SERVERTHREAD.stop();}
+                if(!server & multiplayer) {MainMenuActivity.CLIENTTHREAD.stop();}
                 finish();
                 break;
         }
@@ -646,21 +653,22 @@ public class GameActivity extends Activity implements View.OnClickListener{
         btnBack.setVisibility(View.VISIBLE);
         btnBack.setLayoutParams(lpBtnBack);
 
-        btnAgain.setText(getResources().getString(R.string.strAgain));
-        btnAgain.setBackgroundColor(Color.TRANSPARENT);
-        btnAgain.setVisibility(View.VISIBLE);
-        btnAgain.setLayoutParams(lpBtnAgain);
-
+        if(multiplayer) {
+            btnAgain.setText(getResources().getString(R.string.strAgain));
+            btnAgain.setBackgroundColor(Color.TRANSPARENT);
+            btnAgain.setVisibility(View.VISIBLE);
+            btnAgain.setLayoutParams(lpBtnAgain);
+        }
         rl.addView(gameOverScreen, lpScreen);
         rl.addView(gameOverText, lpText);
     }
 
     private void getAllUsedTV() {
         int count = 0;
-        for(int i = 0; i < arrTextViewsPlayer.length; i++) {
+        for (int[] anArrTextViewsPlayer : arrTextViewsPlayer) {
             for (int j = 0; j < 5; j++) {
-                if (arrTextViewsPlayer[i][j] != -1) {
-                    arrAllUsedTextViews[count] = arrTextViewsPlayer[i][j];
+                if (anArrTextViewsPlayer[j] != -1) {
+                    arrAllUsedTextViews[count] = anArrTextViewsPlayer[j];
                     count++;
                 }
             }
@@ -669,8 +677,8 @@ public class GameActivity extends Activity implements View.OnClickListener{
     }
 
     private boolean checkIfHit(int shot) {
-        for (int i = 0; i < arrAllUsedTextViews.length; i++) {
-            if (shot == arrAllUsedTextViews[i]) {
+        for (int arrAllUsedTextView : arrAllUsedTextViews) {
+            if (shot == arrAllUsedTextView) {
                 return true;
             }
         }

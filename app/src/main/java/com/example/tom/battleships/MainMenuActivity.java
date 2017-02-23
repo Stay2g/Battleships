@@ -1,7 +1,10 @@
 package com.example.tom.battleships;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +22,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 
 
@@ -71,8 +75,6 @@ public class MainMenuActivity extends BaseActivity {
                 break;
 
             case R.id.btnMultiplayer:
-                //Intent intent = new Intent(this, MpPreActivity.class);
-                //startActivity(intent);
                 animButtons();
                 h.postDelayed(new Runnable() {                                                      //Wenn Client sagt, ich bin bereit, dann zu Layout wechseln
                 @Override
@@ -93,6 +95,7 @@ public class MainMenuActivity extends BaseActivity {
                 break;
 
             case R.id.btnSettings:
+                //TODO: Dialog anzeigen -> mit Checkboxen (AlertDialog) Sound/Normaler skin/Penis skin/Musik
                 break;
 
             case R.id.btnLogout:
@@ -111,13 +114,19 @@ public class MainMenuActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(CLIENTTHREAD != null) {
+        if (CLIENTTHREAD != null) {
+            CLIENTTHREAD.setAction("CANCEL");
+            CLIENTTHREAD.setCanceled(true);
             CLIENTTHREAD.stop();
         }
         if (SERVERTHREAD != null) {
+            SERVERTHREAD.setAction("CANCEL");
+            SERVERTHREAD.setCanceled(true);
             SERVERTHREAD.stop();
         }
     }
+
+    // ---- Multiplayer
 
     private void animButtons() {
         btnMultiplayer.setAlpha(0.0f);
@@ -161,7 +170,7 @@ public class MainMenuActivity extends BaseActivity {
         st.start();
         pdHost = new ProgressDialog(this);
         if (getLocalIpAddress() != null) {
-            pdHost.setMessage(getString(R.string.strSearchForPlayer) + "\n" + getString(R.string.strYourCode) + " " + getLocalIpAddress().substring(getLocalIpAddress().indexOf(".", 9) + 1));
+            pdHost.setMessage(getString(R.string.strWaitingForPlayer) + "\n" + getString(R.string.strYourCode) + " " + getLocalIpAddress().substring(getLocalIpAddress().indexOf(".", 9) + 1));
         } else {
             pdHost.setMessage("Please check your network!");
         }
@@ -173,7 +182,7 @@ public class MainMenuActivity extends BaseActivity {
         if(getLocalIpAddress() != null & (!etCode.getText().toString().equals(""))) {
             SERVERIP = getLocalIpAddress().substring(0, getLocalIpAddress().indexOf(".", 9)) + "." + etCode.getText().toString();
         }
-        if (!SERVERIP.equals("")) {
+        if (!SERVERIP.equals("") & !SERVERIP.equals(getLocalIpAddress())) {
             CLIENTTHREAD = new ClientThread();
             Thread cThread = new Thread(CLIENTTHREAD);
             cThread.start();

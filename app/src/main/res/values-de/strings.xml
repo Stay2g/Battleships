@@ -18,7 +18,6 @@
     <string name="strTextViewReg">Keinen Account?</string>
     <string name="strGast">Gast</string>
     <string name="strGuestLogin">Als Gast einloggen</string>
-    <string name="strSearchForPlayer">Warte auf weiteren Spieler...</string>
     <string name="strAgain">Nochmal</string>
     <string name="strBackToMenu">Zurück zum Hauptmenü</string>
     <string name="strWon">Du hast gewonnen.</string>
@@ -27,9 +26,11 @@
     <string name="strYourIPAddress">Deine IP-Adresse lautet:</string>
     <string name="strHostText">Klicke auf den Host-Button um einen Server zu starten.</string>
     <string name="strClientText">Trage den Code des anderen Smartphones in dem darunterliegenden Feld ein und klicke auf \"verbinden\".</string>
-    <string name="strCustomDialog">Bitte IP-Addresse im Feld eintragen:</string>
+    <string name="strCustomDialog">Bitte IP-Adresse im Feld eintragen:</string>
     <string name="strBtnSettings">Einstellungen</string>
     <string name="strLogoutCompleted">Erfolgreich ausgeloggt</string>
-    <string name="strWaitingForPlayer">Warte auf anderen Spieler...</string>
+    <string name="strWaitingForPlayer">Warte auf anderen Spieler....</string>
     <string name="strYourCode">Dein Code lautet:</string>
+    <string name="strShipsPlacedEnemy">\n\nHier befinden sich die Schiffe deines Gegners.</string>
+    <string name="strShipsPlacedPlayer">\n\nHier befinden sich die Schiffe von dir.</string>
 </resources>

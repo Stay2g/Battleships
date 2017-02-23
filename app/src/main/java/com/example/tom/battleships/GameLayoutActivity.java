@@ -102,11 +102,18 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         btnStart();
                         break;
                     case R.id.buttonSetShipsRandom:
+                        btnSetShipsRandom.setEnabled(false);
                         if (firstTimeRandom) {
                             setShipsRandom();
                             firstTimeRandom = false;
                         }
                         setShipsRandom();
+                        btnStart.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                btnSetShipsRandom.setEnabled(true);
+                            }
+                        },500);
                         break;
                 }
                 for (ImageView arrShip : arrShips) {
@@ -165,6 +172,23 @@ public class GameLayoutActivity extends Activity implements Serializable {
                         startActivity(intent);
                         finish();
                     }
+
+                    if (server) {
+                        if (MainMenuActivity.SERVERTHREAD.isCanceled()) {
+                            Toast.makeText(getBaseContext(), "Game canceled.", Toast.LENGTH_SHORT).show();
+                            MainMenuActivity.SERVERTHREAD.stop();
+                            stop = true;
+                            finish();
+                        }
+                    } else {
+                        if (MainMenuActivity.CLIENTTHREAD.isCanceled()) {
+                            Toast.makeText(getBaseContext(), "Game canceled.", Toast.LENGTH_SHORT).show();
+                            MainMenuActivity.CLIENTTHREAD.stop();
+                            stop = true;
+                            finish();
+                        }
+                    }
+
                     if(!stop) {
                         layoutHandler.postDelayed(this, 500);
                     }
@@ -185,7 +209,7 @@ public class GameLayoutActivity extends Activity implements Serializable {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //TODO: GOING BACK
+
     }
 
     @Override
@@ -989,16 +1013,16 @@ public class GameLayoutActivity extends Activity implements Serializable {
         for (int l = 0; l < currentShip[1]; l++) {
             switch (align) {
                 case 1:
-                    for (int m = 0; m < arrTextViewsLocked.length; m++) {
-                        if ((textViewStartId + l) == arrTextViewsLocked[m]) {
+                    for (int anArrTextViewsLocked : arrTextViewsLocked) {
+                        if ((textViewStartId + l) == anArrTextViewsLocked) {
                             initTextViewLocked();
                             return false;
                         }
                     }
                     break;
                 case 2:
-                    for (int m = 0; m < arrTextViewsLocked.length; m++) {
-                        if ((textViewStartId + l * 10) == arrTextViewsLocked[m]) {
+                    for (int anArrTextViewsLocked : arrTextViewsLocked) {
+                        if ((textViewStartId + l * 10) == anArrTextViewsLocked) {
                             initTextViewLocked();
                             return false;
                         }

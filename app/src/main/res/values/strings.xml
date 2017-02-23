@@ -32,7 +32,8 @@
     <string name="strCustomDialog">Please enter the IP-address below:</string>
     <string name="strBtnSettings">Settings</string>
     <string name="strLogoutCompleted">You logged out successfully</string>
-    <string name="strSearchForPlayer">Waiting for another player...</string>
-    <string name="strWaitingForPlayer">Waiting for other player...</string>
+    <string name="strWaitingForPlayer">Waiting for other player....</string>
     <string name="strYourCode">Your code is:</string>
+    <string name="strShipsPlacedPlayer">\n \nHere are your ships placed.</string>
+    <string name="strShipsPlacedEnemy">\n \nHere are the enemy ships placed.</string>
 </resources>

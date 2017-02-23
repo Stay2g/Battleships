@@ -24,7 +24,6 @@ class ClientThread implements Runnable {
     private boolean allShipsReceived = false;
     private int[][] arrTextViewsEnemy= new int[8][5];
     private int enemyShot = -1;
-    private boolean cReady;
     private boolean runThread = true;
     private String action = null;
     private boolean canceled;
@@ -32,9 +31,9 @@ class ClientThread implements Runnable {
     public void run() {
         try {
             Looper.prepare();
-            InetAddress serverAddr = InetAddress.getByName(MpPreActivity.SERVERIP);
+            InetAddress serverAddr = InetAddress.getByName(MainMenuActivity.SERVERIP);
             Log.d("ClientActivity", "C: Waiting for Client...");
-            socket = new Socket(serverAddr, MpPreActivity.SERVERPORT);
+            socket = new Socket(serverAddr, MainMenuActivity.SERVERPORT);
             Thread t = new Thread(new ClientThreadWriter());
             t.start();
             while (runThread) {
@@ -68,7 +67,9 @@ class ClientThread implements Runnable {
     void stop() {
         runThread = false;
         try {
-            socket.close();
+            if (socket != null) { if (socket.isClosed()) {
+                socket.close();
+            }}
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -93,9 +94,6 @@ class ClientThread implements Runnable {
     boolean isCanceled() {
         return canceled;
     }
-    boolean iscReady() {
-        return cReady;
-    }
     int getEnemyShot() {
         return this.enemyShot;
     }
@@ -109,6 +107,9 @@ class ClientThread implements Runnable {
 
     private void handlerLayout(String actionCode) {
         switch (actionCode) {
+            case "CANCEL":
+                canceled = true;
+                break;
             case "READY":
                 GameLayoutActivity.ENEMYREADY = true;
                 break;
@@ -135,9 +136,6 @@ class ClientThread implements Runnable {
     }
     private void handlerGame(String actionCode) {
         switch (actionCode) {
-            case "READY":
-                cReady = true;
-                break;
             case "CANCEL":
                 canceled = true;
                 break;

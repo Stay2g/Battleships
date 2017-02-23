@@ -29,7 +29,6 @@ class ServerThread implements Runnable {
     private boolean allShipsReceived = false;
     private int[][] arrTextViewsEnemy= new int[8][5];
     private int enemyShot = -1;
-    private boolean sReady;
     private boolean runThread = true;
     private String action = null;
     private boolean canceled;
@@ -40,7 +39,7 @@ class ServerThread implements Runnable {
         Looper.prepare();
         ServerSocket ss = null;
         try {
-            ss = new ServerSocket(MpPreActivity.SERVERPORT);
+            ss = new ServerSocket(MainMenuActivity.SERVERPORT);
             Log.d("ServerThread", "ServerSocket");
             while(runThread) {
                 socket = ss.accept();
@@ -49,7 +48,7 @@ class ServerThread implements Runnable {
                     hdl.post(new Runnable() {
                         @Override
                         public void run() {
-                            MpPreActivity.pdHost.cancel();
+                            MainMenuActivity.pdHost.cancel();
                         }
                     });
                 }
@@ -61,7 +60,7 @@ class ServerThread implements Runnable {
                     while ((line = in.readLine()) != null) {
                         Log.d("ServerThread", line);
                         switch(actionCategory) {
-                            case 0:             //MpPreActivity
+                            case 0:             //MainMenuActivity
                                 handlerPrepare(line);
                                 break;
                             case 1:             //GameLayoutActivity
@@ -82,7 +81,7 @@ class ServerThread implements Runnable {
             e.printStackTrace();
         }
         try {
-            if (ss != null) {if (!ss.isClosed()) {
+            if (ss != null) { if (!ss.isClosed()) {
                 ss.close();
             }}
             if(socket != null) { if (!socket.isClosed()) {
@@ -96,7 +95,9 @@ class ServerThread implements Runnable {
     void stop() {
         runThread = false;
         try {
-            socket.close();
+            if (socket != null) { if (socket.isClosed()) {
+                    socket.close();
+            }}
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -122,9 +123,6 @@ class ServerThread implements Runnable {
     boolean isCanceled() {
         return canceled;
     }
-    public boolean issReady() {
-        return sReady;
-    }
     int[][] getArrTextViewsEnemy() {
         return this.arrTextViewsEnemy;
     }
@@ -141,11 +139,14 @@ class ServerThread implements Runnable {
     private void handlerPrepare(String actionCode) {
         switch (actionCode) {
             case "READY":
-                MpPreActivity.DONE = true;
+                MainMenuActivity.DONE = true;
         }
     }
     private void handlerLayout(String actionCode) {
         switch (actionCode) {
+            case "CANCEL":
+                canceled = true;
+                break;
             case "READY":
                 GameLayoutActivity.ENEMYREADY = true;
                 break;
@@ -172,9 +173,6 @@ class ServerThread implements Runnable {
     }
     private void handlerGame(String actionCode) {
         switch (actionCode) {
-            case "READY":
-                sReady = true;
-                break;
             case "CANCEL":
                 canceled = true;
                 break;
