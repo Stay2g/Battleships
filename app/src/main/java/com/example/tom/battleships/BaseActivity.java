@@ -10,16 +10,22 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 public class BaseActivity extends FragmentActivity implements View.OnClickListener {
 
@@ -31,6 +37,8 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
     private static final int RC_LOGOUT = 1;
     private static final String TAG = "SignInActivity";
 
+    private ImageView logo;
+    private TextView logoColor;
     private EditText editTextLoginName, editTextLoginPassword;
     Button btnLogin, btnReg, btnGuestLogin;
 
@@ -69,22 +77,29 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
             dbAdapter.insertNewUser("ADMIN", "ADMIN");                                              //-> Erstbenutzung der App für Login ohne Registrierung
         }
 
-
-        btnLogin.postDelayed(new Runnable() {
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
             @Override
             public void run() {
-                    ColorDrawable[] cd = {new ColorDrawable(Color.WHITE), new ColorDrawable(Color.BLACK)};
-                    TransitionDrawable trans = new TransitionDrawable(cd);
-                    findViewById(R.id.logo2).setBackground(trans);
-                    trans.startTransition(2000);
+                ColorDrawable[] cd = {new ColorDrawable(Color.BLACK), new ColorDrawable(Color.WHITE)};
+                TransitionDrawable trans = new TransitionDrawable(cd);
+                logo.setBackground(trans);
+                trans.startTransition(2000);
             }
         },1000);
 
-        btnGuestLogin.postDelayed(new Runnable() {
+        h.postDelayed(new Runnable() {
             @Override
             public void run() {
-                findViewById(R.id.logo2).setVisibility(View.GONE);
-                findViewById(R.id.logo1).setVisibility(View.GONE);
+                AlphaAnimation aa = new AlphaAnimation(1.0f, 0.0f);
+                aa.setInterpolator(new DecelerateInterpolator());
+                aa.setDuration(800);
+                logoColor.startAnimation(aa);
+                logo.startAnimation(aa);
+
+                logoColor.setVisibility(View.GONE);
+                logo.setVisibility(View.GONE);
+
                 btnLogin.setVisibility(View.VISIBLE);
                 btnGuestLogin.setVisibility(View.VISIBLE);
                 btnReg.setVisibility(View.VISIBLE);
@@ -166,6 +181,9 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
 
         editTextLoginName = (EditText) findViewById(R.id.editTextLogin);
         editTextLoginPassword = (EditText) findViewById(R.id.editTextPwd);
+
+        logo = (ImageView) findViewById(R.id.logo1);
+        logoColor = (TextView) findViewById(R.id.logo2);
 
         btnReg = (Button) findViewById(R.id.btnRegisterCancel);
         btnLogin = (Button) findViewById(R.id.btnLogin);
