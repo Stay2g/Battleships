@@ -184,6 +184,7 @@ public class MainMenuActivity extends BaseActivity {
         }
         if (!SERVERIP.equals("") & !SERVERIP.equals(getLocalIpAddress())) {
             CLIENTTHREAD = new ClientThread();
+            CLIENTTHREAD.setActionCategory(1);
             Thread cThread = new Thread(CLIENTTHREAD);
             cThread.start();
 

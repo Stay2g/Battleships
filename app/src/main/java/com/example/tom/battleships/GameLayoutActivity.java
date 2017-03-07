@@ -230,7 +230,6 @@ public class GameLayoutActivity extends Activity implements Serializable {
             for (int col = 0; col < 10; col++) {
                 int i = col + row * 10;
                 LayoutParams lp = new LayoutParams(textViewSize, textViewSize);
-
                 arrTextViews[i] = new TextView(GameLayoutActivity.this);
                 arrTextViews[i].setId(i + idOffset);
                 gl.addView(arrTextViews[i], lp);
