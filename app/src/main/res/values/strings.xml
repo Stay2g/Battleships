@@ -27,4 +27,23 @@
     <string name="strYourCode">Your code is:</string>
     <string name="strShipsPlacedPlayer">\n \nHere are your ships placed.</string>
     <string name="strShipsPlacedEnemy">\n \nHere are the enemy ships placed.</string>
+    <string name="strPwdDontMatch">Passwords don\'t Match</string>
+    <string name="strNoName">You need to choose a name!</string>
+    <string name="strNameTaken">Your name is already taken!</string>
+    <string name="strPwdNeeded">A password is needed!</string>
+    <string name="strUserCreated">User Created</string>
+    <string name="strHelp">Server:\nGive your partner the shown number.\n\nClient:\nPaste the number given by your Friend.</string>
+    <string name="strOk">Ok</string>
+    <string name="strHelpTitle">Help</string>
+    <string name="strSound">Mute sound</string>
+    <string name="strMusic">Mute music</string>
+    <string name="strSpecialSkin">Use the Special Skin</string>
+    <string name="strSave">Save</string>
+    <string name="strCancelCaps" translatable="false">CANCEL</string>
+    <string name="strCheckNetwork">Please check your network!</string>
+    <string name="strReadyCaps" translatable="false">READY</string>
+    <string name="strMode">mode</string>
+    <string name="strServer">server</string>
+    <string name="strHostNotFound">Can´t find host :(</string>
+    <string name="strCancel">Cancel</string>
 </resources>

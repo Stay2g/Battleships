@@ -102,6 +102,7 @@
 
     <Button
         android:text=" ? "
+        android:id="@+id/btnHelp"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignTop="@+id/btnLogout"

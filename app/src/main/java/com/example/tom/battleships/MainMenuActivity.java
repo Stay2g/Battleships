@@ -2,13 +2,13 @@ package com.example.tom.battleships;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -22,7 +22,6 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.Enumeration;
 
 
@@ -30,7 +29,7 @@ public class MainMenuActivity extends BaseActivity {
     Handler h;
     TextView textViewLoggedInUser;
     EditText etCode;
-    Button btnMultiplayer, btnSingleplayer, btnSettings, btnLogout, btnClient, btnServer;
+    Button btnMultiplayer, btnSingleplayer, btnSettings, btnLogout, btnHelp, btnClient, btnServer;
     public static String SERVERIP = "";
     public static int SERVERPORT = 8080;
     public static ServerThread SERVERTHREAD;
@@ -54,6 +53,7 @@ public class MainMenuActivity extends BaseActivity {
         btnMultiplayer = (Button) findViewById(R.id.btnMultiplayer);
         btnSettings = (Button) findViewById(R.id.btnSettings);
         btnLogout = (Button) findViewById(R.id.btnLogout);
+        btnHelp = (Button) findViewById(R.id.btnHelp);
 
         btnSingleplayer.setOnClickListener(this);
         btnMultiplayer.setOnClickListener(this);
@@ -61,6 +61,7 @@ public class MainMenuActivity extends BaseActivity {
         btnLogout.setOnClickListener(this);
         btnClient.setOnClickListener(this);
         btnServer.setOnClickListener(this);
+        btnHelp.setOnClickListener(this);
 
         h = new Handler();
     }
@@ -95,7 +96,23 @@ public class MainMenuActivity extends BaseActivity {
                 break;
 
             case R.id.btnSettings:
-                //TODO: Dialog anzeigen -> mit Checkboxen (AlertDialog) Sound/Normaler skin/Penis skin/Musik
+                LayoutInflater layoutInflater = LayoutInflater.from(this);
+                View dialogView = layoutInflater.inflate(R.layout.dialog_settings, null);
+                AlertDialog.Builder dialogSettings = new AlertDialog.Builder(this);
+                dialogSettings.setView(dialogView);
+                dialogSettings.setPositiveButton(R.string.strSave, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //TODO: Sound/Musik stummschalten
+                    }
+                });
+                dialogSettings.setNegativeButton(R.string.strCancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+                dialogSettings.show();
                 break;
 
             case R.id.btnLogout:
@@ -108,6 +125,17 @@ public class MainMenuActivity extends BaseActivity {
             case R.id.btnClient:
                 initClient();
                 break;
+            case R.id.btnHelp:
+                final AlertDialog.Builder dialogHelp = new AlertDialog.Builder(this);
+                dialogHelp.setTitle(R.string.strHelpTitle);
+                dialogHelp.setMessage(R.string.strHelp);
+                dialogHelp.setPositiveButton(R.string.strOk, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+                dialogHelp.show();
         }
     }
 
@@ -115,12 +143,12 @@ public class MainMenuActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (CLIENTTHREAD != null) {
-            CLIENTTHREAD.setAction("CANCEL");
+            CLIENTTHREAD.setAction(getString(R.string.strCancelCaps));
             CLIENTTHREAD.setCanceled(true);
             CLIENTTHREAD.stop();
         }
         if (SERVERTHREAD != null) {
-            SERVERTHREAD.setAction("CANCEL");
+            SERVERTHREAD.setAction(getString(R.string.strCancelCaps));
             SERVERTHREAD.setCanceled(true);
             SERVERTHREAD.stop();
         }
@@ -172,7 +200,7 @@ public class MainMenuActivity extends BaseActivity {
         if (getLocalIpAddress() != null) {
             pdHost.setMessage(getString(R.string.strWaitingForPlayer) + "\n" + getString(R.string.strYourCode) + " " + getLocalIpAddress().substring(getLocalIpAddress().indexOf(".", 9) + 1));
         } else {
-            pdHost.setMessage("Please check your network!");
+            pdHost.setMessage(getString(R.string.strCheckNetwork));
         }
         pdHost.setCanceledOnTouchOutside(true);
         pdHost.show();
@@ -192,13 +220,13 @@ public class MainMenuActivity extends BaseActivity {
                 @Override
                 public void run() {
                     if(CLIENTTHREAD.getSocket() != null) {
-                        CLIENTTHREAD.setAction("READY");
+                        CLIENTTHREAD.setAction(getString(R.string.strReadyCaps));
                         Intent intent = new Intent(getBaseContext(), GameLayoutActivity.class);
-                        intent.putExtra("mode", true);
-                        intent.putExtra("server", false);
+                        intent.putExtra(getString(R.string.strMode), true);
+                        intent.putExtra(getString(R.string.strServer), false);
                         startActivity(intent);
                     } else {
-                        Toast.makeText(getBaseContext(), "Can´t find host :(", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), R.string.strHostNotFound, Toast.LENGTH_SHORT).show();
                     }
                 }
             }, 300);

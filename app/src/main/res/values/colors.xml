@@ -8,7 +8,7 @@
     <color name="buttonEndColor">#e7e7e7</color>
     <color name="buttonTextStartColor">#747474</color>
 
-    <color name="colorText">#000</color>
+    <color name="colorText">#fff</color>
     <color name="colorTextHint">#696969</color>
 
 </resources>

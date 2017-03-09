@@ -24,4 +24,22 @@
     <string name="strYourCode">Dein Code lautet:</string>
     <string name="strShipsPlacedEnemy">\n\nHier befinden sich die Schiffe deines Gegners.</string>
     <string name="strShipsPlacedPlayer">\n\nHier befinden sich die Schiffe von dir.</string>
+    <string name="strOk">Ok</string>
+    <string name="strHostNotFound">Es wurde kein Host gefunen :(</string>
+    <string name="strCancelCaps"></string>
+    <string name="strCheckNetwork">Verbindung überprüfen!</string>
+    <string name="strHelp">Server:\nGebe deinem Gegner die angezeigte Nummer.\n\nClient:\nTrage die Nummer von deinem Gegner ein.</string>
+    <string name="strHelpTitle" translatable="false">Hilfe</string>
+    <string name="strMode">Modus</string>
+    <string name="strMusic">Musik stummschalten</string>
+    <string name="strNameTaken">Dieser Name ist schon vergeben!</string>
+    <string name="strNoName">Du musst einen Namen auswählen!</string>
+    <string name="strPwdDontMatch">Passwörter stimmen nicht überein!</string>
+    <string name="strPwdNeeded">Du musst ein Passwort eingeben!</string>
+    <string name="strReadyCaps"></string>
+    <string name="strSave">Speichern</string>
+    <string name="strServer">Server</string>
+    <string name="strSound">Soundeffekte stummschalten</string>
+    <string name="strSpecialSkin">Willst du den spezial Skin benutzen?</string>
+    <string name="strUserCreated">Benutzer erstellt!</string>
 </resources>

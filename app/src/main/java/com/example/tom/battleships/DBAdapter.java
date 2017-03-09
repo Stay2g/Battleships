@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 public class DBAdapter {
@@ -112,6 +113,26 @@ public class DBAdapter {
             mCursor.moveToFirst();
         }
         return mCursor;
+    }
+
+    public boolean checkForName(String username){
+
+        boolean nameUsed = false;
+
+        Cursor mCursor =
+                db.rawQuery("SELECT * FROM " + DATABASE_TABLE
+                        + " WHERE " + KEY_USERNAME + " LIKE ?",
+                        new String []{username});
+
+        if (mCursor.getCount() == 0){
+            nameUsed = false;
+            Log.d("nameUsed", "nameUsed=FALSE");
+        } else {
+            nameUsed = true;
+            Log.d("nameUsed", "nameUsed=TRUE");
+        }
+
+        return nameUsed;
     }
 
     public boolean updatePassword(
