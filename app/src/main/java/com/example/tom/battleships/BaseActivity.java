@@ -46,11 +46,16 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
 
     public String strLoginName, strLoginPassword;
 
+    Intent musicService;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        musicService = new Intent(this, BackgroundSoundService.class);
+        startService(musicService);
 
         initAll();
         initLogo();
@@ -111,6 +116,7 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
     protected void onDestroy() {
         super.onDestroy();
         dbAdapter.close();                                                                          //Datenbankverbindung beenden
+        stopService(musicService);
     }
 
     @Override

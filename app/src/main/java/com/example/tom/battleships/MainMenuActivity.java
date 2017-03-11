@@ -103,7 +103,6 @@ public class MainMenuActivity extends BaseActivity {
                 dialogSettings.setPositiveButton(R.string.strSave, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //TODO: Sound/Musik stummschalten
                     }
                 });
                 dialogSettings.setNegativeButton(R.string.strCancel, new DialogInterface.OnClickListener() {

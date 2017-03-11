@@ -458,7 +458,6 @@ public class GameActivity extends Activity implements View.OnClickListener{
                     int anArrTextViewsEnemy[] = arrTextViewsEnemy[i];
                     for (int k = 0; k < 5; k++) {
                         if (vId == anArrTextViewsEnemy[k]) {
-                            //arrTextViews[x].setBackgroundColor(Color.RED);
                             setTextViewImage(true, x, textViewSizeEnemy);
                             playerShots[x] = -1;
                             anArrTextViewsEnemy[k] = -1;
