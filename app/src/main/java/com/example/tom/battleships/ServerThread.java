@@ -19,7 +19,6 @@ import java.net.Socket;
 
 /**
  * Created by Alrik on 13.02.2017.
- * Alrik macht alles
  */
 
 class ServerThread implements Runnable {

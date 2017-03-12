@@ -2,6 +2,7 @@ package com.example.tom.battleships;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -59,6 +60,7 @@ public class RegisterActivity extends BaseActivity{
                         if (editTextPassword.length() > 0) {
                             if (editTextPassword.getText().toString().equals(editTextPasswordConfirm.getText().toString())) {
                                 dbAdapter.insertNewUser(username, password);
+                                Log.d("DB New User", username + " " + password);
                                 finish();
                                 Toast.makeText(this, R.string.strUserCreated, Toast.LENGTH_SHORT).show();
                             } else {

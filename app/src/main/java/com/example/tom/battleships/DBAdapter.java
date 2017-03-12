@@ -115,8 +115,7 @@ public class DBAdapter {
         return mCursor;
     }
 
-    public boolean checkForName(String username){
-
+    boolean checkForName(String username){
         boolean nameUsed = false;
 
         Cursor mCursor =

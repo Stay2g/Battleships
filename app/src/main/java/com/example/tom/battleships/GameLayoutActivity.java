@@ -14,6 +14,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -1229,11 +1230,12 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 objJson.put("textView4", arrTextViewsUsed[i][3]);
                 objJson.put("textView5", arrTextViewsUsed[i][4]);
             } catch (JSONException e) {
-                Toast.makeText(this, "FUCK JSON!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "JSON Fehler", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
             arrJson.put(objJson);
         }
+        Log.d(arrJson.toString(), arrJson.toString());
         return arrJson;
     }
 
