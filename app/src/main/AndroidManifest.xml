@@ -42,6 +42,6 @@
             android:screenOrientation="sensorLandscape"
             android:theme="@style/Theme.AppCompat.NoActionBar">
         </activity>
-       <service android:name=".BackgroundSoundService"/>
+       <!--<service android:name=".BackgroundSoundService"/>-->
     </application>
 </manifest>
