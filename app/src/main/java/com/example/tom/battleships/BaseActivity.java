@@ -37,8 +37,6 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
     private static final int RC_LOGOUT = 1;
     private static final String TAG = "SignInActivity";
 
-    private ImageView logo;
-    private TextView logoColor;
     private EditText editTextLoginName, editTextLoginPassword;
     Button btnLogin, btnReg, btnGuestLogin;
 
@@ -54,16 +52,11 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        musicService = new Intent(this, BackgroundSoundService.class);
-        startService(musicService);
+
+        //musicService = new Intent(this, BackgroundSoundService.class);
+        //startService(musicService);
 
         initAll();
-        initLogo();
-        btnLogin.setVisibility(View.GONE);
-        btnGuestLogin.setVisibility(View.GONE);
-        btnReg.setVisibility(View.GONE);
-        findViewById(R.id.logo2).bringToFront();                                                   //initialisiere alle Buttons, TextViews, usw.
-        findViewById(R.id.logo1).bringToFront();
 
         if (instantGameStart) {                                                                     //loginUmgehung == true -> Loginanzeige wird übersprungen
             Intent intentStartGame = new Intent(this, GameLayoutActivity.class);
@@ -81,35 +74,6 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
             Log.d("EXCEPTION", "NEUER DATENBANKEINTRAG WIRD ANGELEGT");                             //Falls der erste User nicht der ADMIN ist, wird er eingetragen
             dbAdapter.insertNewUser("ADMIN", "ADMIN");                                              //-> Erstbenutzung der App für Login ohne Registrierung
         }
-
-        Handler h = new Handler();
-        h.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                ColorDrawable[] cd = {new ColorDrawable(Color.BLACK), new ColorDrawable(Color.WHITE)};
-                TransitionDrawable trans = new TransitionDrawable(cd);
-                logo.setBackground(trans);
-                trans.startTransition(2000);
-            }
-        },1000);
-
-        h.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                AlphaAnimation aa = new AlphaAnimation(1.0f, 0.0f);
-                aa.setInterpolator(new DecelerateInterpolator());
-                aa.setDuration(800);
-                logoColor.startAnimation(aa);
-                logo.startAnimation(aa);
-
-                logoColor.setVisibility(View.GONE);
-                logo.setVisibility(View.GONE);
-
-                btnLogin.setVisibility(View.VISIBLE);
-                btnGuestLogin.setVisibility(View.VISIBLE);
-                btnReg.setVisibility(View.VISIBLE);
-            }
-        }, 4000);
     }
 
     @Override
@@ -188,9 +152,6 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
         editTextLoginName = (EditText) findViewById(R.id.editTextLogin);
         editTextLoginPassword = (EditText) findViewById(R.id.editTextPwd);
 
-        logo = (ImageView) findViewById(R.id.logo1);
-        logoColor = (TextView) findViewById(R.id.logo2);
-
         btnReg = (Button) findViewById(R.id.btnRegisterCancel);
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnGuestLogin = (Button) findViewById(R.id.btnGuestLogin);
@@ -198,18 +159,5 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
         btnReg.setOnClickListener(this);
         btnLogin.setOnClickListener(this);
         btnGuestLogin.setOnClickListener(this);
-    }
-
-    private void initLogo() {
-        Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.av);
-
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        WindowManager wm = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
-        wm.getDefaultDisplay().getMetrics(displayMetrics);
-        int w = displayMetrics.widthPixels;
-        int h = displayMetrics.heightPixels;
-
-        ImageView iv = (ImageView) findViewById(R.id.logo1);
-        iv.setImageBitmap(Bitmap.createScaledBitmap(background, w, h, false));
     }
 }
