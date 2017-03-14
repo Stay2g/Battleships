@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -39,7 +40,6 @@ public class MainMenuActivity extends BaseActivity {
     public static ClientThread CLIENTTHREAD;
     public static ProgressDialog pdHost;
     public static boolean DONE;
-    public static boolean SERVER, MODE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,8 +89,6 @@ public class MainMenuActivity extends BaseActivity {
                     boolean stop = false;
                     if (DONE) {
                         Intent intent = new Intent(MainMenuActivity.this, GameLayoutActivity.class);
-                        SERVER = true;
-                        MODE = true;
                         intent.putExtra("mode", true);
                         intent.putExtra("server", true);
                         startActivity(intent);
@@ -235,14 +233,14 @@ public class MainMenuActivity extends BaseActivity {
                     if(CLIENTTHREAD.getSocket() != null) {
                         CLIENTTHREAD.setAction("READY");
                         Intent intent = new Intent(getBaseContext(), GameLayoutActivity.class);
-                        intent.putExtra(getString(R.string.strMode), true);
-                        intent.putExtra(getString(R.string.strServer), false);
+                        intent.putExtra("mode", true);
+                        intent.putExtra("server", false);
                         startActivity(intent);
                     } else {
                         Toast.makeText(getBaseContext(), R.string.strHostNotFound, Toast.LENGTH_SHORT).show();
                     }
                 }
-            }, 300);
+            }, 400);
         }
     }
 

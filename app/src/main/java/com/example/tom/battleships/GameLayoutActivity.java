@@ -95,6 +95,11 @@ public class GameLayoutActivity extends Activity implements Serializable {
         initBackground();
         initGridBackgrounds();
 
+        multiplayer = (boolean) getIntent().getSerializableExtra("mode");
+        if(multiplayer) {
+            server = (boolean) getIntent().getSerializableExtra("server");
+        }
+
         ocl = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,8 +134,6 @@ public class GameLayoutActivity extends Activity implements Serializable {
         btnStart.setClickable(false);
         btnStart.setAlpha(0.5f);
         btnSetShipsRandom.setOnClickListener(ocl);
-
-        multiplayer = MainMenuActivity.MODE;
 
 
         if (multiplayer) {
@@ -198,12 +201,13 @@ public class GameLayoutActivity extends Activity implements Serializable {
             }, 500);
         }
  if(multiplayer) {
-            if (MainMenuActivity.SERVER) {
+            if (server) {
                 MainMenuActivity.SERVERTHREAD.setActionCategory(1);
             } else {
                 MainMenuActivity.CLIENTTHREAD.setActionCategory(1);
             }
         }
+
     }
 
     @Override

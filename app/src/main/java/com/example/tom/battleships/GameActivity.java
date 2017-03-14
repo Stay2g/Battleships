@@ -134,6 +134,8 @@ public class GameActivity extends Activity implements View.OnClickListener{
         }, 2800);
 
 
+
+
         multiplayer = (boolean) getIntent().getSerializableExtra("multiplayer");
 
         if (multiplayer) {
