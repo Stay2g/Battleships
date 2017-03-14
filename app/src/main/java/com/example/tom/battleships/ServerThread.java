@@ -17,10 +17,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-/**
- * Created by Alrik on 13.02.2017.
- */
-
 class ServerThread implements Runnable {
     private Socket socket = null;
     private Handler hdl = null;

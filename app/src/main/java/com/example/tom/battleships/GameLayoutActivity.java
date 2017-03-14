@@ -130,7 +130,8 @@ public class GameLayoutActivity extends Activity implements Serializable {
         btnStart.setAlpha(0.5f);
         btnSetShipsRandom.setOnClickListener(ocl);
 
-        multiplayer = (boolean) getIntent().getSerializableExtra("mode");
+        multiplayer = MainMenuActivity.MODE;
+
 
         if (multiplayer) {
             layoutHandler.postDelayed(new Runnable() {
@@ -196,15 +197,13 @@ public class GameLayoutActivity extends Activity implements Serializable {
                 }
             }, 500);
         }
-
-        if(multiplayer) {
-            if (server = (boolean) getIntent().getSerializableExtra("server")) {
+ if(multiplayer) {
+            if (MainMenuActivity.SERVER) {
                 MainMenuActivity.SERVERTHREAD.setActionCategory(1);
             } else {
                 MainMenuActivity.CLIENTTHREAD.setActionCategory(1);
             }
         }
-
     }
 
     @Override

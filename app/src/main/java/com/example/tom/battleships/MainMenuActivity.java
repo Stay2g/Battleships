@@ -7,9 +7,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
@@ -36,10 +39,13 @@ public class MainMenuActivity extends BaseActivity {
     public static ClientThread CLIENTTHREAD;
     public static ProgressDialog pdHost;
     public static boolean DONE;
+    public static boolean SERVER, MODE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main_menu);
 
         String username = getIntent().getStringExtra("strUsername");
@@ -63,7 +69,7 @@ public class MainMenuActivity extends BaseActivity {
         btnServer.setOnClickListener(this);
         btnHelp.setOnClickListener(this);
 
-        h = new Handler();
+        h = new Handler(Looper.getMainLooper());
     }
 
     @Override
@@ -82,7 +88,9 @@ public class MainMenuActivity extends BaseActivity {
                 public void run() {
                     boolean stop = false;
                     if (DONE) {
-                        Intent intent = new Intent(getBaseContext(), GameLayoutActivity.class);
+                        Intent intent = new Intent(MainMenuActivity.this, GameLayoutActivity.class);
+                        SERVER = true;
+                        MODE = true;
                         intent.putExtra("mode", true);
                         intent.putExtra("server", true);
                         startActivity(intent);
@@ -137,6 +145,12 @@ public class MainMenuActivity extends BaseActivity {
                 dialogHelp.show();
         }
     }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus){
+        super.onWindowFocusChanged(hasFocus);
+    }
+
 
     @Override
     protected void onDestroy() {

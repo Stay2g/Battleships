@@ -39,9 +39,7 @@
     <string name="strMusic">Mute music</string>
     <string name="strSpecialSkin">Use the Special Skin</string>
     <string name="strSave">Save</string>
-    <string name="strCancelCaps" translatable="false">CANCEL</string>
     <string name="strCheckNetwork">Please check your network!</string>
-    <string name="strReadyCaps">READY</string>
     <string name="strMode">mode</string>
     <string name="strServer">server</string>
     <string name="strHostNotFound">Can´t find host :(</string>
