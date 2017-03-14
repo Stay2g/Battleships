@@ -142,12 +142,12 @@ public class MainMenuActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (CLIENTTHREAD != null) {
-            CLIENTTHREAD.setAction(getString(R.string.strCancelCaps));
+            CLIENTTHREAD.setAction("CANCEL");
             CLIENTTHREAD.setCanceled(true);
             CLIENTTHREAD.stop();
         }
         if (SERVERTHREAD != null) {
-            SERVERTHREAD.setAction(getString(R.string.strCancelCaps));
+            SERVERTHREAD.setAction("CANCEL");
             SERVERTHREAD.setCanceled(true);
             SERVERTHREAD.stop();
         }
@@ -219,7 +219,7 @@ public class MainMenuActivity extends BaseActivity {
                 @Override
                 public void run() {
                     if(CLIENTTHREAD.getSocket() != null) {
-                        CLIENTTHREAD.setAction(getString(R.string.strReadyCaps));
+                        CLIENTTHREAD.setAction("READY");
                         Intent intent = new Intent(getBaseContext(), GameLayoutActivity.class);
                         intent.putExtra(getString(R.string.strMode), true);
                         intent.putExtra(getString(R.string.strServer), false);
